@@ -1874,6 +1874,8 @@ std::atomic<double> g_userSourceSwitchAt{-100.0};  // NowSeconds() of the last u
 HANDLE g_mediaRefreshEvent = nullptr;              // wakes MediaThreadProc
 HANDLE g_lyricsRefreshEvent = nullptr;             // wakes LyricsThreadProc immediately
 std::atomic<bool> g_isPendingNewTimeline{false};   // true on track change until new timeline arrives from GSMTC
+std::atomic<double> g_lastTrackChangeTime{0.0};
+std::atomic<bool> g_wasExpandedAtTrackChange{false};
 std::atomic<bool> g_hardResyncRequested{false};
 std::atomic<bool> g_lyricsResetRenderStateRequested{false};
 void ForceResyncLyricsWithSystemAudio();
@@ -2338,12 +2340,12 @@ const wchar_t* Loc(const wchar_t* english) {
         {L"Clear lyrics cache", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Xóa bộ nhớ đệm lời bài hát"}},
         {L"Lyrics sync", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Đồng bộ lời bài hát"}},
         {L"Speakers", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Loa ngoài"}},
-        {L"Earlier +10 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Sớm hơn +10 ms"}},
-        {L"Earlier +50 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Sớm hơn +50 ms"}},
-        {L"Earlier +250 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Sớm hơn +250 ms"}},
-        {L"Later -10 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Trễ hơn -10 ms"}},
-        {L"Later -50 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Trễ hơn -50 ms"}},
-        {L"Later -250 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Trễ hơn -250 ms"}},
+        {L"Earlier +150 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Sớm hơn +150 ms"}},
+        {L"Earlier +500 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Sớm hơn +500 ms"}},
+        {L"Earlier +950 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Sớm hơn +950 ms"}},
+        {L"Later -150 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Trễ hơn -150 ms"}},
+        {L"Later -500 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Trễ hơn -500 ms"}},
+        {L"Later -950 ms", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Trễ hơn -950 ms"}},
         {L"Reset this profile", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Đặt lại cấu hình này"}},
         {L"Transparency", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"Độ trong suốt"}},
         {L"100% (Opaque)", {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, L"100% (Đậm đặc)"}},
@@ -5858,7 +5860,10 @@ DWORD WINAPI MediaThreadProc(void*) {
             if (isDifferentTrack) {
                 next.titleChangedAt = NowSeconds();
                 trackJustChanged = true;
-                g_idleTab = 0;
+                g_lastTrackChangeTime.store(NowSeconds());
+                if (g_clickExpanded.load() || g_pinnedExpanded.load()) {
+                    g_wasExpandedAtTrackChange.store(true);
+                }
             }
 
             if (titleOrArtistChanged) {
@@ -11432,13 +11437,13 @@ void ShowContextMenu(HWND hwnd, POINT screenPoint) {
             HMENU lyricsSyncMenu = CreatePopupMenu();
             AppendMenuW(lyricsSyncMenu, MF_STRING | MF_GRAYED | MF_DISABLED, kLyricsSyncMenuIdBase, header);
             AppendMenuW(lyricsSyncMenu, MF_SEPARATOR, 0, nullptr);
-            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 1, Loc(L"Earlier +10 ms"));
-            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 2, Loc(L"Earlier +50 ms"));
-            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 3, Loc(L"Earlier +250 ms"));
+            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 1, Loc(L"Earlier +150 ms"));
+            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 2, Loc(L"Earlier +500 ms"));
+            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 3, Loc(L"Earlier +950 ms"));
             AppendMenuW(lyricsSyncMenu, MF_SEPARATOR, 0, nullptr);
-            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 4, Loc(L"Later -10 ms"));
-            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 5, Loc(L"Later -50 ms"));
-            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 6, Loc(L"Later -250 ms"));
+            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 4, Loc(L"Later -150 ms"));
+            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 5, Loc(L"Later -500 ms"));
+            AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 6, Loc(L"Later -950 ms"));
             AppendMenuW(lyricsSyncMenu, MF_SEPARATOR, 0, nullptr);
             AppendMenuW(lyricsSyncMenu, MF_STRING, kLyricsSyncMenuIdBase + 7, Loc(L"Reset this profile"));
             AppendMenuW(menu, MF_POPUP, reinterpret_cast<UINT_PTR>(lyricsSyncMenu), Loc(L"Lyrics sync"));
@@ -11658,7 +11663,7 @@ void ShowContextMenu(HWND hwnd, POINT screenPoint) {
         case kLyricsSyncMenuIdBase + 4:
         case kLyricsSyncMenuIdBase + 5:
         case kLyricsSyncMenuIdBase + 6: {
-            static const int kLyricsSteps[] = {10, 50, 250, -10, -50, -250};
+            static const int kLyricsSteps[] = {150, 500, 950, -150, -500, -950};
             AdjustLyricsNudge(kLyricsSteps[cmd - kLyricsSyncMenuIdBase - 1]);
             break;
         }
@@ -16442,6 +16447,33 @@ class Renderer {
                 if (settings.mediaTabLyrics) {
                     DrawImmersiveLyricsButton(rect, immersiveMix);
                 }
+                // Lyric source badge tag (Zing MP3 / LRCLIB / NetEase) near transport buttons
+                if (state.lyrics.hasData && !state.lyrics.sourceName.empty()) {
+                    const std::wstring srcTag = state.lyrics.sourceName;
+                    const float tagW = static_cast<float>(srcTag.size()) * 6.0f + 12.0f;
+                    const float tagH = 17.0f;
+                    float tagCx = 0.0f;
+                    if (settings.mediaTabLyrics) {
+                        const float leftBound = cx + MediaLayout::kControlSpacing + MediaLayout::kNavButtonRadius + 4.0f;
+                        const float rightBound = rect.right - ImmersiveLayout::kBtnInsetRight - ImmersiveLayout::kBtnRadius * 2.0f - 4.0f;
+                        tagCx = (leftBound + rightBound) * 0.5f;
+                    } else {
+                        tagCx = rect.right - 24.0f - tagW * 0.5f;
+                    }
+                    const D2D1_RECT_F tagRect = D2D1::RectF(tagCx - tagW * 0.5f, cy - tagH * 0.5f, tagCx + tagW * 0.5f, cy + tagH * 0.5f);
+
+                    if (ID2D1SolidColorBrush* bg = AcquireBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.12f * settingsOpacity_))) {
+                        target_->FillRoundedRectangle(D2D1::RoundedRect(tagRect, 4.0f, 4.0f), bg);
+                    }
+                    if (smallTextFormat_) {
+                        smallTextFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+                        smallTextFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+                        mutedBrush_->SetOpacity(0.85f * settingsOpacity_);
+                        target_->DrawTextW(srcTag.c_str(), static_cast<UINT32>(srcTag.size()), smallTextFormat_.Get(), tagRect, mutedBrush_.Get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                        smallTextFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+                        smallTextFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+                    }
+                }
                 target_->SetTransform(playerZoneOldTransform);
                 if (sideLyricsExtra > 1.0f) {
                     DrawMediaSideLyrics(state,
@@ -20741,7 +20773,8 @@ std::vector<IslandKind> ChooseActivities(const SharedState& state, const Setting
          state.timer.active)) {
         activities.push_back(IslandKind::Timer);
     }
-    if (settings.media && state.media.available) {
+    const bool inTrackGrace = (now - g_lastTrackChangeTime.load() < 2.5);
+    if (settings.media && (state.media.available || inTrackGrace)) {
         activities.push_back(IslandKind::Media);
     }
 
@@ -22348,6 +22381,11 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     if (cmd != -1) {
                         if (cmd == 0) g_skipTriggerPrev.fetch_add(1);
                         else if (cmd == 2) g_skipTriggerNext.fetch_add(1);
+                        if (cmd == 0 || cmd == 2) {
+                            g_lastTrackChangeTime.store(NowSeconds());
+                            g_wasExpandedAtTrackChange.store(true);
+                            g_clickExpanded.store(true);
+                        }
                         g_layoutDirty = true;
                         SendMediaTransportCommand(cmd);
                         return 0;
@@ -22856,15 +22894,18 @@ DWORD WINAPI RenderThreadProc(void*) {
         }
 
         const bool pinned = g_pinnedExpanded.load();
+        const bool inTrackChangeGrace = (now - g_lastTrackChangeTime.load() < 2.5);
 
         if (primary.kind != previousPrimary) {
             if (primary.kind == IslandKind::Idle) {
-                // AnimateToIdleState: when media session ends or changes to idle, unexpand immediately
-                g_clickExpanded.store(false);
-                g_pinnedExpanded.store(false);
-                nudgeSpring.value = 4.0f;
-                nudgeSpring.velocity = 0.0f;
-                nudgeSpring.target = 0.0f;
+                if (!inTrackChangeGrace) {
+                    // AnimateToIdleState: when media session ends or changes to idle, unexpand immediately
+                    g_clickExpanded.store(false);
+                    g_pinnedExpanded.store(false);
+                    nudgeSpring.value = 4.0f;
+                    nudgeSpring.velocity = 0.0f;
+                    nudgeSpring.target = 0.0f;
+                }
             } else {
                 nudgeSpring.value = -6.0f;
                 nudgeSpring.velocity = 0.0f;
@@ -22922,8 +22963,10 @@ DWORD WINAPI RenderThreadProc(void*) {
         }
 
         if (!hover && g_clickExpanded.load()) {
-            g_clickExpanded = false;
-            needsRender = true;
+            if (!inTrackChangeGrace) {
+                g_clickExpanded = false;
+                needsRender = true;
+            }
         }
         if (!hover && g_hoveredMediaButton.load() != -1) {
             g_hoveredMediaButton = -1;
@@ -22981,6 +23024,9 @@ DWORD WINAPI RenderThreadProc(void*) {
         }
 
         bool isHoverExpanded = g_settings.expandOnHover ? hover : (hover && g_clickExpanded.load());
+        if (inTrackChangeGrace && g_wasExpandedAtTrackChange.load()) {
+            isHoverExpanded = true;
+        }
         const bool gameMetricsPresent = primary.kind == IslandKind::Idle &&
             (g_settings.gameOverlay || g_gameOverlayPinned.load());
         if (gameMetricsPresent) {
@@ -23090,7 +23136,8 @@ DWORD WINAPI RenderThreadProc(void*) {
             }
         }
         if (primary.kind == IslandKind::Media) {
-            if (!isFullscreen && (isHoverExpanded || pinned || recentTrackChange)) {
+            const bool keepExpanded = isHoverExpanded || pinned || (inTrackChangeGrace && g_wasExpandedAtTrackChange.load());
+            if (!isFullscreen && (keepExpanded || recentTrackChange)) {
                 primary.width = MediaLayout::kExpandedWidth * g_settings.sizeScale;
                 primary.height = MediaLayout::kExpandedHeight * g_settings.sizeScale;
                 // (Immersive lyrics: the island keeps its normal 380px width.)
@@ -23106,6 +23153,9 @@ DWORD WINAPI RenderThreadProc(void*) {
                     primary.width = (MediaPillLayout::kBaseWidth + clockSection) * g_settings.sizeScale;
                 }
             }
+        }
+        if (!inTrackChangeGrace && g_wasExpandedAtTrackChange.load()) {
+            g_wasExpandedAtTrackChange.store(false);
         }
 
         const bool fullscreenSuppressed =
