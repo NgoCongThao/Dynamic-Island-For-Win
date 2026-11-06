@@ -16266,8 +16266,39 @@ class Renderer {
                 const float textLeft = artRect.right + 18.0f;
                 const float textRight = waveRect.left - 16.0f;
 
-                // Title — bold, prominent.
-                D2D1_RECT_F titleRect = D2D1::RectF(textLeft, rect.top + 34.0f, textRight, rect.top + 54.0f);
+                // Lyric source badge tag (Zing MP3 / LRCLIB / NetEase) fixed on the title row
+                float titleRight = textRight;
+                if (state.lyrics.hasData && !state.lyrics.sourceName.empty()) {
+                    const std::wstring srcTag = state.lyrics.sourceName;
+                    const float tagW = static_cast<float>(srcTag.size()) * 6.0f + 12.0f;
+                    const float tagH = 16.0f;
+                    const float tagRight = waveRect.left - 10.0f;
+                    const float tagLeft = tagRight - tagW;
+                    const float tagTop = rect.top + 44.0f - tagH * 0.5f;
+                    const float tagBottom = tagTop + tagH;
+                    const D2D1_RECT_F tagRect = D2D1::RectF(tagLeft, tagTop, tagRight, tagBottom);
+
+                    if (ID2D1SolidColorBrush* bg = AcquireBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.12f * settingsOpacity_))) {
+                        target_->FillRoundedRectangle(D2D1::RoundedRect(tagRect, 4.0f, 4.0f), bg);
+                    }
+                    if (smallTextFormat_) {
+                        smallTextFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+                        smallTextFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+                        mutedBrush_->SetOpacity(0.85f * settingsOpacity_);
+                        target_->DrawTextW(srcTag.c_str(), static_cast<UINT32>(srcTag.size()),
+                                           smallTextFormat_.Get(), tagRect, mutedBrush_.Get(),
+                                           D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                        smallTextFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+                        smallTextFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+                    }
+                    titleRight = tagLeft - 8.0f;
+                    if (titleRight < textLeft + 20.0f) {
+                        titleRight = textLeft + 20.0f;
+                    }
+                }
+
+                // Title — bold, prominent. If long, marquees smoothly up to titleRight.
+                D2D1_RECT_F titleRect = D2D1::RectF(textLeft, rect.top + 34.0f, titleRight, rect.top + 54.0f);
                 const std::wstring titleText =
                     state.media.title.empty() ? std::wstring(Loc(L"Unknown")) : state.media.title;
                 if (!DrawTitleTransition(titleText, titleRect, textBrush_.Get(), now, !state.media.title.empty())) {
@@ -16446,33 +16477,6 @@ class Renderer {
                 DrawSourceDock(state, rect, now);  // stays still during a switch
                 if (settings.mediaTabLyrics) {
                     DrawImmersiveLyricsButton(rect, immersiveMix);
-                }
-                // Lyric source badge tag (Zing MP3 / LRCLIB / NetEase) near transport buttons
-                if (state.lyrics.hasData && !state.lyrics.sourceName.empty()) {
-                    const std::wstring srcTag = state.lyrics.sourceName;
-                    const float tagW = static_cast<float>(srcTag.size()) * 6.0f + 12.0f;
-                    const float tagH = 17.0f;
-                    float tagCx = 0.0f;
-                    if (settings.mediaTabLyrics) {
-                        const float leftBound = cx + MediaLayout::kControlSpacing + MediaLayout::kNavButtonRadius + 4.0f;
-                        const float rightBound = rect.right - ImmersiveLayout::kBtnInsetRight - ImmersiveLayout::kBtnRadius * 2.0f - 4.0f;
-                        tagCx = (leftBound + rightBound) * 0.5f;
-                    } else {
-                        tagCx = rect.right - 24.0f - tagW * 0.5f;
-                    }
-                    const D2D1_RECT_F tagRect = D2D1::RectF(tagCx - tagW * 0.5f, cy - tagH * 0.5f, tagCx + tagW * 0.5f, cy + tagH * 0.5f);
-
-                    if (ID2D1SolidColorBrush* bg = AcquireBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.12f * settingsOpacity_))) {
-                        target_->FillRoundedRectangle(D2D1::RoundedRect(tagRect, 4.0f, 4.0f), bg);
-                    }
-                    if (smallTextFormat_) {
-                        smallTextFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-                        smallTextFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-                        mutedBrush_->SetOpacity(0.85f * settingsOpacity_);
-                        target_->DrawTextW(srcTag.c_str(), static_cast<UINT32>(srcTag.size()), smallTextFormat_.Get(), tagRect, mutedBrush_.Get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
-                        smallTextFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-                        smallTextFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-                    }
                 }
                 target_->SetTransform(playerZoneOldTransform);
                 if (sideLyricsExtra > 1.0f) {
