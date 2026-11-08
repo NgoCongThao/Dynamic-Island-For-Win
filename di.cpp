@@ -269,14 +269,14 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $options:
       - volume: Âm lượng hệ thống (Volume)
       - brightness: Độ sáng màn hình (Brightness)
-  - CollapsedSwipeDirection: vertical
+  - CollapsedSwipeDirection: horizontal
     $name: Hướng vuốt & Chiều tăng giảm khi thu nhỏ
     $description: Quy định hướng vuốt chuột/cảm ứng để tăng hoặc giảm giá trị.
     $options:
-      - vertical: Vuốt Lên = Tăng, Vuốt Xuống = Giảm (Mặc định)
-      - vertical_inverted: Vuốt Lên = Giảm, Vuốt Xuống = Tăng
-      - horizontal: Vuốt Sang Phải = Tăng, Vuốt Sang Trái = Giảm
+      - horizontal: Vuốt Sang Phải = Tăng, Vuốt Sang Trái = Giảm (Mặc định)
       - horizontal_inverted: Vuốt Sang Phải = Giảm, Vuốt Sang Trái = Tăng
+      - vertical: Vuốt Xuống = Tăng, Vuốt Lên = Giảm (Kéo từ đỉnh xuống)
+      - vertical_inverted: Vuốt Xuống = Giảm, Vuốt Lên = Tăng
   - CollapsedDoubleClickAction: play_pause
     $name: Hành động khi Nhấp Đúp trên Island thu nhỏ
     $description: Thao tác thực hiện khi nhấp đúp chuột trái vào viên thuốc thu nhỏ.
@@ -293,14 +293,14 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
       - play_pause: Phát / Tạm dừng nhạc
       - screenshot: Chụp màn hình nhanh (Win + Shift + S)
       - dismiss: Đóng nhanh thông báo đang hiện
-  - TabSwitchDirection: vertical_up
+  - TabSwitchDirection: horizontal
     $name: Hướng trượt cửa sổ / tab mở rộng
     $description: Quy định hướng chuyển đổi giữa các thẻ nội dung (Media, Lịch, Thời tiết, Giám sát, Khay tệp).
     $options:
-      - vertical_up: Chiều dọc (Vuốt/Cuộn Lên -> Kế tiếp, Xuống -> Trước)
-      - vertical_down: Chiều dọc đảo ngược (Vuốt/Cuộn Xuống -> Kế tiếp, Lên -> Trước)
-      - horizontal_right: Chiều ngang (Vuốt/Cuộn Sang Phải -> Kế tiếp, Trái -> Trước)
-      - horizontal_left: Chiều ngang đảo ngược (Vuốt/Cuộn Sang Trái -> Kế tiếp, Phải -> Trước)
+      - horizontal: Trượt Ngang (Vuốt Trái / Cuộn Xuống -> Kế tiếp, Vuốt Phải / Cuộn Lên -> Trước) (Mặc định khuyên dùng)
+      - horizontal_inverted: Trượt Ngang đảo ngược (Vuốt Phải -> Kế tiếp, Vuốt Trái -> Trước)
+      - vertical: Trượt Dọc (Vuốt Lên / Cuộn Xuống -> Kế tiếp, Vuốt Xuống / Cuộn Lên -> Trước)
+      - vertical_inverted: Trượt Dọc đảo ngược (Vuốt Xuống -> Kế tiếp, Vuốt Lên -> Trước)
       - auto: Tự động thích ứng theo hướng vuốt tay
   - CollapsedTitleMarquee: true
     $name: Tự động cuộn chữ khi tên bài hát dài
@@ -1275,10 +1275,10 @@ struct Settings {
     // ── Gestures & Swipe ─────────────────────────────────────────────────────
     bool collapsedSwipeEnabled = true;
     std::wstring collapsedSwipeTarget = L"volume";
-    std::wstring collapsedSwipeDirection = L"vertical";
+    std::wstring collapsedSwipeDirection = L"horizontal";
     std::wstring collapsedDoubleClickAction = L"play_pause";
     std::wstring collapsedMiddleClickAction = L"mute_toggle";
-    std::wstring tabSwitchDirection = L"vertical_up";
+    std::wstring tabSwitchDirection = L"horizontal";
     bool collapsedTitleMarquee = true;
     bool collapsedFluidFill = true;
 
@@ -10215,14 +10215,8 @@ void ApplyCollapsedSwipeStep(int direction) {
     const Settings s = GetSettingsCopy();
     if (!s.collapsedSwipeEnabled) return;
 
-    int factor = 1;
-    if (s.collapsedSwipeDirection == L"vertical_inverted" || s.collapsedSwipeDirection == L"horizontal_inverted") {
-        factor = -1;
-    }
-    const int effectiveDir = direction * factor;
-
     if (s.collapsedSwipeTarget == L"brightness") {
-        StepPanelBrightness(effectiveDir * 5);
+        StepPanelBrightness(direction * 5);
         if (s.collapsedFluidFill) {
             int cur = g_lastBrightness >= 0 ? g_lastBrightness : 50;
             g_fluidFillFraction.store(Clamp(static_cast<float>(cur) / 100.0f, 0.0f, 1.0f));
@@ -10231,7 +10225,7 @@ void ApplyCollapsedSwipeStep(int direction) {
         }
     } else {
         // Volume
-        StepSystemVolume(effectiveDir * 0.02f);
+        StepSystemVolume(direction * 0.02f);
         if (s.collapsedFluidFill && g_endpointVolume) {
             float vol = 0.0f;
             if (SUCCEEDED(g_endpointVolume->GetMasterVolumeLevelScalar(&vol))) {
@@ -15972,15 +15966,22 @@ class Renderer {
             const float scale = 1.0f - (1.0f - kMinScale) * eased;
             float transX = 0.0f;
             float transY = 0.0f;
-            if (g_settings.tabSwitchDirection == L"horizontal_right") {
-                transX = -d * kTravelPx * 2.2f;
-            } else if (g_settings.tabSwitchDirection == L"horizontal_left") {
-                transX = d * kTravelPx * 2.2f;
-            } else if (g_settings.tabSwitchDirection == L"vertical_down") {
-                transY = -d * kTravelPx;
+            const bool isHoriz = (g_settings.tabSwitchDirection.find(L"horizontal") != std::wstring::npos);
+            const bool isHorizInv = (g_settings.tabSwitchDirection == L"horizontal_inverted" || g_settings.tabSwitchDirection == L"horizontal_left");
+            const bool isVertInv = (g_settings.tabSwitchDirection == L"vertical_inverted" || g_settings.tabSwitchDirection == L"vertical_down");
+
+            if (isHoriz) {
+                if (isHorizInv) {
+                    transX = -d * kTravelPx * 2.5f;
+                } else {
+                    transX = d * kTravelPx * 2.5f;
+                }
             } else {
-                // vertical_up (default) and auto
-                transY = d * kTravelPx;
+                if (isVertInv) {
+                    transY = -d * kTravelPx;
+                } else {
+                    transY = d * kTravelPx;
+                }
             }
 
             target_->SetTransform(D2D1::Matrix3x2F::Scale(scale, scale, center) *
@@ -16020,8 +16021,7 @@ class Renderer {
             return;
         }
 
-        const bool isHorizontal = (g_settings.tabSwitchDirection == L"horizontal_right" ||
-                                   g_settings.tabSwitchDirection == L"horizontal_left");
+        const bool isHorizontal = (g_settings.tabSwitchDirection.find(L"horizontal") != std::wstring::npos);
         if (isHorizontal) {
             const float dotY = rect.bottom - 10.0f;
             const float spacing = 11.0f;
@@ -22161,7 +22161,26 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
     static bool s_trayPressActive = false;   // left button went down on a File Tray row
     static POINT s_trayPressPt = {0, 0};
     static std::wstring s_trayPressPath;
+    static bool s_pendingSingleClickExpand = false;
+    static bool s_ignoreNextLButtonUp = false;
+    static const UINT_PTR IDT_SINGLE_CLICK_EXPAND = 1001;
     switch (msg) {
+        case WM_TIMER: {
+            if (wParam == IDT_SINGLE_CLICK_EXPAND) {
+                KillTimer(hwnd, IDT_SINGLE_CLICK_EXPAND);
+                if (s_pendingSingleClickExpand) {
+                    s_pendingSingleClickExpand = false;
+                    bool expanded = g_pinnedExpanded.load() || g_clickExpanded.load();
+                    if (!expanded) {
+                        g_clickExpanded = true;
+                        g_layoutDirty = true;
+                        TriggerNudge();
+                    }
+                }
+                return 0;
+            }
+            break;
+        }
         case WM_CREATE:
             AddClipboardFormatListener(hwnd);
             if (g_shellHookMessage == 0) g_shellHookMessage = RegisterWindowMessageW(L"SHELLHOOK");
@@ -22500,6 +22519,10 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         case WM_LBUTTONDOWN:
             {
+                if (s_pendingSingleClickExpand) {
+                    KillTimer(hwnd, IDT_SINGLE_CLICK_EXPAND);
+                    s_pendingSingleClickExpand = false;
+                }
                 int xPos = GET_X_LPARAM(lParam);
                 int yPos = GET_Y_LPARAM(lParam);
 
@@ -22725,6 +22748,11 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         case WM_LBUTTONUP:
             {
+                if (s_ignoreNextLButtonUp) {
+                    s_ignoreNextLButtonUp = false;
+                    return 0;
+                }
+
                 if (g_scrubbing.load()) {
                     g_scrubbing = false;
                     ReleaseCapture();
@@ -22774,15 +22802,20 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                             swipeDir = g_settings.collapsedSwipeDirection;
                         }
                         if (swipeEnabled) {
-                            if (swipeDir.find(L"vertical") != std::wstring::npos && abs(dy) >= 20) {
-                                int step = (dy < 0) ? 1 : -1;
-                                if (swipeDir == L"vertical_down_inc") step = -step;
+                            const bool isHoriz = (swipeDir.find(L"horizontal") != std::wstring::npos);
+                            const bool isInverted = (swipeDir.find(L"inverted") != std::wstring::npos);
+
+                            if (isHoriz && abs(dx) >= 20) {
+                                // Horizontal: Drag RIGHT = Tăng (+1), Drag LEFT = Giảm (-1)
+                                int step = (dx > 0) ? 1 : -1;
+                                if (isInverted) step = -step;
                                 ApplyCollapsedSwipeStep(step);
                                 s_touchStartTime = 0;
                                 return 0;
-                            } else if (swipeDir.find(L"horizontal") != std::wstring::npos && abs(dx) >= 20) {
-                                int step = (dx > 0) ? 1 : -1;
-                                if (swipeDir == L"horizontal_left_inc") step = -step;
+                            } else if (!isHoriz && abs(dy) >= 20) {
+                                // Vertical: Đảo ở đỉnh màn hình, Kéo XUỐNG = Tăng (+1), Kéo LÊN = Giảm (-1)
+                                int step = (dy > 0) ? 1 : -1;
+                                if (isInverted) step = -step;
                                 ApplyCollapsedSwipeStep(step);
                                 s_touchStartTime = 0;
                                 return 0;
@@ -22796,22 +22829,31 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                             tabDir = g_settings.tabSwitchDirection;
                         }
                         if (ActiveTabCount(GetSettingsCopy()) > 1) {
-                            if (tabDir.find(L"horizontal") != std::wstring::npos && abs(dx) > 25) {
+                            const bool isHoriz = (tabDir.find(L"horizontal") != std::wstring::npos);
+                            const bool isHorizInv = (tabDir == L"horizontal_inverted" || tabDir == L"horizontal_left");
+                            const bool isVertInv = (tabDir == L"vertical_inverted" || tabDir == L"vertical_down");
+
+                            if (isHoriz && abs(dx) > 25) {
+                                // Natural carousel: Vuốt TRÁI = Kế tiếp (+1), Vuốt PHẢI = Trước (-1)
                                 int step = (dx < 0) ? 1 : -1;
-                                if (tabDir == L"horizontal_left") step = -step;
+                                if (isHorizInv) step = -step;
                                 StepIdleTab(step);
                                 s_touchStartTime = 0;
                                 return 0;
-                            } else if (tabDir.find(L"vertical") != std::wstring::npos && abs(dy) > 25) {
+                            } else if (!isHoriz && tabDir != L"auto" && abs(dy) > 25) {
+                                // Natural vertical: Vuốt LÊN = Kế tiếp (+1), Vuốt XUỐNG = Trước (-1)
                                 int step = (dy < 0) ? 1 : -1;
-                                if (tabDir == L"vertical_up") step = -step;
+                                if (isVertInv) step = -step;
                                 StepIdleTab(step);
                                 s_touchStartTime = 0;
                                 return 0;
-                            } else {
-                                const int travel = abs(dy) > abs(dx) ? dy : dx;
-                                if (abs(travel) > 35) {
-                                    StepIdleTab(travel > 0 ? -1 : 1);
+                            } else if (tabDir == L"auto") {
+                                if (abs(dx) >= abs(dy) && abs(dx) > 25) {
+                                    StepIdleTab((dx < 0) ? 1 : -1);
+                                    s_touchStartTime = 0;
+                                    return 0;
+                                } else if (abs(dy) > abs(dx) && abs(dy) > 25) {
+                                    StepIdleTab((dy < 0) ? 1 : -1);
                                     s_touchStartTime = 0;
                                     return 0;
                                 }
@@ -22856,9 +22898,20 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
                 bool expanded = g_pinnedExpanded.load() || g_clickExpanded.load();
                 if (!gameMetricsPresent && !g_settings.expandOnHover && !expanded) {
-                    g_clickExpanded = true;
-                    g_layoutDirty = true;
-                    return 0; // consumed click to expand
+                    std::wstring dblAction;
+                    {
+                        std::lock_guard lock(g_settingsMutex);
+                        dblAction = g_settings.collapsedDoubleClickAction;
+                    }
+                    if (dblAction != L"none" && !dblAction.empty()) {
+                        s_pendingSingleClickExpand = true;
+                        SetTimer(hwnd, IDT_SINGLE_CLICK_EXPAND, 220, nullptr);
+                        return 0;
+                    } else {
+                        g_clickExpanded = true;
+                        g_layoutDirty = true;
+                        return 0; // consumed click to expand
+                    }
                 }
 
                 RECT clientRect;
@@ -23025,6 +23078,10 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             return 0;
 
         case WM_LBUTTONDBLCLK: {
+            KillTimer(hwnd, IDT_SINGLE_CLICK_EXPAND);
+            s_pendingSingleClickExpand = false;
+            s_ignoreNextLButtonUp = true;
+
             POINT screenPt;
             GetCursorPos(&screenPt);
             if (g_settings.unhideOnHover && IsCursorInIslandMouseTrap(screenPt)) {
@@ -23080,8 +23137,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     swipeDir = g_settings.collapsedSwipeDirection;
                 }
                 if (swipeEnabled) {
+                    // Wheel UP = Tăng (+1), Wheel DOWN = Giảm (-1)
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir == L"vertical_down_inc") step = -step;
+                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
                     ApplyCollapsedSwipeStep(step);
                     return 0;
                 }
@@ -23119,8 +23177,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 std::lock_guard lock(g_settingsMutex);
                 tabDir = g_settings.tabSwitchDirection;
             }
-            int tabStep = (s_wheelAccum > 0) ? -1 : 1;
-            if (tabDir == L"vertical_up" || tabDir == L"horizontal_left") {
+            // Natural wheel: Cuộn XUỐNG (s_wheelAccum < 0) = Kế tiếp (+1), Cuộn LÊN (s_wheelAccum > 0) = Trước (-1)
+            int tabStep = (s_wheelAccum < 0) ? 1 : -1;
+            if (tabDir.find(L"inverted") != std::wstring::npos || tabDir == L"horizontal_left" || tabDir == L"vertical_down") {
                 tabStep = -tabStep;
             }
             StepIdleTab(tabStep);
@@ -23142,8 +23201,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     swipeDir = g_settings.collapsedSwipeDirection;
                 }
                 if (swipeEnabled) {
+                    // Tilt RIGHT = Tăng (+1), Tilt LEFT = Giảm (-1)
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir == L"horizontal_left_inc") step = -step;
+                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
                     ApplyCollapsedSwipeStep(step);
                     return 0;
                 }
@@ -23153,8 +23213,11 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     std::lock_guard lock(g_settingsMutex);
                     tabDir = g_settings.tabSwitchDirection;
                 }
+                // Tilt RIGHT = Kế tiếp (+1), Tilt LEFT = Trước (-1)
                 int tabStep = (delta > 0) ? 1 : -1;
-                if (tabDir == L"horizontal_left") tabStep = -tabStep;
+                if (tabDir.find(L"inverted") != std::wstring::npos || tabDir == L"horizontal_left") {
+                    tabStep = -tabStep;
+                }
                 StepIdleTab(tabStep);
                 return 0;
             }
@@ -24005,6 +24068,9 @@ DWORD WINAPI RenderThreadProc(void*) {
 
         // Check if layout was explicitly invalidated
         if (g_layoutDirty.load()) {
+            needsRender = true;
+        }
+        if (now < g_fluidFillUntil.load(std::memory_order_relaxed)) {
             needsRender = true;
         }
 
