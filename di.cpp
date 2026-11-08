@@ -269,22 +269,25 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $options:
       - volume: Âm lượng hệ thống (Volume)
       - brightness: Độ sáng màn hình (Brightness)
-  - CollapsedSwipeDirection: horizontal
-    $name: Hướng vuốt & Chiều tăng giảm khi thu nhỏ
-    $description: Quy định hướng vuốt chuột/cảm ứng để tăng hoặc giảm giá trị.
+  - CollapsedSwipeDirection: natural
+    $name: Hướng & Đảo chiều vuốt khi thu nhỏ
+    $description: Cả 4 hướng (Trái/Phải/Lên/Xuống) đều hoạt động đồng thời. Bạn có thể tùy chọn chiều tăng giảm tự nhiên hoặc đảo chiều.
     $options:
-      - horizontal: Vuốt Sang Phải = Tăng, Vuốt Sang Trái = Giảm (Mặc định)
-      - horizontal_inverted: Vuốt Sang Phải = Giảm, Vuốt Sang Trái = Tăng
-      - vertical: Vuốt Xuống = Tăng, Vuốt Lên = Giảm (Kéo từ đỉnh xuống)
-      - vertical_inverted: Vuốt Xuống = Giảm, Vuốt Lên = Tăng
+      - natural: Tự nhiên (Vuốt Phải hoặc Vuốt Lên = Tăng, Vuốt Trái hoặc Vuốt Xuống = Giảm)
+      - invert_vertical: Đảo chiều dọc (Vuốt Xuống = Tăng, Vuốt Lên = Giảm)
+      - invert_horizontal: Đảo chiều ngang (Vuốt Trái = Tăng, Vuốt Phải = Giảm)
+      - invert_both: Đảo cả 2 chiều
+      - horizontal: Vuốt Ngang (Phải = Tăng, Trái = Giảm)
+      - vertical: Vuốt Dọc (Lên = Tăng, Xuống = Giảm)
   - CollapsedDoubleClickAction: play_pause
     $name: Hành động khi Nhấp Đúp trên Island thu nhỏ
-    $description: Thao tác thực hiện khi nhấp đúp chuột trái vào viên thuốc thu nhỏ.
+    $description: Thao tác thực hiện khi nhấp đúp chuột trái vào viên thuốc (không bị kẹt ghim mở rộng).
     $options:
-      - none: Mở rộng bình thường
       - play_pause: Phát / Tạm dừng nhạc (Play/Pause)
       - mute_toggle: Bật / Tắt tiếng nhanh
       - open_filetray: Mở thẳng vào Khay tệp & Lịch sử sao chép
+      - pin_toggle: Ghim / Bỏ ghim mở rộng Island
+      - none: Mở rộng bình thường
   - CollapsedMiddleClickAction: mute_toggle
     $name: Hành động khi Nhấp Chuột Giữa (Con lăn)
     $description: Thao tác thực hiện khi nhấn con lăn chuột vào viên thuốc thu nhỏ.
@@ -293,15 +296,14 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
       - play_pause: Phát / Tạm dừng nhạc
       - screenshot: Chụp màn hình nhanh (Win + Shift + S)
       - dismiss: Đóng nhanh thông báo đang hiện
-  - TabSwitchDirection: horizontal
+  - TabSwitchDirection: auto
     $name: Hướng trượt cửa sổ / tab mở rộng
-    $description: Quy định hướng chuyển đổi giữa các thẻ nội dung (Media, Lịch, Thời tiết, Giám sát, Khay tệp).
+    $description: Tự do vuốt theo cả 4 hướng để đổi tab. Hiệu ứng trượt mượt mà sẽ thích ứng theo hướng bạn vuốt (ngang hoặc dọc).
     $options:
-      - horizontal: Trượt Ngang (Vuốt Trái / Cuộn Xuống -> Kế tiếp, Vuốt Phải / Cuộn Lên -> Trước) (Mặc định khuyên dùng)
-      - horizontal_inverted: Trượt Ngang đảo ngược (Vuốt Phải -> Kế tiếp, Vuốt Trái -> Trước)
-      - vertical: Trượt Dọc (Vuốt Lên / Cuộn Xuống -> Kế tiếp, Vuốt Xuống / Cuộn Lên -> Trước)
-      - vertical_inverted: Trượt Dọc đảo ngược (Vuốt Xuống -> Kế tiếp, Vuốt Lên -> Trước)
-      - auto: Tự động thích ứng theo hướng vuốt tay
+      - auto: Tự động 4 hướng (Vuốt Trái hoặc Vuốt Lên -> Kế tiếp, Vuốt Phải hoặc Vuốt Xuống -> Trước)
+      - invert_swipe: Đảo chiều vuốt (Vuốt Phải hoặc Vuốt Xuống -> Kế tiếp, Vuốt Trái hoặc Vuốt Lên -> Trước)
+      - horizontal: Ưu tiên trượt ngang (Vuốt Trái/Phải)
+      - vertical: Ưu tiên trượt dọc (Vuốt Lên/Xuống)
   - CollapsedTitleMarquee: true
     $name: Tự động cuộn chữ khi tên bài hát dài
     $description: Tự động cuộn chạy chữ êm ái khi tên bài hát dài vượt quá không gian của thanh thu nhỏ (tránh bị sóng nhạc cắt cụt chữ).
@@ -1275,10 +1277,10 @@ struct Settings {
     // ── Gestures & Swipe ─────────────────────────────────────────────────────
     bool collapsedSwipeEnabled = true;
     std::wstring collapsedSwipeTarget = L"volume";
-    std::wstring collapsedSwipeDirection = L"horizontal";
+    std::wstring collapsedSwipeDirection = L"natural";
     std::wstring collapsedDoubleClickAction = L"play_pause";
     std::wstring collapsedMiddleClickAction = L"mute_toggle";
-    std::wstring tabSwitchDirection = L"horizontal";
+    std::wstring tabSwitchDirection = L"auto";
     bool collapsedTitleMarquee = true;
     bool collapsedFluidFill = true;
 
@@ -1652,6 +1654,7 @@ std::atomic<bool> g_sessionLocked{false};
 std::atomic<bool> g_internalClipboardCopy{false};
 std::atomic<float> g_fluidFillFraction{0.0f};
 std::atomic<double> g_fluidFillUntil{0.0};
+std::atomic<int> g_activeTabTransitionAxis{0};  // 0 = horizontal (transX), 1 = vertical (transY)
 std::atomic<int> g_pressedMediaButton = -1;
 std::atomic<int> g_hoveredMediaButton = -1;
 std::atomic<unsigned> g_skipTriggerPrev{0};  // bumped on click, the render thread plays the prev button's animation
@@ -11769,7 +11772,7 @@ std::wstring WidestDigitForm(std::wstring text) {
 
 // ── Collapsed-pill lyrics ────────────────────────────────────────────────────
 // Width of the collapsed media pill while it carries a lyric line (content px).
-constexpr float kCollapsedLyricsWidth = 320.0f;
+constexpr float kCollapsedLyricsWidth = 335.0f;
 
 // True when the collapsed pill should be widened for lyrics. "fetching" counts
 // too, so the pill does not shrink and regrow on every track change.
@@ -14345,27 +14348,35 @@ class Renderer {
                 accentBrush_->SetOpacity(1.0f);
             }
 
-            wchar_t sizeBuf[40] = {};
+            wchar_t sizeBuf[64] = {};
+            wchar_t timePrefix[24] = {};
+            if (item.addedTime > 0) {
+                time_t t = static_cast<time_t>(item.addedTime);
+                struct tm lt;
+                if (localtime_s(&lt, &t) == 0) {
+                    swprintf_s(timePrefix, L"%02d:%02d · ", lt.tm_hour, lt.tm_min);
+                }
+            }
             if (item.isText) {
-                swprintf_s(sizeBuf, L"%zu ch", item.text.size());
+                swprintf_s(sizeBuf, L"%s%zu ch", timePrefix, item.text.size());
             } else if (item.isImage) {
                 if (item.sizeBytes >= 1048576ull) {
-                    swprintf_s(sizeBuf, L"%.1f MB", static_cast<double>(item.sizeBytes) / 1048576.0);
+                    swprintf_s(sizeBuf, L"%s%.1f MB", timePrefix, static_cast<double>(item.sizeBytes) / 1048576.0);
                 } else if (item.sizeBytes >= 1024ull) {
-                    swprintf_s(sizeBuf, L"%.0f KB", static_cast<double>(item.sizeBytes) / 1024.0);
+                    swprintf_s(sizeBuf, L"%s%.0f KB", timePrefix, static_cast<double>(item.sizeBytes) / 1024.0);
                 } else {
-                    wcscpy_s(sizeBuf, L"Image");
+                    swprintf_s(sizeBuf, L"%sẢnh", timePrefix);
                 }
             } else if (item.isDirectory) {
-                wcscpy_s(sizeBuf, L"—");
+                swprintf_s(sizeBuf, L"%s—", timePrefix);
             } else if (item.sizeBytes >= 1073741824ull) {
-                swprintf_s(sizeBuf, L"%.1f GB", static_cast<double>(item.sizeBytes) / 1073741824.0);
+                swprintf_s(sizeBuf, L"%s%.1f GB", timePrefix, static_cast<double>(item.sizeBytes) / 1073741824.0);
             } else if (item.sizeBytes >= 1048576ull) {
-                swprintf_s(sizeBuf, L"%.1f MB", static_cast<double>(item.sizeBytes) / 1048576.0);
+                swprintf_s(sizeBuf, L"%s%.1f MB", timePrefix, static_cast<double>(item.sizeBytes) / 1048576.0);
             } else if (item.sizeBytes >= 1024ull) {
-                swprintf_s(sizeBuf, L"%.0f KB", static_cast<double>(item.sizeBytes) / 1024.0);
+                swprintf_s(sizeBuf, L"%s%.0f KB", timePrefix, static_cast<double>(item.sizeBytes) / 1024.0);
             } else {
-                swprintf_s(sizeBuf, L"%llu B", static_cast<unsigned long long>(item.sizeBytes));
+                swprintf_s(sizeBuf, L"%s%llu B", timePrefix, static_cast<unsigned long long>(item.sizeBytes));
             }
 
             const float removeSize = FileTrayLayout::kRemoveBtnSize * scale;
@@ -14384,7 +14395,7 @@ class Renderer {
                 (row.top + row.bottom) * 0.5f);
             DrawTrayPinButton(pinCenter, pinSize, item.isPinned, false, hovered);
 
-            const float sizeW = 66.0f * scale;
+            const float sizeW = 88.0f * scale;
             const D2D1_RECT_F nameRect = D2D1::RectF(row.left + 32.0f * scale, row.top,
                                                       row.right - removeSpace - sizeW - 4.0f * scale, row.bottom);
             if (smallTextFormat_) {
@@ -15966,22 +15977,12 @@ class Renderer {
             const float scale = 1.0f - (1.0f - kMinScale) * eased;
             float transX = 0.0f;
             float transY = 0.0f;
-            const bool isHoriz = (g_settings.tabSwitchDirection.find(L"horizontal") != std::wstring::npos);
-            const bool isHorizInv = (g_settings.tabSwitchDirection == L"horizontal_inverted" || g_settings.tabSwitchDirection == L"horizontal_left");
-            const bool isVertInv = (g_settings.tabSwitchDirection == L"vertical_inverted" || g_settings.tabSwitchDirection == L"vertical_down");
+            const bool isHoriz = (g_activeTabTransitionAxis.load(std::memory_order_relaxed) == 0);
 
             if (isHoriz) {
-                if (isHorizInv) {
-                    transX = -d * kTravelPx * 2.5f;
-                } else {
-                    transX = d * kTravelPx * 2.5f;
-                }
+                transX = d * kTravelPx * 2.5f;
             } else {
-                if (isVertInv) {
-                    transY = -d * kTravelPx;
-                } else {
-                    transY = d * kTravelPx;
-                }
+                transY = d * kTravelPx * 1.5f;
             }
 
             target_->SetTransform(D2D1::Matrix3x2F::Scale(scale, scale, center) *
@@ -17496,9 +17497,16 @@ class Renderer {
             }
             if (overflow > 0.0f || forceMarquee) {
                 if (c.isTitle) {
-                    // Long title: scroll it in a loop, like the other marquees.
+                    // Long title: pause briefly at start, then scroll smoothly in a loop
                     titleCycle = c.width + 45.0f;
-                    x = area.left - std::fmod(static_cast<float>(now) * 26.0f, titleCycle);
+                    double elapsed = now - collapsedLyricAnimStart_;
+                    if (elapsed < 0.0) elapsed = 0.0;
+                    if (elapsed > 1.6) {
+                        const float scroll = static_cast<float>(std::fmod((elapsed - 1.6) * 26.0, static_cast<double>(titleCycle)));
+                        x = area.left - scroll;
+                    } else {
+                        x = area.left;
+                    }
                     g_layoutDirty = true;
                 } else if (showIdx >= 0) {
                     // Long lyric: start at the left edge and pan across as it is sung.
@@ -22783,6 +22791,12 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     g_layoutDirty = true;
                 }
 
+                if (s_ignoreNextLButtonUp) {
+                    s_ignoreNextLButtonUp = false;
+                    s_touchStartTime = 0;
+                    return 0;
+                }
+
                 int xPos = GET_X_LPARAM(lParam);
                 int yPos = GET_Y_LPARAM(lParam);
 
@@ -22793,7 +22807,7 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     const bool isIslandExpanded = g_clickExpanded.load() || g_pinnedExpanded.load();
 
                     if (!isIslandExpanded) {
-                        // Gesture on collapsed Dynamic Island: adjust volume or brightness
+                        // Gesture on collapsed Dynamic Island: adjust volume or brightness in all 4 directions
                         bool swipeEnabled = false;
                         std::wstring swipeDir;
                         {
@@ -22802,61 +22816,69 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                             swipeDir = g_settings.collapsedSwipeDirection;
                         }
                         if (swipeEnabled) {
-                            const bool isHoriz = (swipeDir.find(L"horizontal") != std::wstring::npos);
-                            const bool isInverted = (swipeDir.find(L"inverted") != std::wstring::npos);
-
-                            if (isHoriz && abs(dx) >= 20) {
-                                // Horizontal: Drag RIGHT = Tăng (+1), Drag LEFT = Giảm (-1)
-                                int step = (dx > 0) ? 1 : -1;
-                                if (isInverted) step = -step;
-                                ApplyCollapsedSwipeStep(step);
-                                s_touchStartTime = 0;
-                                return 0;
-                            } else if (!isHoriz && abs(dy) >= 20) {
-                                // Vertical: Đảo ở đỉnh màn hình, Kéo XUỐNG = Tăng (+1), Kéo LÊN = Giảm (-1)
-                                int step = (dy > 0) ? 1 : -1;
-                                if (isInverted) step = -step;
+                            const bool horizDominant = (abs(dx) >= abs(dy));
+                            const int travel = horizDominant ? abs(dx) : abs(dy);
+                            if (travel >= 20) {
+                                int step = 0;
+                                if (horizDominant) {
+                                    // Horizontal: Vuốt Phải (dx > 0) = Tăng (+1), Vuốt Trái (dx < 0) = Giảm (-1)
+                                    step = (dx > 0) ? 1 : -1;
+                                    if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
+                                        swipeDir.find(L"invert_both") != std::wstring::npos ||
+                                        swipeDir == L"horizontal_inverted") {
+                                        step = -step;
+                                    }
+                                } else {
+                                    // Vertical: Vuốt Lên (dy < 0) = Tăng (+1), Vuốt Xuống (dy > 0) = Giảm (-1)
+                                    step = (dy < 0) ? 1 : -1;
+                                    if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
+                                        swipeDir.find(L"invert_both") != std::wstring::npos ||
+                                        swipeDir == L"vertical_inverted" ||
+                                        swipeDir == L"vertical_down_inc") {
+                                        step = -step;
+                                    }
+                                }
                                 ApplyCollapsedSwipeStep(step);
                                 s_touchStartTime = 0;
                                 return 0;
                             }
                         }
                     } else {
-                        // Gesture on expanded Dynamic Island: Switch tabs based on tabSwitchDirection
+                        // Gesture on expanded Dynamic Island: Switch tabs in all 4 directions
                         std::wstring tabDir;
                         {
                             std::lock_guard lock(g_settingsMutex);
                             tabDir = g_settings.tabSwitchDirection;
                         }
                         if (ActiveTabCount(GetSettingsCopy()) > 1) {
-                            const bool isHoriz = (tabDir.find(L"horizontal") != std::wstring::npos);
-                            const bool isHorizInv = (tabDir == L"horizontal_inverted" || tabDir == L"horizontal_left");
-                            const bool isVertInv = (tabDir == L"vertical_inverted" || tabDir == L"vertical_down");
-
-                            if (isHoriz && abs(dx) > 25) {
-                                // Natural carousel: Vuốt TRÁI = Kế tiếp (+1), Vuốt PHẢI = Trước (-1)
-                                int step = (dx < 0) ? 1 : -1;
-                                if (isHorizInv) step = -step;
-                                StepIdleTab(step);
-                                s_touchStartTime = 0;
-                                return 0;
-                            } else if (!isHoriz && tabDir != L"auto" && abs(dy) > 25) {
-                                // Natural vertical: Vuốt LÊN = Kế tiếp (+1), Vuốt XUỐNG = Trước (-1)
-                                int step = (dy < 0) ? 1 : -1;
-                                if (isVertInv) step = -step;
-                                StepIdleTab(step);
-                                s_touchStartTime = 0;
-                                return 0;
-                            } else if (tabDir == L"auto") {
-                                if (abs(dx) >= abs(dy) && abs(dx) > 25) {
-                                    StepIdleTab((dx < 0) ? 1 : -1);
-                                    s_touchStartTime = 0;
-                                    return 0;
-                                } else if (abs(dy) > abs(dx) && abs(dy) > 25) {
-                                    StepIdleTab((dy < 0) ? 1 : -1);
-                                    s_touchStartTime = 0;
-                                    return 0;
+                            const bool horizDominant = (abs(dx) >= abs(dy));
+                            const int travel = horizDominant ? abs(dx) : abs(dy);
+                            const ULONGLONG elapsedPress = now - s_touchStartTime;
+                            if (travel >= 28 && elapsedPress >= 40) {
+                                int step = 0;
+                                if (horizDominant) {
+                                    // Horizontal: Vuốt Trái (dx < 0) -> Tab Kế tiếp (+1), Vuốt Phải (dx > 0) -> Tab Trước (-1)
+                                    step = (dx < 0) ? 1 : -1;
+                                    if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
+                                        tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                                        tabDir == L"horizontal_inverted") {
+                                        step = -step;
+                                    }
+                                    g_activeTabTransitionAxis.store(0);  // animate horizontally
+                                } else {
+                                    // Vertical: Vuốt Lên (dy < 0) -> Tab Kế tiếp (+1), Vuốt Xuống (dy > 0) -> Tab Trước (-1)
+                                    step = (dy < 0) ? 1 : -1;
+                                    if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
+                                        tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                                        tabDir == L"vertical_inverted" ||
+                                        tabDir == L"vertical_down") {
+                                        step = -step;
+                                    }
+                                    g_activeTabTransitionAxis.store(1);  // animate vertically
                                 }
+                                StepIdleTab(step);
+                                s_touchStartTime = 0;
+                                return 0;
                             }
                         }
                     }
@@ -23088,22 +23110,40 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 TriggerShowAnimation();
                 return 0;
             }
-            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
-            if (!isExpanded) {
-                std::wstring action;
-                {
-                    std::lock_guard lock(g_settingsMutex);
-                    action = g_settings.collapsedDoubleClickAction;
-                }
-                if (action != L"none" && !action.empty()) {
-                    g_clickExpanded = false;
-                    ExecuteIslandQuickAction(action, hwnd);
-                    return 0;
-                }
+
+            // If the island was pinned expanded, a double click unpins/collapses it back
+            if (g_pinnedExpanded.load()) {
+                g_pinnedExpanded.store(false);
+                Wh_SetIntValue(L"PinnedExpanded", 0);
+                g_clickExpanded = false;
+                g_layoutDirty = true;
+                TriggerNudge();
+                return 0;
             }
-            const bool nextVal = !g_pinnedExpanded.load();
-            g_pinnedExpanded.store(nextVal);
-            Wh_SetIntValue(L"PinnedExpanded", nextVal ? 1 : 0);
+
+            std::wstring action;
+            {
+                std::lock_guard lock(g_settingsMutex);
+                action = g_settings.collapsedDoubleClickAction;
+            }
+
+            if (action == L"pin_toggle") {
+                const bool nextVal = !g_pinnedExpanded.load();
+                g_pinnedExpanded.store(nextVal);
+                Wh_SetIntValue(L"PinnedExpanded", nextVal ? 1 : 0);
+                g_layoutDirty = true;
+                TriggerNudge();
+                return 0;
+            } else if (action == L"expand") {
+                g_clickExpanded = true;
+                g_layoutDirty = true;
+                return 0;
+            } else if (action != L"none" && !action.empty()) {
+                g_clickExpanded = false;
+                ExecuteIslandQuickAction(action, hwnd);
+                g_layoutDirty = true;
+                return 0;
+            }
             return 0;
         }
 
@@ -23139,7 +23179,12 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 if (swipeEnabled) {
                     // Wheel UP = Tăng (+1), Wheel DOWN = Giảm (-1)
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
+                    if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
+                        swipeDir.find(L"invert_both") != std::wstring::npos ||
+                        swipeDir == L"vertical_inverted" ||
+                        swipeDir == L"vertical_down_inc") {
+                        step = -step;
+                    }
                     ApplyCollapsedSwipeStep(step);
                     return 0;
                 }
@@ -23177,9 +23222,12 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 std::lock_guard lock(g_settingsMutex);
                 tabDir = g_settings.tabSwitchDirection;
             }
+            g_activeTabTransitionAxis.store(1);  // vertical animation
             // Natural wheel: Cuộn XUỐNG (s_wheelAccum < 0) = Kế tiếp (+1), Cuộn LÊN (s_wheelAccum > 0) = Trước (-1)
             int tabStep = (s_wheelAccum < 0) ? 1 : -1;
-            if (tabDir.find(L"inverted") != std::wstring::npos || tabDir == L"horizontal_left" || tabDir == L"vertical_down") {
+            if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
+                tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                tabDir == L"vertical_down" || tabDir == L"horizontal_left") {
                 tabStep = -tabStep;
             }
             StepIdleTab(tabStep);
@@ -23203,7 +23251,11 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 if (swipeEnabled) {
                     // Tilt RIGHT = Tăng (+1), Tilt LEFT = Giảm (-1)
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
+                    if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
+                        swipeDir.find(L"invert_both") != std::wstring::npos ||
+                        swipeDir == L"horizontal_inverted") {
+                        step = -step;
+                    }
                     ApplyCollapsedSwipeStep(step);
                     return 0;
                 }
@@ -23213,9 +23265,12 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     std::lock_guard lock(g_settingsMutex);
                     tabDir = g_settings.tabSwitchDirection;
                 }
+                g_activeTabTransitionAxis.store(0);  // horizontal animation
                 // Tilt RIGHT = Kế tiếp (+1), Tilt LEFT = Trước (-1)
                 int tabStep = (delta > 0) ? 1 : -1;
-                if (tabDir.find(L"inverted") != std::wstring::npos || tabDir == L"horizontal_left") {
+                if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
+                    tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                    tabDir == L"horizontal_left") {
                     tabStep = -tabStep;
                 }
                 StepIdleTab(tabStep);
@@ -24117,8 +24172,11 @@ DWORD WINAPI RenderThreadProc(void*) {
         // frozen.
         const bool mediaShown = primary.kind == IslandKind::Media ||
                                 (secondary && secondary->kind == IslandKind::Media);
+        const bool collapsedMarqueeRunning =
+            mediaShown && g_settings.collapsedTitleMarquee &&
+            CollapsedLyricsActive(snapshot, g_settings);
         const bool mediaAnimating =
-            mediaShown && (snapshot.media.playing || isHoverExpanded || pinned);
+            mediaShown && (snapshot.media.playing || isHoverExpanded || pinned || collapsedMarqueeRunning);
 
         // Transient alert pills. All expire within a few seconds, so treating them as
         // continuous cannot run away.
