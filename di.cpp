@@ -224,7 +224,7 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $description: Hiển thị thời tiết ở phía bên phải thanh thu nhỏ và trên tab mở rộng.
   - WeatherCity: ""
     $name: Thành phố thời tiết (Tùy chọn)
-    $description: Nhập tên thành phố (ví dụ: Ha Noi, Ho Chi Minh, Da Nang). Để trống để tự động định vị theo IP.
+    $description: "Nhập tên thành phố (ví dụ: Ha Noi, Ho Chi Minh, Da Nang). Để trống để tự động định vị theo IP."
   - MediaTabLyrics: false
     $name: Lời bài hát trong tab Media
     $description: Hiển thị nút mở lời bài hát trực tiếp ngay trên thanh điều khiển của tab Media.
@@ -261,7 +261,7 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
       - win_alt: Win + Alt
   - HideShowKey: "D"
     $name: Phím chữ cho phím tắt Ẩn/Hiện
-    $description: Phím chữ kết hợp với phím bổ trợ phía trên. Mặc định là 'D' (Ctrl + Alt + D).
+    $description: "Phím chữ kết hợp với phím bổ trợ phía trên. Mặc định là 'D' (Ctrl + Alt + D)."
   $name: Phím tắt thao tác nhanh
 */
 // ==/WindhawkModSettings==
