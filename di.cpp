@@ -304,8 +304,6 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
 #include <pdh.h>
 #include <pdhmsg.h>
 
-#pragma comment(lib, "bcrypt.lib")
-
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -7427,10 +7425,6 @@ std::string UrlEncodeUtf8(const std::wstring& value) {
         }
     }
     return out;
-}
-
-std::string UrlEncodeComponent(const std::wstring& value) {
-    return UrlEncodeUtf8(value);
 }
 
 std::wstring AsciiToWide(const std::string& s) {
