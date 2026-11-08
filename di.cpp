@@ -246,7 +246,69 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
   - FileTrayAutoCapture: true
     $name: Tự động lưu khi sao chép (Ctrl+C)
     $description: Tự động bắt và thêm tệp hoặc văn bản vào Khay mỗi khi nhấn Ctrl+C.
+  - FileTrayExpireHours: '0'
+    $name: Thời hạn lưu trữ Khay tệp & Bộ nhớ tạm
+    $description: Tự động dọn dẹp các tệp và đoạn sao chép sau thời gian quy định (các mục được Ghim sẽ không bao giờ bị xóa).
+    $options:
+      - '0': Vô thời hạn (Không bao giờ tự xóa - Mặc định)
+      - '1': 1 Giờ
+      - '6': 6 Giờ
+      - '12': 12 Giờ
+      - '24': 1 Ngày (24 Giờ)
+      - '72': 3 Ngày
+      - '168': 7 Ngày (1 Tuần)
+      - '720': 30 Ngày (1 Tháng)
   $name: Mô-đun & Tính năng
+- Gestures:
+  - CollapsedSwipeEnabled: true
+    $name: Bật cử chỉ vuốt khi Island thu nhỏ
+    $description: Cho phép vuốt hoặc cuộn chuột trên thanh Dynamic Island thu nhỏ để điều chỉnh nhanh Âm lượng hoặc Độ sáng màn hình.
+  - CollapsedSwipeTarget: volume
+    $name: Đối tượng điều khiển khi vuốt thu nhỏ
+    $description: Chọn tính năng bạn muốn điều chỉnh khi vuốt trên thanh thu nhỏ.
+    $options:
+      - volume: Âm lượng hệ thống (Volume)
+      - brightness: Độ sáng màn hình (Brightness)
+  - CollapsedSwipeDirection: vertical
+    $name: Hướng vuốt & Chiều tăng giảm khi thu nhỏ
+    $description: Quy định hướng vuốt chuột/cảm ứng để tăng hoặc giảm giá trị.
+    $options:
+      - vertical: Vuốt Lên = Tăng, Vuốt Xuống = Giảm (Mặc định)
+      - vertical_inverted: Vuốt Lên = Giảm, Vuốt Xuống = Tăng
+      - horizontal: Vuốt Sang Phải = Tăng, Vuốt Sang Trái = Giảm
+      - horizontal_inverted: Vuốt Sang Phải = Giảm, Vuốt Sang Trái = Tăng
+  - CollapsedDoubleClickAction: play_pause
+    $name: Hành động khi Nhấp Đúp trên Island thu nhỏ
+    $description: Thao tác thực hiện khi nhấp đúp chuột trái vào viên thuốc thu nhỏ.
+    $options:
+      - none: Mở rộng bình thường
+      - play_pause: Phát / Tạm dừng nhạc (Play/Pause)
+      - mute_toggle: Bật / Tắt tiếng nhanh
+      - open_filetray: Mở thẳng vào Khay tệp & Lịch sử sao chép
+  - CollapsedMiddleClickAction: mute_toggle
+    $name: Hành động khi Nhấp Chuột Giữa (Con lăn)
+    $description: Thao tác thực hiện khi nhấn con lăn chuột vào viên thuốc thu nhỏ.
+    $options:
+      - mute_toggle: Bật / Tắt tiếng nhanh (Mặc định)
+      - play_pause: Phát / Tạm dừng nhạc
+      - screenshot: Chụp màn hình nhanh (Win + Shift + S)
+      - dismiss: Đóng nhanh thông báo đang hiện
+  - TabSwitchDirection: vertical_up
+    $name: Hướng trượt cửa sổ / tab mở rộng
+    $description: Quy định hướng chuyển đổi giữa các thẻ nội dung (Media, Lịch, Thời tiết, Giám sát, Khay tệp).
+    $options:
+      - vertical_up: Chiều dọc (Vuốt/Cuộn Lên -> Kế tiếp, Xuống -> Trước)
+      - vertical_down: Chiều dọc đảo ngược (Vuốt/Cuộn Xuống -> Kế tiếp, Lên -> Trước)
+      - horizontal_right: Chiều ngang (Vuốt/Cuộn Sang Phải -> Kế tiếp, Trái -> Trước)
+      - horizontal_left: Chiều ngang đảo ngược (Vuốt/Cuộn Sang Trái -> Kế tiếp, Phải -> Trước)
+      - auto: Tự động thích ứng theo hướng vuốt tay
+  - CollapsedTitleMarquee: true
+    $name: Tự động cuộn chữ khi tên bài hát dài
+    $description: Tự động cuộn chạy chữ êm ái khi tên bài hát dài vượt quá không gian của thanh thu nhỏ (tránh bị sóng nhạc cắt cụt chữ).
+  - CollapsedFluidFill: true
+    $name: Hiệu ứng thanh lấp đầy phát sáng khi vuốt
+    $description: Hiển thị dải phát sáng lấp đầy viên thuốc theo tỷ lệ phần trăm khi bạn vuốt chỉnh Âm lượng hoặc Độ sáng.
+  $name: Thao Tác Cử Chỉ & Vuốt Trượt
 - Shortcuts:
   - HideShowHotkeyEnabled: true
     $name: Bật phím tắt Ẩn / Hiện Island
@@ -1208,6 +1270,17 @@ struct Settings {
     bool fileTrayAutoCapture = true;  // Modules.FileTrayAutoCapture
     int fileTrayMaxItems = 10;
     bool fileTrayPersist = true;   // Modules.FileTrayPersist
+    int fileTrayExpireHours = 0;   // Modules.FileTrayExpireHours
+
+    // ── Gestures & Swipe ─────────────────────────────────────────────────────
+    bool collapsedSwipeEnabled = true;
+    std::wstring collapsedSwipeTarget = L"volume";
+    std::wstring collapsedSwipeDirection = L"vertical";
+    std::wstring collapsedDoubleClickAction = L"play_pause";
+    std::wstring collapsedMiddleClickAction = L"mute_toggle";
+    std::wstring tabSwitchDirection = L"vertical_up";
+    bool collapsedTitleMarquee = true;
+    bool collapsedFluidFill = true;
 
     // ── Media auto-expand exclusions (#62) ───────────────────────────────────
     std::vector<std::wstring> mediaExpandBlocklist;
@@ -1425,6 +1498,8 @@ struct FileTrayItem {
     bool isImage = false;    // a captured/pasted image snippet
     std::wstring text;       // full snippet when isText is set
     PixelsRef icon;
+    uint64_t addedTime = 0;  // Unix epoch seconds when added
+    bool isPinned = false;   // pinned items are preserved across clears & expiration
 };
 
 struct LyricsLine {
@@ -1575,6 +1650,8 @@ std::atomic<bool> g_layoutDirty = true;
 std::atomic<bool> g_clickExpanded = false;
 std::atomic<bool> g_sessionLocked{false};
 std::atomic<bool> g_internalClipboardCopy{false};
+std::atomic<float> g_fluidFillFraction{0.0f};
+std::atomic<double> g_fluidFillUntil{0.0};
 std::atomic<int> g_pressedMediaButton = -1;
 std::atomic<int> g_hoveredMediaButton = -1;
 std::atomic<unsigned> g_skipTriggerPrev{0};  // bumped on click, the render thread plays the prev button's animation
@@ -2363,6 +2440,22 @@ bool FileTrayRemoveHitTest(const MediaContentPoint& pt, int row) {
     return std::fabs(pt.x - centerX) <= half && std::fabs(pt.y - centerY) <= half;
 }
 
+// True when the point is over the pin button of the given visible row.
+bool FileTrayPinHitTest(const MediaContentPoint& pt, int row) {
+    if (!pt.valid || row < 0 || pt.height <= MediaLayout::kExpandedMinHeight) {
+        return false;
+    }
+    constexpr float kSlop = 3.0f;
+    const float half = FileTrayLayout::kRemoveBtnSize * 0.5f + kSlop;
+    const float removeCenterX = pt.width - FileTrayLayout::kPadX - FileTrayLayout::kRemoveBtnMargin -
+                                FileTrayLayout::kRemoveBtnSize * 0.5f;
+    const float pinCenterX = removeCenterX - FileTrayLayout::kRemoveBtnSize - 4.0f;
+    const float centerY = FileTrayLayout::kListTop +
+                          static_cast<float>(row) * (FileTrayLayout::kRowHeight + FileTrayLayout::kRowGap) +
+                          FileTrayLayout::kRowHeight * 0.5f;
+    return std::fabs(pt.x - pinCenterX) <= half && std::fabs(pt.y - centerY) <= half;
+}
+
 // True when the point is over the expanded layout's album art.
 bool MediaArtHitTest(const MediaContentPoint& pt) {
     if (!pt.valid || pt.height <= MediaLayout::kExpandedMinHeight) {
@@ -3032,6 +3125,32 @@ void LoadSettings() {
     next.fileTrayAutoCapture = Wh_GetIntSetting(L"Modules.FileTrayAutoCapture") != 0;
     next.fileTrayMaxItems = ClampInt(Wh_GetIntSetting(L"Modules.FileTrayMaxItems"), 1, 25);
     next.fileTrayPersist = Wh_GetIntSetting(L"Modules.FileTrayPersist") != 0;
+    next.fileTrayExpireHours = ClampInt(Wh_GetIntSetting(L"Modules.FileTrayExpireHours"), 0, 720);
+
+    // ── Gestures & Swipe ─────────────────────────────────────────────────────
+    next.collapsedSwipeEnabled = Wh_GetIntSetting(L"Gestures.CollapsedSwipeEnabled") != 0;
+    {
+        std::wstring s = GetStringSettingCopy(L"Gestures.CollapsedSwipeTarget");
+        if (!s.empty()) next.collapsedSwipeTarget = s;
+    }
+    {
+        std::wstring s = GetStringSettingCopy(L"Gestures.CollapsedSwipeDirection");
+        if (!s.empty()) next.collapsedSwipeDirection = s;
+    }
+    {
+        std::wstring s = GetStringSettingCopy(L"Gestures.CollapsedDoubleClickAction");
+        if (!s.empty()) next.collapsedDoubleClickAction = s;
+    }
+    {
+        std::wstring s = GetStringSettingCopy(L"Gestures.CollapsedMiddleClickAction");
+        if (!s.empty()) next.collapsedMiddleClickAction = s;
+    }
+    {
+        std::wstring s = GetStringSettingCopy(L"Gestures.TabSwitchDirection");
+        if (!s.empty()) next.tabSwitchDirection = s;
+    }
+    next.collapsedTitleMarquee = Wh_GetIntSetting(L"Gestures.CollapsedTitleMarquee") != 0;
+    next.collapsedFluidFill = Wh_GetIntSetting(L"Gestures.CollapsedFluidFill") != 0;
 
     // ── Media auto-expand exclusions (#62) ───────────────────────────────────
     next.mediaExpandBlocklist.clear();
@@ -10048,6 +10167,82 @@ void UpdateBrightnessSnapshot() {
     g_brightnessInitialized = true;
 }
 
+bool SetPanelBrightness(int level) {
+    level = ClampInt(level, 0, 100);
+    constexpr DWORD kIoctlSetDisplayBrightness = 0x23049C;
+    struct DisplayBrightness {
+        UCHAR policy;
+        UCHAR acBrightness;
+        UCHAR dcBrightness;
+    };
+    HANDLE lcd = CreateFileW(L"\\\\.\\LCD", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                             nullptr, OPEN_EXISTING, 0, nullptr);
+    if (lcd == INVALID_HANDLE_VALUE) {
+        lcd = CreateFileW(L"\\\\.\\LCD", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                          nullptr, OPEN_EXISTING, 0, nullptr);
+    }
+    if (lcd == INVALID_HANDLE_VALUE) {
+        return false;
+    }
+    DisplayBrightness db = {};
+    db.policy = 1 | 2; // both AC and DC
+    db.acBrightness = static_cast<UCHAR>(level);
+    db.dcBrightness = static_cast<UCHAR>(level);
+    DWORD returned = 0;
+    const bool ok = DeviceIoControl(lcd, kIoctlSetDisplayBrightness, &db, sizeof(db), nullptr, 0, &returned, nullptr);
+    CloseHandle(lcd);
+    return ok;
+}
+
+void StepPanelBrightness(int deltaPercent) {
+    int current = g_lastBrightness >= 0 ? g_lastBrightness : 50;
+    int next = ClampInt(current + deltaPercent, 0, 100);
+    if (SetPanelBrightness(next)) {
+        g_lastBrightness = next;
+    } else {
+        g_lastBrightness = next;
+    }
+    {
+        std::lock_guard lock(g_stateMutex);
+        g_state.brightness.active = true;
+        g_state.brightness.percent = next;
+        g_state.brightness.expiresAt = NowSeconds() + 1.8;
+    }
+    TriggerNudge();
+}
+
+void ApplyCollapsedSwipeStep(int direction) {
+    const Settings s = GetSettingsCopy();
+    if (!s.collapsedSwipeEnabled) return;
+
+    int factor = 1;
+    if (s.collapsedSwipeDirection == L"vertical_inverted" || s.collapsedSwipeDirection == L"horizontal_inverted") {
+        factor = -1;
+    }
+    const int effectiveDir = direction * factor;
+
+    if (s.collapsedSwipeTarget == L"brightness") {
+        StepPanelBrightness(effectiveDir * 5);
+        if (s.collapsedFluidFill) {
+            int cur = g_lastBrightness >= 0 ? g_lastBrightness : 50;
+            g_fluidFillFraction.store(Clamp(static_cast<float>(cur) / 100.0f, 0.0f, 1.0f));
+            g_fluidFillUntil.store(NowSeconds() + 1.2);
+            g_layoutDirty = true;
+        }
+    } else {
+        // Volume
+        StepSystemVolume(effectiveDir * 0.02f);
+        if (s.collapsedFluidFill && g_endpointVolume) {
+            float vol = 0.0f;
+            if (SUCCEEDED(g_endpointVolume->GetMasterVolumeLevelScalar(&vol))) {
+                g_fluidFillFraction.store(Clamp(vol, 0.0f, 1.0f));
+                g_fluidFillUntil.store(NowSeconds() + 1.2);
+                g_layoutDirty = true;
+            }
+        }
+    }
+}
+
 // ---- Privacy indicator helpers ----
 std::wstring CleanActiveAppName(const std::wstring& raw) {
     std::wstring name;
@@ -10611,6 +10806,7 @@ void OpenRelevantApp();
 void ToggleEndpointMute();
 void SeekMediaToTicks(int64_t targetTicks);
 void PasteIntoFileTray(HWND hwnd);
+void PruneExpiredFileTrayItems();
 void SaveFileTray();
 void LoadFileTray();
 
@@ -13081,6 +13277,24 @@ class Renderer {
             FillIslandShape(rect, radius, settings.w11Style, settings.notchStyle, fillBrush);
         }
 
+        // Fluid Pill Fill Feedback when swiping volume / brightness on collapsed island
+        const double fillUntil = g_fluidFillUntil.load(std::memory_order_relaxed);
+        const double nowTime = NowSeconds();
+        if (settings.collapsedFluidFill && nowTime < fillUntil) {
+            const float frac = g_fluidFillFraction.load(std::memory_order_relaxed);
+            const float fillAlpha = Clamp(static_cast<float>((fillUntil - nowTime) / 0.4f), 0.0f, 1.0f);
+            if (frac > 0.01f && fillAlpha > 0.01f) {
+                const float fillRight = rect.left + (rect.right - rect.left) * frac;
+                D2D1_COLOR_F fillCol = currentAccent_.a > 0.0f ? currentAccent_ : D2D1::ColorF(0x4cc9f0);
+                fillCol.a = 0.22f * fillAlpha * settingsOpacity_;
+                if (ID2D1SolidColorBrush* fillB = AcquireBrush(fillCol)) {
+                    target_->PushAxisAlignedClip(D2D1::RectF(rect.left, rect.top, fillRight, rect.bottom), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+                    FillIslandShape(rect, radius, settings.w11Style, settings.notchStyle, fillB);
+                    target_->PopAxisAlignedClip();
+                }
+            }
+        }
+
         if (settings.materialDepth) {
             FillSurfaceDepth(rect, radius, kind == IslandKind::Media || kind == IslandKind::Idle);
 
@@ -14006,6 +14220,29 @@ class Renderer {
                           brush.Get(), stroke, round.Get());
     }
 
+    // Small pin button to the left of the remove button on a File Tray row.
+    void DrawTrayPinButton(D2D1_POINT_2F c, float size, bool isPinned, bool hovered, bool rowHovered) {
+        if (hovered || isPinned) {
+            D2D1_COLOR_F bgCol = isPinned ? (currentAccent_.a > 0.0f ? currentAccent_ : D2D1::ColorF(0x4cc9f0))
+                                          : WithAlpha(material_.textSecondary, 0.20f);
+            bgCol.a = (isPinned ? 0.25f : 0.18f) * settingsOpacity_;
+            if (ID2D1SolidColorBrush* bg = AcquireBrush(bgCol)) {
+                target_->FillEllipse(D2D1::Ellipse(c, size * 0.5f, size * 0.5f), bg);
+            }
+        }
+        if (iconFormat_) {
+            D2D1_COLOR_F ink = isPinned ? (currentAccent_.a > 0.0f ? currentAccent_ : D2D1::ColorF(0x4cc9f0))
+                                        : WithAlpha(material_.textSecondary, hovered ? 0.95f : (rowHovered ? 0.65f : 0.35f));
+            ink.a *= settingsOpacity_;
+            if (ID2D1SolidColorBrush* brush = AcquireBrush(ink)) {
+                const float half = size * 0.5f;
+                const D2D1_RECT_F r = D2D1::RectF(c.x - half, c.y - half, c.x + half, c.y + half);
+                const wchar_t* glyph = isPinned ? L"\uE840" : L"\uE718";
+                target_->DrawTextW(glyph, 1, iconFormat_.Get(), r, brush, D2D1_DRAW_TEXT_OPTIONS_NONE);
+            }
+        }
+    }
+
     // File Tray (#33): a shelf for files dragged onto the island. Rows are built
     // from the shared DrawCard primitive so the shelf matches every other
     // dashboard, with the real Explorer icon for each file.
@@ -14139,12 +14376,19 @@ class Renderer {
 
             const float removeSize = FileTrayLayout::kRemoveBtnSize * scale;
             const float removeMargin = FileTrayLayout::kRemoveBtnMargin * scale;
-            const float removeSpace = removeSize + removeMargin + 4.0f * scale;
+            const float pinMargin = 4.0f * scale;
+            const float pinSize = removeSize;
+            const float removeSpace = removeSize + removeMargin + pinSize + pinMargin + 4.0f * scale;
             const bool removeHovered =
                 (g_hoveredFileTrayAction.load(std::memory_order_relaxed) == drawn);
             DrawTrayRemoveButton(D2D1::Point2F(row.right - removeMargin - removeSize * 0.5f,
                                                (row.top + row.bottom) * 0.5f),
                                  removeSize, removeHovered, hovered);
+
+            const D2D1_POINT_2F pinCenter = D2D1::Point2F(
+                row.right - removeMargin - removeSize - pinMargin - pinSize * 0.5f,
+                (row.top + row.bottom) * 0.5f);
+            DrawTrayPinButton(pinCenter, pinSize, item.isPinned, false, hovered);
 
             const float sizeW = 66.0f * scale;
             const D2D1_RECT_F nameRect = D2D1::RectF(row.left + 32.0f * scale, row.top,
@@ -15726,10 +15970,21 @@ class Renderer {
             }
 
             const float scale = 1.0f - (1.0f - kMinScale) * eased;
-            const float dy = d * kTravelPx;
+            float transX = 0.0f;
+            float transY = 0.0f;
+            if (g_settings.tabSwitchDirection == L"horizontal_right") {
+                transX = -d * kTravelPx * 2.2f;
+            } else if (g_settings.tabSwitchDirection == L"horizontal_left") {
+                transX = d * kTravelPx * 2.2f;
+            } else if (g_settings.tabSwitchDirection == L"vertical_down") {
+                transY = -d * kTravelPx;
+            } else {
+                // vertical_up (default) and auto
+                transY = d * kTravelPx;
+            }
 
             target_->SetTransform(D2D1::Matrix3x2F::Scale(scale, scale, center) *
-                                  D2D1::Matrix3x2F::Translation(0.0f, dy) * oldTransform);
+                                  D2D1::Matrix3x2F::Translation(transX, transY) * oldTransform);
             if (alpha < 0.995f && tabLayer_) {
                 target_->PushLayer(
                     D2D1::LayerParameters(rect, nullptr, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
@@ -15755,8 +16010,7 @@ class Renderer {
         }
     }
 
-    // Vertical pagination dots on the right edge. The active dot stretches into a
-    // pill and slides with the transition instead of jumping.
+    // Pagination dots: vertical on the right edge or horizontal at the bottom edge depending on tabSwitchDirection.
     void DrawTabPagination(D2D1_RECT_F rect, int tabCount) {
         if (tabCount <= 1) {
             return;
@@ -15766,31 +16020,53 @@ class Renderer {
             return;
         }
 
-        const float dotX = rect.right - 10.0f;
-        const float spacing = 9.0f;
-        const float r = 2.5f;
-        const float startY = (rect.top + rect.bottom) * 0.5f - spacing * (tabCount - 1) * 0.5f;
+        const bool isHorizontal = (g_settings.tabSwitchDirection == L"horizontal_right" ||
+                                   g_settings.tabSwitchDirection == L"horizontal_left");
+        if (isHorizontal) {
+            const float dotY = rect.bottom - 10.0f;
+            const float spacing = 11.0f;
+            const float r = 2.5f;
+            const float startX = (rect.left + rect.right) * 0.5f - spacing * (tabCount - 1) * 0.5f;
 
-        // Resting dots. The one under the indicator fades out, so the pill reads
-        // as travelling over the track instead of sitting on top of a dot.
-        for (int i = 0; i < tabCount; ++i) {
-            const float under = SmoothStep01(Clamp(1.0f - std::fabs(tabPos_ - static_cast<float>(i)), 0.0f, 1.0f));
-            dotBrush->SetOpacity(0.22f * (1.0f - under) * settingsOpacity_);
-            target_->FillEllipse(
-                D2D1::Ellipse(D2D1::Point2F(dotX, startY + spacing * static_cast<float>(i)), r, r),
+            for (int i = 0; i < tabCount; ++i) {
+                const float under = SmoothStep01(Clamp(1.0f - std::fabs(tabPos_ - static_cast<float>(i)), 0.0f, 1.0f));
+                dotBrush->SetOpacity(0.22f * (1.0f - under) * settingsOpacity_);
+                target_->FillEllipse(D2D1::Ellipse(D2D1::Point2F(startX + spacing * static_cast<float>(i), dotY), r, r), dotBrush);
+            }
+
+            const float pos = Clamp(tabPos_, -0.3f, static_cast<float>(tabCount) - 0.7f);
+            const float stretch = Clamp(std::fabs(tabVel_) * 0.55f, 0.0f, 3.5f);
+            const float halfW = r + 2.2f + stretch;
+            const float cx = startX + spacing * pos;
+            dotBrush->SetOpacity(0.90f * settingsOpacity_);
+            target_->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(cx - halfW, dotY - r, cx + halfW, dotY + r), r, r), dotBrush);
+        } else {
+            const float dotX = rect.right - 10.0f;
+            const float spacing = 9.0f;
+            const float r = 2.5f;
+            const float startY = (rect.top + rect.bottom) * 0.5f - spacing * (tabCount - 1) * 0.5f;
+
+            // Resting dots. The one under the indicator fades out, so the pill reads
+            // as travelling over the track instead of sitting on top of a dot.
+            for (int i = 0; i < tabCount; ++i) {
+                const float under = SmoothStep01(Clamp(1.0f - std::fabs(tabPos_ - static_cast<float>(i)), 0.0f, 1.0f));
+                dotBrush->SetOpacity(0.22f * (1.0f - under) * settingsOpacity_);
+                target_->FillEllipse(
+                    D2D1::Ellipse(D2D1::Point2F(dotX, startY + spacing * static_cast<float>(i)), r, r),
+                    dotBrush);
+            }
+
+            // Travelling indicator: follows the spring exactly (so it also gives a little
+            // at the ends) and stretches slightly with speed.
+            const float pos = Clamp(tabPos_, -0.3f, static_cast<float>(tabCount) - 0.7f);
+            const float stretch = Clamp(std::fabs(tabVel_) * 0.55f, 0.0f, 3.5f);
+            const float halfH = r + 2.2f + stretch;
+            const float cy = startY + spacing * pos;
+            dotBrush->SetOpacity(0.90f * settingsOpacity_);
+            target_->FillRoundedRectangle(
+                D2D1::RoundedRect(D2D1::RectF(dotX - r, cy - halfH, dotX + r, cy + halfH), r, r),
                 dotBrush);
         }
-
-        // Travelling indicator: follows the spring exactly (so it also gives a little
-        // at the ends) and stretches slightly with speed.
-        const float pos = Clamp(tabPos_, -0.3f, static_cast<float>(tabCount) - 0.7f);
-        const float stretch = Clamp(std::fabs(tabVel_) * 0.55f, 0.0f, 3.5f);
-        const float halfH = r + 2.2f + stretch;
-        const float cy = startY + spacing * pos;
-        dotBrush->SetOpacity(0.90f * settingsOpacity_);
-        target_->FillRoundedRectangle(
-            D2D1::RoundedRect(D2D1::RectF(dotX - r, cy - halfH, dotX + r, cy + halfH), r, r),
-            dotBrush);
     }
 
     // Publishes the content-space rect currently being painted so
@@ -16318,8 +16594,8 @@ class Renderer {
                 const float lyricsAlpha =
                     SmoothStep01(((rect.right - rect.left) - 175.0f) / 60.0f);
                 if (lyricsAlpha > 0.01f) {
-                    const float textLeft = artRect.right + 10.0f;
-                    const float textRight = waveRect.left - 10.0f;
+                    const float textLeft = artRect.right + 12.0f;
+                    const float textRight = waveRect.left - 12.0f;
                     DrawCollapsedLyrics(state,
                                         D2D1::RectF(textLeft, rect.top + 4.0f, textRight, rect.bottom - 4.0f),
                                         now, lyricsAlpha);
@@ -17211,11 +17487,19 @@ class Renderer {
             float x = area.left + (availW - c.width) * 0.5f;  // centred when it fits
             const float overflow = c.width - availW;
             float titleCycle = 0.0f;  // > 0 only when the title is scrolling as a marquee
-            if (overflow > 0.0f) {
+            bool forceMarquee = false;
+            if (c.isTitle) {
+                std::lock_guard lock(g_settingsMutex);
+                if (g_settings.collapsedTitleMarquee && (overflow > -25.0f || c.width > availW * 0.85f)) {
+                    forceMarquee = true;
+                }
+            }
+            if (overflow > 0.0f || forceMarquee) {
                 if (c.isTitle) {
                     // Long title: scroll it in a loop, like the other marquees.
-                    titleCycle = c.width + 38.0f;
-                    x = area.left - std::fmod(static_cast<float>(now) * 30.0f, titleCycle);
+                    titleCycle = c.width + 45.0f;
+                    x = area.left - std::fmod(static_cast<float>(now) * 26.0f, titleCycle);
+                    g_layoutDirty = true;
                 } else if (showIdx >= 0) {
                     // Long lyric: start at the left edge and pan across as it is sung.
                     const int64_t startMs = lines[showIdx].timeMs;
@@ -20976,9 +21260,55 @@ bool CopyImageFileToClipboard(HWND hwnd, const std::wstring& filePath) {
     return true;
 }
 
+// Prunes expired File Tray items based on fileTrayExpireHours.
+// Pinned items are NEVER pruned.
+void PruneExpiredFileTrayItems() {
+    int expireHours = 0;
+    {
+        std::lock_guard lock(g_settingsMutex);
+        expireHours = g_settings.fileTrayExpireHours;
+    }
+    if (expireHours <= 0) {
+        return;
+    }
+    const uint64_t nowSec = static_cast<uint64_t>(time(nullptr));
+    const uint64_t maxAgeSec = static_cast<uint64_t>(expireHours) * 3600ULL;
+    if (nowSec < maxAgeSec) {
+        return;
+    }
+    const uint64_t cutoff = nowSec - maxAgeSec;
+
+    std::vector<std::wstring> filesToDelete;
+    bool changed = false;
+    {
+        std::lock_guard lock(g_stateMutex);
+        auto& items = g_state.fileTrayItems;
+        for (auto it = items.begin(); it != items.end(); ) {
+            if (!it->isPinned && it->addedTime > 0 && it->addedTime < cutoff) {
+                if (it->isImage && !it->path.empty()) {
+                    filesToDelete.push_back(it->path);
+                }
+                it = items.erase(it);
+                changed = true;
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    for (const auto& f : filesToDelete) {
+        DeleteFileW(f.c_str());
+    }
+
+    if (changed) {
+        SaveFileTray();
+        g_layoutDirty = true;
+    }
+}
+
 // Writes the current tray to disk. Safe to call from any thread, and never call
 // it while holding g_stateMutex. With persistence off, or an empty tray, the
-// saved file is removed instead.
+// saved file is removed instead. Format DIWFT 2 adds addedTime and isPinned.
 void SaveFileTray() {
     bool persist = true;
     {
@@ -20991,13 +21321,15 @@ void SaveFileTray() {
         bool isImage;
         std::wstring name;
         std::wstring value;
+        uint64_t addedTime = 0;
+        bool isPinned = false;
     };
     std::vector<Row> rows;
     {
         std::lock_guard lock(g_stateMutex);
         rows.reserve(g_state.fileTrayItems.size());
         for (const FileTrayItem& item : g_state.fileTrayItems) {
-            rows.push_back(Row{item.isText, item.isImage, item.name, item.isText ? item.text : item.path});
+            rows.push_back(Row{item.isText, item.isImage, item.name, item.isText ? item.text : item.path, item.addedTime, item.isPinned});
         }
     }
 
@@ -21014,16 +21346,17 @@ void SaveFileTray() {
 
     SHCreateDirectoryExW(nullptr, dir.c_str(), nullptr);
 
-    std::string data = "DIWFT 1\n";
+    std::string data = "DIWFT 2\n";
     for (const Row& row : rows) {
+        std::string meta = std::to_string(row.addedTime) + "\t" + (row.isPinned ? "1\t" : "0\t");
         if (row.isText) {
-            data += "T\t" + FileTrayStore::Escape(row.name) + "\t" +
+            data += "T\t" + meta + FileTrayStore::Escape(row.name) + "\t" +
                     FileTrayStore::Escape(row.value) + "\n";
         } else if (row.isImage) {
-            data += "I\t" + FileTrayStore::Escape(row.name) + "\t" +
+            data += "I\t" + meta + FileTrayStore::Escape(row.name) + "\t" +
                     FileTrayStore::Escape(row.value) + "\n";
         } else {
-            data += "F\t" + FileTrayStore::Escape(row.value) + "\n";
+            data += "F\t" + meta + FileTrayStore::Escape(row.value) + "\n";
         }
     }
 
@@ -21033,9 +21366,7 @@ void SaveFileTray() {
 }
 
 // Reads the saved tray back. Runs once on the render thread at startup (it needs
-// COM for the shell icons). Files that have since moved or been deleted are kept,
-// since you asked for items to stay until you remove them; they just show a
-// generic icon.
+// COM for the shell icons). Supports both DIWFT 2 and legacy DIWFT 1 format.
 void LoadFileTray() {
     bool persist = true;
     int maxItems = 10;
@@ -21074,14 +21405,22 @@ void LoadFileTray() {
     }
     CloseHandle(h);
 
-    static const char kHeader[] = "DIWFT 1\n";
-    if (!readOk || data.compare(0, sizeof(kHeader) - 1, kHeader) != 0) {
+    static const char kHeader2[] = "DIWFT 2\n";
+    static const char kHeader1[] = "DIWFT 1\n";
+    int formatVer = 0;
+    if (readOk && data.compare(0, sizeof(kHeader2) - 1, kHeader2) == 0) {
+        formatVer = 2;
+    } else if (readOk && data.compare(0, sizeof(kHeader1) - 1, kHeader1) == 0) {
+        formatVer = 1;
+    } else {
         Wh_Log(L"File Tray: saved list is unreadable; starting empty.");
         return;
     }
 
     std::vector<FileTrayItem> loaded;
-    size_t pos = sizeof(kHeader) - 1;
+    size_t pos = (formatVer == 2) ? sizeof(kHeader2) - 1 : sizeof(kHeader1) - 1;
+    const uint64_t nowSec = static_cast<uint64_t>(time(nullptr));
+
     while (pos < data.size()) {
         size_t end = data.find('\n', pos);
         if (end == std::string::npos) end = data.size();
@@ -21093,64 +21432,137 @@ void LoadFileTray() {
         }
 
         FileTrayItem item;
-        if (line[0] == 'T') {
-            const std::string rest = line.substr(2);
-            const size_t tab = rest.find('\t');
-            if (tab == std::string::npos) continue;
-            item.isText = true;
-            item.name = FileTrayStore::Unescape(rest.substr(0, tab));
-            item.text = FileTrayStore::Unescape(rest.substr(tab + 1));
-            if (item.text.empty()) continue;
-            if (item.name.empty()) item.name = L"Text";
-        } else if (line[0] == 'I') {
-            const std::string rest = line.substr(2);
-            const size_t tab = rest.find('\t');
-            if (tab == std::string::npos) continue;
-            item.isImage = true;
-            item.name = FileTrayStore::Unescape(rest.substr(0, tab));
-            item.path = FileTrayStore::Unescape(rest.substr(tab + 1));
-            if (item.path.empty()) continue;
-            if (item.name.empty()) item.name = L"Image";
+        item.addedTime = nowSec;
+        item.isPinned = false;
 
-            WIN32_FILE_ATTRIBUTE_DATA attr = {};
-            if (GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr)) {
-                item.sizeBytes =
-                    (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
-                BitmapPixels thumb;
-                if (LoadImagePixelsFromPngFile(item.path, &thumb, 48)) {
-                    static uint64_t s_loadGen = 5000;
-                    thumb.generation = ++s_loadGen;
-                    item.icon = PixelsRef(std::move(thumb));
+        if (formatVer == 2) {
+            std::string rest = line.substr(2);
+            size_t tab1 = rest.find('\t');
+            if (tab1 == std::string::npos) continue;
+            std::string timeStr = rest.substr(0, tab1);
+            try { item.addedTime = std::stoull(timeStr); } catch (...) { item.addedTime = nowSec; }
+
+            rest = rest.substr(tab1 + 1);
+            size_t tab2 = rest.find('\t');
+            if (tab2 == std::string::npos) continue;
+            item.isPinned = (rest.substr(0, tab2) == "1");
+
+            std::string payload = rest.substr(tab2 + 1);
+            if (line[0] == 'T') {
+                const size_t tab = payload.find('\t');
+                if (tab == std::string::npos) continue;
+                item.isText = true;
+                item.name = FileTrayStore::Unescape(payload.substr(0, tab));
+                item.text = FileTrayStore::Unescape(payload.substr(tab + 1));
+                if (item.text.empty()) continue;
+                if (item.name.empty()) item.name = L"Text";
+            } else if (line[0] == 'I') {
+                const size_t tab = payload.find('\t');
+                if (tab == std::string::npos) continue;
+                item.isImage = true;
+                item.name = FileTrayStore::Unescape(payload.substr(0, tab));
+                item.path = FileTrayStore::Unescape(payload.substr(tab + 1));
+                if (item.path.empty()) continue;
+                if (item.name.empty()) item.name = L"Image";
+
+                WIN32_FILE_ATTRIBUTE_DATA attr = {};
+                if (GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr)) {
+                    item.sizeBytes =
+                        (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+                    BitmapPixels thumb;
+                    if (LoadImagePixelsFromPngFile(item.path, &thumb, 48)) {
+                        static uint64_t s_loadGen = 5000;
+                        thumb.generation = ++s_loadGen;
+                        item.icon = PixelsRef(std::move(thumb));
+                    }
                 }
-            }
-        } else if (line[0] == 'F') {
-            item.path = FileTrayStore::Unescape(line.substr(2));
-            if (item.path.empty()) continue;
-            item.name = BaseNameFromPath(item.path);
-            if (item.name.empty()) item.name = item.path;
+            } else if (line[0] == 'F') {
+                item.path = FileTrayStore::Unescape(payload);
+                if (item.path.empty()) continue;
+                item.name = BaseNameFromPath(item.path);
+                if (item.name.empty()) item.name = item.path;
 
-            WIN32_FILE_ATTRIBUTE_DATA attr = {};
-            const bool exists =
-                GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr) != 0;
-            if (exists) {
-                item.isDirectory = (attr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-                item.sizeBytes =
-                    (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
-            }
+                WIN32_FILE_ATTRIBUTE_DATA attr = {};
+                const bool exists =
+                    GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr) != 0;
+                if (exists) {
+                    item.isDirectory = (attr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+                    item.sizeBytes =
+                        (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+                }
 
-            // A missing file gets its type icon from the extension alone, which
-            // never touches the disk (so an unplugged drive can't stall startup).
-            SHFILEINFOW info = {};
-            UINT flags = SHGFI_ICON | SHGFI_LARGEICON;
-            if (!exists) flags |= SHGFI_USEFILEATTRIBUTES;
-            if (SHGetFileInfoW(item.path.c_str(), exists ? 0 : FILE_ATTRIBUTE_NORMAL, &info,
-                               sizeof(info), flags) &&
-                info.hIcon) {
-                item.icon = IconToPixelsRef(info.hIcon, 32);
-                DestroyIcon(info.hIcon);
+                SHFILEINFOW info = {};
+                UINT flags = SHGFI_ICON | SHGFI_LARGEICON;
+                if (!exists) flags |= SHGFI_USEFILEATTRIBUTES;
+                if (SHGetFileInfoW(item.path.c_str(), exists ? 0 : FILE_ATTRIBUTE_NORMAL, &info,
+                                   sizeof(info), flags) &&
+                    info.hIcon) {
+                    item.icon = IconToPixelsRef(info.hIcon, 32);
+                    DestroyIcon(info.hIcon);
+                }
+            } else {
+                continue;
             }
         } else {
-            continue;
+            // Format 1 legacy
+            if (line[0] == 'T') {
+                const std::string rest = line.substr(2);
+                const size_t tab = rest.find('\t');
+                if (tab == std::string::npos) continue;
+                item.isText = true;
+                item.name = FileTrayStore::Unescape(rest.substr(0, tab));
+                item.text = FileTrayStore::Unescape(rest.substr(tab + 1));
+                if (item.text.empty()) continue;
+                if (item.name.empty()) item.name = L"Text";
+            } else if (line[0] == 'I') {
+                const std::string rest = line.substr(2);
+                const size_t tab = rest.find('\t');
+                if (tab == std::string::npos) continue;
+                item.isImage = true;
+                item.name = FileTrayStore::Unescape(rest.substr(0, tab));
+                item.path = FileTrayStore::Unescape(rest.substr(tab + 1));
+                if (item.path.empty()) continue;
+                item.name = FileTrayStore::Unescape(rest.substr(0, tab));
+                if (item.name.empty()) item.name = L"Image";
+
+                WIN32_FILE_ATTRIBUTE_DATA attr = {};
+                if (GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr)) {
+                    item.sizeBytes =
+                        (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+                    BitmapPixels thumb;
+                    if (LoadImagePixelsFromPngFile(item.path, &thumb, 48)) {
+                        static uint64_t s_loadGen = 5000;
+                        thumb.generation = ++s_loadGen;
+                        item.icon = PixelsRef(std::move(thumb));
+                    }
+                }
+            } else if (line[0] == 'F') {
+                item.path = FileTrayStore::Unescape(line.substr(2));
+                if (item.path.empty()) continue;
+                item.name = BaseNameFromPath(item.path);
+                if (item.name.empty()) item.name = item.path;
+
+                WIN32_FILE_ATTRIBUTE_DATA attr = {};
+                const bool exists =
+                    GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr) != 0;
+                if (exists) {
+                    item.isDirectory = (attr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+                    item.sizeBytes =
+                        (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+                }
+
+                SHFILEINFOW info = {};
+                UINT flags = SHGFI_ICON | SHGFI_LARGEICON;
+                if (!exists) flags |= SHGFI_USEFILEATTRIBUTES;
+                if (SHGetFileInfoW(item.path.c_str(), exists ? 0 : FILE_ATTRIBUTE_NORMAL, &info,
+                                   sizeof(info), flags) &&
+                    info.hIcon) {
+                    item.icon = IconToPixelsRef(info.hIcon, 32);
+                    DestroyIcon(info.hIcon);
+                }
+            } else {
+                continue;
+            }
         }
         loaded.push_back(std::move(item));
     }
@@ -21165,9 +21577,15 @@ void LoadFileTray() {
     items.insert(items.begin(), std::make_move_iterator(loaded.begin()),
                  std::make_move_iterator(loaded.end()));
     while (items.size() > static_cast<size_t>(maxItems)) {
-        items.erase(items.begin());
+        auto it = std::find_if(items.begin(), items.end(), [](const FileTrayItem& x) { return !x.isPinned; });
+        if (it != items.end()) {
+            items.erase(it);
+        } else {
+            break;
+        }
     }
     Wh_Log(L"File Tray: restored %zu item(s).", items.size());
+    PruneExpiredFileTrayItems();
 }
 
 bool TrayModuleEnabled() {
@@ -21186,6 +21604,8 @@ void AddPathsToFileTrayCore(const std::vector<std::wstring>& paths) {
     added.reserve(paths.size());
     for (const std::wstring& path : paths) {
         FileTrayItem item;
+        item.addedTime = static_cast<uint64_t>(time(nullptr));
+        item.isPinned = false;
         item.path = path;
         item.name = BaseNameFromPath(path);
         if (item.name.empty()) {
@@ -21218,12 +21638,19 @@ void AddPathsToFileTrayCore(const std::vector<std::wstring>& paths) {
                                          return _wcsicmp(other.path.c_str(), item.path.c_str()) == 0;
                                      });
         if (existing != g_state.fileTrayItems.end()) {
+            item.isPinned = existing->isPinned;  // Retain pin status if re-dropped
             g_state.fileTrayItems.erase(existing);
         }
         g_state.fileTrayItems.push_back(std::move(item));
     }
     while (g_state.fileTrayItems.size() > static_cast<size_t>(maxItems)) {
-        g_state.fileTrayItems.erase(g_state.fileTrayItems.begin());
+        auto it = std::find_if(g_state.fileTrayItems.begin(), g_state.fileTrayItems.end(),
+                               [](const FileTrayItem& x) { return !x.isPinned; });
+        if (it != g_state.fileTrayItems.end()) {
+            g_state.fileTrayItems.erase(it);
+        } else {
+            break;
+        }
     }
 }
 
@@ -21231,6 +21658,7 @@ void AddPathsToFileTrayCore(const std::vector<std::wstring>& paths) {
 // only changes the in-memory list.
 void AddPathsToFileTray(const std::vector<std::wstring>& paths) {
     AddPathsToFileTrayCore(paths);
+    PruneExpiredFileTrayItems();
     SaveFileTray();
 }
 
@@ -21321,6 +21749,8 @@ void AddTextToFileTray(const std::wstring& rawText) {
     }
 
     FileTrayItem item;
+    item.addedTime = static_cast<uint64_t>(time(nullptr));
+    item.isPinned = false;
     item.isText = true;
     item.text = std::move(text);
     item.name = preview.empty() ? std::wstring(L"Text") : preview;
@@ -21328,14 +21758,22 @@ void AddTextToFileTray(const std::wstring& rawText) {
     std::lock_guard lock(g_stateMutex);
     auto& items = g_state.fileTrayItems;
     // Pasting the same snippet again promotes it instead of duplicating it.
-    items.erase(std::remove_if(items.begin(), items.end(),
-                               [&](const FileTrayItem& other) {
-                                   return other.isText && other.text == item.text;
-                               }),
-                items.end());
+    auto existing = std::find_if(items.begin(), items.end(),
+                                 [&](const FileTrayItem& other) {
+                                     return other.isText && other.text == item.text;
+                                 });
+    if (existing != items.end()) {
+        item.isPinned = existing->isPinned;
+        items.erase(existing);
+    }
     items.push_back(std::move(item));
     while (items.size() > static_cast<size_t>(maxItems)) {
-        items.erase(items.begin());
+        auto it = std::find_if(items.begin(), items.end(), [](const FileTrayItem& x) { return !x.isPinned; });
+        if (it != items.end()) {
+            items.erase(it);
+        } else {
+            break;
+        }
     }
 }
 
@@ -21405,6 +21843,8 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
     thumb.generation = ++s_imgGen;
 
     FileTrayItem item;
+    item.addedTime = static_cast<uint64_t>(time(nullptr));
+    item.isPinned = false;
     item.isImage = true;
     item.path = filePath;
     item.name = L"Ảnh " + std::to_wstring(fullPixels.width) + L"x" + std::to_wstring(fullPixels.height);
@@ -21427,10 +21867,15 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
         auto& items = g_state.fileTrayItems;
         items.push_back(std::move(item));
         while (items.size() > static_cast<size_t>(maxItems)) {
-            if (items.front().isImage && !items.front().path.empty()) {
-                filesToDelete.push_back(items.front().path);
+            auto it = std::find_if(items.begin(), items.end(), [](const FileTrayItem& x) { return !x.isPinned; });
+            if (it != items.end()) {
+                if (it->isImage && !it->path.empty()) {
+                    filesToDelete.push_back(it->path);
+                }
+                items.erase(it);
+            } else {
+                break;
             }
-            items.erase(items.begin());
         }
     }
 
@@ -21438,6 +21883,7 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
         DeleteFileW(f.c_str());
     }
 
+    PruneExpiredFileTrayItems();
     SaveFileTray();
 }
 
@@ -21477,6 +21923,7 @@ void AutoCaptureClipboardToFileTray(HWND hwnd) {
         std::wstring text = ReadClipboardText(hwnd);
         if (!text.empty()) {
             AddTextToFileTray(text);
+            PruneExpiredFileTrayItems();
             SaveFileTray();
         }
     } else if (hasBitmap) {
@@ -21676,6 +22123,35 @@ void StartFileTrayDrag(const std::wstring& path) {
     // File was moved away by the target: its tray entry is now stale.
     if (effect != DROPEFFECT_NONE && GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) {
         RemoveFileTrayItemByPath(path);
+    }
+}
+
+void ExecuteIslandQuickAction(const std::wstring& action, HWND hwnd) {
+    if (action == L"play_pause") {
+        SendMediaTransportCommand(1);
+    } else if (action == L"mute_toggle") {
+        ToggleEndpointMute();
+    } else if (action == L"open_filetray") {
+        const int tab = FileTrayTabIndex(GetSettingsCopy());
+        if (tab >= 0) g_idleTab = tab;
+        g_clickExpanded = true;
+        g_layoutDirty = true;
+        TriggerNudge();
+    } else if (action == L"screenshot") {
+        INPUT inputs[6] = {};
+        inputs[0].type = INPUT_KEYBOARD; inputs[0].ki.wVk = VK_LWIN;
+        inputs[1].type = INPUT_KEYBOARD; inputs[1].ki.wVk = VK_SHIFT;
+        inputs[2].type = INPUT_KEYBOARD; inputs[2].ki.wVk = 'S';
+        inputs[3].type = INPUT_KEYBOARD; inputs[3].ki.wVk = 'S'; inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
+        inputs[4].type = INPUT_KEYBOARD; inputs[4].ki.wVk = VK_SHIFT; inputs[4].ki.dwFlags = KEYEVENTF_KEYUP;
+        inputs[5].type = INPUT_KEYBOARD; inputs[5].ki.wVk = VK_LWIN; inputs[5].ki.dwFlags = KEYEVENTF_KEYUP;
+        SendInput(6, inputs, sizeof(INPUT));
+    } else if (action == L"dismiss") {
+        g_manuallyHidden = true;
+        Wh_SetIntValue(L"ManuallyHidden", 1);
+        g_hotkeyUnhideUntil.store(0.0);
+        g_layoutDirty = true;
+        if (hwnd) PostMessageW(hwnd, WM_APP_NEW_EVENT, 0, 0);
     }
 }
 
@@ -22047,7 +22523,7 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     std::lock_guard lock(g_stateMutex);
                     const int count = static_cast<int>(g_state.fileTrayItems.size());
                     const int row = FileTrayRowAtContentPoint(tcp, count);
-                    if (row >= 0 && !FileTrayRemoveHitTest(tcp, row)) {
+                    if (row >= 0 && !FileTrayRemoveHitTest(tcp, row) && !FileTrayPinHitTest(tcp, row)) {
                         s_trayPressActive = true;
                         s_trayPressPt.x = xPos;
                         s_trayPressPt.y = yPos;
@@ -22286,14 +22762,61 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 if (s_touchStartTime > 0 && (now - s_touchStartTime) < 500) {
                     const int dx = xPos - s_touchStart.x;
                     const int dy = yPos - s_touchStart.y;
-                    const int travel = abs(dy) > abs(dx) ? dy : dx;  // dominant axis wins
-                    if (abs(travel) > 40) {
-                        // Swipe up / left -> next tab, down / right -> previous tab
-                        if (ActiveTabCount(GetSettingsCopy()) > 1) {
-                            StepIdleTab(travel > 0 ? -1 : 1);
+                    const bool isIslandExpanded = g_clickExpanded.load() || g_pinnedExpanded.load();
+
+                    if (!isIslandExpanded) {
+                        // Gesture on collapsed Dynamic Island: adjust volume or brightness
+                        bool swipeEnabled = false;
+                        std::wstring swipeDir;
+                        {
+                            std::lock_guard lock(g_settingsMutex);
+                            swipeEnabled = g_settings.collapsedSwipeEnabled;
+                            swipeDir = g_settings.collapsedSwipeDirection;
                         }
-                        s_touchStartTime = 0;
-                        return 0; // Consume swipe gesture
+                        if (swipeEnabled) {
+                            if (swipeDir.find(L"vertical") != std::wstring::npos && abs(dy) >= 20) {
+                                int step = (dy < 0) ? 1 : -1;
+                                if (swipeDir == L"vertical_down_inc") step = -step;
+                                ApplyCollapsedSwipeStep(step);
+                                s_touchStartTime = 0;
+                                return 0;
+                            } else if (swipeDir.find(L"horizontal") != std::wstring::npos && abs(dx) >= 20) {
+                                int step = (dx > 0) ? 1 : -1;
+                                if (swipeDir == L"horizontal_left_inc") step = -step;
+                                ApplyCollapsedSwipeStep(step);
+                                s_touchStartTime = 0;
+                                return 0;
+                            }
+                        }
+                    } else {
+                        // Gesture on expanded Dynamic Island: Switch tabs based on tabSwitchDirection
+                        std::wstring tabDir;
+                        {
+                            std::lock_guard lock(g_settingsMutex);
+                            tabDir = g_settings.tabSwitchDirection;
+                        }
+                        if (ActiveTabCount(GetSettingsCopy()) > 1) {
+                            if (tabDir.find(L"horizontal") != std::wstring::npos && abs(dx) > 25) {
+                                int step = (dx < 0) ? 1 : -1;
+                                if (tabDir == L"horizontal_left") step = -step;
+                                StepIdleTab(step);
+                                s_touchStartTime = 0;
+                                return 0;
+                            } else if (tabDir.find(L"vertical") != std::wstring::npos && abs(dy) > 25) {
+                                int step = (dy < 0) ? 1 : -1;
+                                if (tabDir == L"vertical_up") step = -step;
+                                StepIdleTab(step);
+                                s_touchStartTime = 0;
+                                return 0;
+                            } else {
+                                const int travel = abs(dy) > abs(dx) ? dy : dx;
+                                if (abs(travel) > 35) {
+                                    StepIdleTab(travel > 0 ? -1 : 1);
+                                    s_touchStartTime = 0;
+                                    return 0;
+                                }
+                            }
+                        }
                     }
                 }
                 s_touchStartTime = 0;
@@ -22368,18 +22891,24 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                         const int count = static_cast<int>(g_state.fileTrayItems.size());
                         if (count > 0 && FileTrayClearHitTest(cp)) {
                             for (const auto& item : g_state.fileTrayItems) {
-                                if (item.isImage && !item.path.empty()) {
+                                if (!item.isPinned && item.isImage && !item.path.empty()) {
                                     DeleteFileW(item.path.c_str());
                                 }
                             }
-                            g_state.fileTrayItems.clear();
+                            g_state.fileTrayItems.erase(
+                                std::remove_if(g_state.fileTrayItems.begin(), g_state.fileTrayItems.end(),
+                                               [](const FileTrayItem& item) { return !item.isPinned; }),
+                                g_state.fileTrayItems.end());
                             changed = true;
                         } else {
                             const int row = FileTrayRowAtContentPoint(cp, count);
                             if (row >= 0) {
                                 // Rows render newest-first, so map back from the end.
                                 const size_t index = static_cast<size_t>(count - 1 - row);
-                                if (FileTrayRemoveHitTest(cp, row)) {
+                                if (FileTrayPinHitTest(cp, row)) {
+                                    g_state.fileTrayItems[index].isPinned = !g_state.fileTrayItems[index].isPinned;
+                                    changed = true;
+                                } else if (FileTrayRemoveHitTest(cp, row)) {
                                     if (g_state.fileTrayItems[index].isImage && !g_state.fileTrayItems[index].path.empty()) {
                                         DeleteFileW(g_state.fileTrayItems[index].path.c_str());
                                     }
@@ -22495,10 +23024,6 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             }
             return 0;
 
-        case WM_MBUTTONUP:
-            ToggleEndpointMute();
-            return 0;
-
         case WM_LBUTTONDBLCLK: {
             POINT screenPt;
             GetCursorPos(&screenPt);
@@ -22506,21 +23031,60 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 TriggerShowAnimation();
                 return 0;
             }
+            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
+            if (!isExpanded) {
+                std::wstring action;
+                {
+                    std::lock_guard lock(g_settingsMutex);
+                    action = g_settings.collapsedDoubleClickAction;
+                }
+                if (action != L"none" && !action.empty()) {
+                    g_clickExpanded = false;
+                    ExecuteIslandQuickAction(action, hwnd);
+                    return 0;
+                }
+            }
             const bool nextVal = !g_pinnedExpanded.load();
             g_pinnedExpanded.store(nextVal);
             Wh_SetIntValue(L"PinnedExpanded", nextVal ? 1 : 0);
             return 0;
         }
 
+        case WM_MBUTTONUP: {
+            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
+            if (!isExpanded) {
+                std::wstring action;
+                {
+                    std::lock_guard lock(g_settingsMutex);
+                    action = g_settings.collapsedMiddleClickAction;
+                }
+                if (action != L"none" && !action.empty()) {
+                    ExecuteIslandQuickAction(action, hwnd);
+                    return 0;
+                }
+            }
+            break;
+        }
+
         case WM_MOUSEWHEEL: {
             const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
             if (delta == 0) return 0;
 
-            // Bước 3: Cuộn chuột chỉnh Volume khi đảo ở trạng thái thu gọn
             const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
-                StepSystemVolume(delta > 0 ? 0.02f : -0.02f);
-                return 0;
+                bool swipeEnabled = false;
+                std::wstring swipeDir;
+                {
+                    std::lock_guard lock(g_settingsMutex);
+                    swipeEnabled = g_settings.collapsedSwipeEnabled;
+                    swipeDir = g_settings.collapsedSwipeDirection;
+                }
+                if (swipeEnabled) {
+                    int step = (delta > 0) ? 1 : -1;
+                    if (swipeDir == L"vertical_down_inc") step = -step;
+                    ApplyCollapsedSwipeStep(step);
+                    return 0;
+                }
             }
 
             // Khi mở rộng: Cuộn chuột để chuyển tab
@@ -22549,8 +23113,51 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 return 0;
             }
             s_lastWheelStep = wheelNow;
-            StepIdleTab(s_wheelAccum > 0 ? -1 : 1);  // wheel up = previous tab
+
+            std::wstring tabDir;
+            {
+                std::lock_guard lock(g_settingsMutex);
+                tabDir = g_settings.tabSwitchDirection;
+            }
+            int tabStep = (s_wheelAccum > 0) ? -1 : 1;
+            if (tabDir == L"vertical_up" || tabDir == L"horizontal_left") {
+                tabStep = -tabStep;
+            }
+            StepIdleTab(tabStep);
             s_wheelAccum = 0;
+            return 0;
+        }
+
+        case WM_MOUSEHWHEEL: {
+            const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+            if (delta == 0) return 0;
+
+            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
+            if (!isExpanded) {
+                bool swipeEnabled = false;
+                std::wstring swipeDir;
+                {
+                    std::lock_guard lock(g_settingsMutex);
+                    swipeEnabled = g_settings.collapsedSwipeEnabled;
+                    swipeDir = g_settings.collapsedSwipeDirection;
+                }
+                if (swipeEnabled) {
+                    int step = (delta > 0) ? 1 : -1;
+                    if (swipeDir == L"horizontal_left_inc") step = -step;
+                    ApplyCollapsedSwipeStep(step);
+                    return 0;
+                }
+            } else {
+                std::wstring tabDir;
+                {
+                    std::lock_guard lock(g_settingsMutex);
+                    tabDir = g_settings.tabSwitchDirection;
+                }
+                int tabStep = (delta > 0) ? 1 : -1;
+                if (tabDir == L"horizontal_left") tabStep = -tabStep;
+                StepIdleTab(tabStep);
+                return 0;
+            }
             return 0;
         }
 
@@ -22633,6 +23240,7 @@ DWORD WINAPI RenderThreadProc(void*) {
 
     WNDCLASSEXW wc = {};
     wc.cbSize = sizeof(wc);
+    wc.style = CS_DBLCLKS;
     wc.lpfnWndProc = OverlayWndProc;
     wc.hInstance = GetModuleHandleW(nullptr);
     wc.lpszClassName = kWindowClass;
@@ -22763,6 +23371,7 @@ DWORD WINAPI RenderThreadProc(void*) {
     double nextProgressPoll = 0.0;
     double nextSystemPoll = 0.0;
     double nextPrivacyPoll = 0.0;
+    double nextFileTrayPrune = 0.0;
     bool wasManuallyHidden = false;
     bool wasAutoHiddenParked = false;
     bool parkedForFullscreen = false;
@@ -22918,6 +23527,10 @@ DWORD WINAPI RenderThreadProc(void*) {
         if (!pollBusy && now >= nextPrivacyPoll) {
             UpdatePrivacyIndicators();
             nextPrivacyPoll = now + 0.5;  // poll every 0.5 s for snappy response
+        }
+        if (g_settings.fileTrayModule && now >= nextFileTrayPrune) {
+            nextFileTrayPrune = now + 60.0;
+            PruneExpiredFileTrayItems();
         }
 
         bool timerJustCompleted = false;
