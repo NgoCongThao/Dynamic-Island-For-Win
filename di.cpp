@@ -269,16 +269,15 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $options:
       - volume: Âm lượng hệ thống (Volume)
       - brightness: Độ sáng màn hình (Brightness)
-  - CollapsedSwipeDirection: natural
-    $name: Hướng & Đảo chiều vuốt khi thu nhỏ
-    $description: Cả 4 hướng (Trái/Phải/Lên/Xuống) đều hoạt động đồng thời. Bạn có thể tùy chọn chiều tăng giảm tự nhiên hoặc đảo chiều.
+  - CollapsedSwipeDirection: horizontal
+    $name: Hướng vuốt khi thu nhỏ (Khóa hướng di chuyển)
+    $description: Khóa cử chỉ vuốt theo hướng đã chọn. Khi chọn Ngang, chỉ nhận vuốt Trái/Phải; khi chọn Dọc, chỉ nhận vuốt Lên/Xuống (không bị loạn hướng).
     $options:
-      - natural: Tự nhiên (Vuốt Phải hoặc Vuốt Lên = Tăng, Vuốt Trái hoặc Vuốt Xuống = Giảm)
-      - invert_vertical: Đảo chiều dọc (Vuốt Xuống = Tăng, Vuốt Lên = Giảm)
-      - invert_horizontal: Đảo chiều ngang (Vuốt Trái = Tăng, Vuốt Phải = Giảm)
-      - invert_both: Đảo cả 2 chiều
-      - horizontal: Vuốt Ngang (Phải = Tăng, Trái = Giảm)
-      - vertical: Vuốt Dọc (Lên = Tăng, Xuống = Giảm)
+      - horizontal: Khóa Chiều Ngang (Vuốt Phải = Tăng, Vuốt Trái = Giảm) (Mặc định khuyên dùng)
+      - horizontal_inverted: Khóa Chiều Ngang Đảo Ngược (Vuốt Phải = Giảm, Vuốt Trái = Tăng)
+      - vertical: Khóa Chiều Dọc (Vuốt Lên = Tăng, Vuốt Xuống = Giảm)
+      - vertical_inverted: Khóa Chiều Dọc Đảo Ngược (Vuốt Xuống = Tăng, Vuốt Lên = Giảm)
+      - natural: Tự do cả 2 trục (Nhận cả Ngang và Dọc)
   - CollapsedDoubleClickAction: play_pause
     $name: Hành động khi Nhấp Đúp trên Island thu nhỏ
     $description: Thao tác thực hiện khi nhấp đúp chuột trái vào viên thuốc (không bị kẹt ghim mở rộng).
@@ -296,14 +295,15 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
       - play_pause: Phát / Tạm dừng nhạc
       - screenshot: Chụp màn hình nhanh (Win + Shift + S)
       - dismiss: Đóng nhanh thông báo đang hiện
-  - TabSwitchDirection: auto
-    $name: Hướng trượt cửa sổ / tab mở rộng
-    $description: Tự do vuốt theo cả 4 hướng để đổi tab. Hiệu ứng trượt mượt mà sẽ thích ứng theo hướng bạn vuốt (ngang hoặc dọc).
+  - TabSwitchDirection: horizontal
+    $name: Hướng trượt cửa sổ tab mở rộng (Khóa hướng di chuyển)
+    $description: Khóa hướng vuốt đổi tab. Khi chọn Ngang, chỉ nhận vuốt Trái/Phải để lướt ngang; khi chọn Dọc, chỉ nhận vuốt Lên/Xuống để lướt dọc.
     $options:
-      - auto: Tự động 4 hướng (Vuốt Trái hoặc Vuốt Lên -> Kế tiếp, Vuốt Phải hoặc Vuốt Xuống -> Trước)
-      - invert_swipe: Đảo chiều vuốt (Vuốt Phải hoặc Vuốt Xuống -> Kế tiếp, Vuốt Trái hoặc Vuốt Lên -> Trước)
-      - horizontal: Ưu tiên trượt ngang (Vuốt Trái/Phải)
-      - vertical: Ưu tiên trượt dọc (Vuốt Lên/Xuống)
+      - horizontal: Khóa Trượt Ngang (Vuốt Trái / Cuộn Xuống -> Kế tiếp, Vuốt Phải / Cuộn Lên -> Trước) (Mặc định)
+      - horizontal_inverted: Khóa Trượt Ngang Đảo Ngược (Vuốt Phải -> Kế tiếp, Vuốt Trái -> Trước)
+      - vertical: Khóa Trượt Dọc (Vuốt Lên / Cuộn Xuống -> Kế tiếp, Vuốt Xuống / Cuộn Lên -> Trước)
+      - vertical_inverted: Khóa Trượt Dọc Đảo Ngược (Vuốt Xuống -> Kế tiếp, Vuốt Lên -> Trước)
+      - auto: Tự do cả 2 trục (Tự động thích ứng)
   - CollapsedTitleMarquee: true
     $name: Tự động cuộn chữ khi tên bài hát dài
     $description: Tự động cuộn chạy chữ êm ái khi tên bài hát dài vượt quá không gian của thanh thu nhỏ (tránh bị sóng nhạc cắt cụt chữ).
@@ -1277,10 +1277,10 @@ struct Settings {
     // ── Gestures & Swipe ─────────────────────────────────────────────────────
     bool collapsedSwipeEnabled = true;
     std::wstring collapsedSwipeTarget = L"volume";
-    std::wstring collapsedSwipeDirection = L"natural";
+    std::wstring collapsedSwipeDirection = L"horizontal";
     std::wstring collapsedDoubleClickAction = L"play_pause";
     std::wstring collapsedMiddleClickAction = L"mute_toggle";
-    std::wstring tabSwitchDirection = L"auto";
+    std::wstring tabSwitchDirection = L"horizontal";
     bool collapsedTitleMarquee = true;
     bool collapsedFluidFill = true;
 
@@ -15880,9 +15880,9 @@ class Renderer {
         tabIdx = ClampInt(tabIdx, 0, count - 1);
 
         // ── Feel: tweak these ──
-        constexpr float kStiffness = 250.0f;        // higher = faster (settles in ~0.29s)
-        constexpr float kDamping = 31.0f;           // ~0.92 damping ratio: no visible overshoot
-        constexpr float kTravelPx = 34.0f;          // vertical gap between neighbouring tabs
+        constexpr float kStiffness = 180.0f;        // smooth & weighted spring (settles in ~0.35s)
+        constexpr float kDamping = 27.0f;           // ~1.0 critical damping: no overshoot or flashing
+        constexpr float kTravelPx = 34.0f;          // gap between neighbouring tabs
         constexpr float kMinScale = 0.965f;         // size of a tab that is fully out of view
         constexpr float kFadePower = 1.4f;          // >1 thins the mid-point slightly so text never ghosts
 
@@ -15980,7 +15980,7 @@ class Renderer {
             const bool isHoriz = (g_activeTabTransitionAxis.load(std::memory_order_relaxed) == 0);
 
             if (isHoriz) {
-                transX = d * kTravelPx * 2.5f;
+                transX = d * kTravelPx * 2.0f;
             } else {
                 transY = d * kTravelPx * 1.5f;
             }
@@ -22797,17 +22797,21 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     return 0;
                 }
 
+                RECT clientRect;
+                GetClientRect(hwnd, &clientRect);
+                const float height = static_cast<float>(clientRect.bottom - clientRect.top);
+                const bool isIslandExpanded = (height > 60.0f) || g_clickExpanded.load() || g_pinnedExpanded.load();
+
                 int xPos = GET_X_LPARAM(lParam);
                 int yPos = GET_Y_LPARAM(lParam);
 
                 ULONGLONG now = GetTickCount64();
-                if (s_touchStartTime > 0 && (now - s_touchStartTime) < 500) {
+                if (s_touchStartTime > 0 && (now - s_touchStartTime) < 550) {
                     const int dx = xPos - s_touchStart.x;
                     const int dy = yPos - s_touchStart.y;
-                    const bool isIslandExpanded = g_clickExpanded.load() || g_pinnedExpanded.load();
 
                     if (!isIslandExpanded) {
-                        // Gesture on collapsed Dynamic Island: adjust volume or brightness in all 4 directions
+                        // Gesture on collapsed Dynamic Island: adjust volume or brightness
                         bool swipeEnabled = false;
                         std::wstring swipeDir;
                         {
@@ -22816,69 +22820,133 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                             swipeDir = g_settings.collapsedSwipeDirection;
                         }
                         if (swipeEnabled) {
-                            const bool horizDominant = (abs(dx) >= abs(dy));
-                            const int travel = horizDominant ? abs(dx) : abs(dy);
-                            if (travel >= 20) {
-                                int step = 0;
-                                if (horizDominant) {
-                                    // Horizontal: Vuốt Phải (dx > 0) = Tăng (+1), Vuốt Trái (dx < 0) = Giảm (-1)
-                                    step = (dx > 0) ? 1 : -1;
-                                    if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
-                                        swipeDir.find(L"invert_both") != std::wstring::npos ||
-                                        swipeDir == L"horizontal_inverted") {
-                                        step = -step;
-                                    }
-                                } else {
-                                    // Vertical: Vuốt Lên (dy < 0) = Tăng (+1), Vuốt Xuống (dy > 0) = Giảm (-1)
-                                    step = (dy < 0) ? 1 : -1;
-                                    if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
-                                        swipeDir.find(L"invert_both") != std::wstring::npos ||
-                                        swipeDir == L"vertical_inverted" ||
-                                        swipeDir == L"vertical_down_inc") {
-                                        step = -step;
-                                    }
+                            const bool isHorizOnly = (swipeDir.find(L"horizontal") != std::wstring::npos);
+                            const bool isVertOnly = (swipeDir.find(L"vertical") != std::wstring::npos);
+
+                            if (isHorizOnly) {
+                                // Strictly locked to horizontal: ignore vertical swipes
+                                if (abs(dx) >= 20 && abs(dx) > abs(dy) * 1.2f) {
+                                    int step = (dx > 0) ? 1 : -1;
+                                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
+                                    ApplyCollapsedSwipeStep(step);
+                                    s_touchStartTime = 0;
+                                    return 0;
                                 }
-                                ApplyCollapsedSwipeStep(step);
-                                s_touchStartTime = 0;
-                                return 0;
+                            } else if (isVertOnly) {
+                                // Strictly locked to vertical: ignore horizontal swipes
+                                if (abs(dy) >= 20 && abs(dy) > abs(dx) * 1.2f) {
+                                    int step = (dy < 0) ? 1 : -1;
+                                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
+                                    ApplyCollapsedSwipeStep(step);
+                                    s_touchStartTime = 0;
+                                    return 0;
+                                }
+                            } else {
+                                // Natural: allow both axes based on dominant travel
+                                const bool horizDominant = (abs(dx) >= abs(dy));
+                                const int travel = horizDominant ? abs(dx) : abs(dy);
+                                if (travel >= 20) {
+                                    int step = 0;
+                                    if (horizDominant) {
+                                        step = (dx > 0) ? 1 : -1;
+                                        if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
+                                            swipeDir.find(L"invert_both") != std::wstring::npos ||
+                                            swipeDir == L"horizontal_inverted") {
+                                            step = -step;
+                                        }
+                                    } else {
+                                        step = (dy < 0) ? 1 : -1;
+                                        if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
+                                            swipeDir.find(L"invert_both") != std::wstring::npos ||
+                                            swipeDir == L"vertical_inverted" ||
+                                            swipeDir == L"vertical_down_inc") {
+                                            step = -step;
+                                        }
+                                    }
+                                    ApplyCollapsedSwipeStep(step);
+                                    s_touchStartTime = 0;
+                                    return 0;
+                                }
                             }
                         }
                     } else {
-                        // Gesture on expanded Dynamic Island: Switch tabs in all 4 directions
+                        // Gesture on expanded Dynamic Island: Switch tabs based on tabSwitchDirection
                         std::wstring tabDir;
                         {
                             std::lock_guard lock(g_settingsMutex);
                             tabDir = g_settings.tabSwitchDirection;
                         }
                         if (ActiveTabCount(GetSettingsCopy()) > 1) {
-                            const bool horizDominant = (abs(dx) >= abs(dy));
-                            const int travel = horizDominant ? abs(dx) : abs(dy);
+                            const bool isHorizOnly = (tabDir.find(L"horizontal") != std::wstring::npos);
+                            const bool isVertOnly = (tabDir.find(L"vertical") != std::wstring::npos);
                             const ULONGLONG elapsedPress = now - s_touchStartTime;
-                            if (travel >= 28 && elapsedPress >= 40) {
-                                int step = 0;
-                                if (horizDominant) {
-                                    // Horizontal: Vuốt Trái (dx < 0) -> Tab Kế tiếp (+1), Vuốt Phải (dx > 0) -> Tab Trước (-1)
-                                    step = (dx < 0) ? 1 : -1;
-                                    if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
-                                        tabDir.find(L"invert_swipe") != std::wstring::npos ||
-                                        tabDir == L"horizontal_inverted") {
-                                        step = -step;
+
+                            // Debounce cooldown to prevent accidental rapid skips
+                            static ULONGLONG s_lastTabSwitchTime = 0;
+                            const bool canSwitchTab = (now - s_lastTabSwitchTime >= 240);
+
+                            if (canSwitchTab && elapsedPress >= 40) {
+                                if (isHorizOnly) {
+                                    // Strictly locked to horizontal tab switching: ignore vertical swipes
+                                    // Requires at least 45px travel with dominant horizontal direction
+                                    if (abs(dx) >= 45 && abs(dx) > abs(dy) * 1.2f) {
+                                        s_lastTabSwitchTime = now;
+                                        int step = (dx < 0) ? 1 : -1;  // Drag Left = Next (+1), Drag Right = Prev (-1)
+                                        if (tabDir.find(L"inverted") != std::wstring::npos ||
+                                            tabDir == L"horizontal_inverted") {
+                                            step = -step;
+                                        }
+                                        g_activeTabTransitionAxis.store(0);  // animate horizontally
+                                        StepIdleTab(step);
+                                        s_touchStartTime = 0;
+                                        return 0;
                                     }
-                                    g_activeTabTransitionAxis.store(0);  // animate horizontally
+                                } else if (isVertOnly) {
+                                    // Strictly locked to vertical tab switching: ignore horizontal swipes
+                                    // Requires at least 45px travel with dominant vertical direction
+                                    if (abs(dy) >= 45 && abs(dy) > abs(dx) * 1.2f) {
+                                        s_lastTabSwitchTime = now;
+                                        int step = (dy < 0) ? 1 : -1;  // Drag Up = Next (+1), Drag Down = Prev (-1)
+                                        if (tabDir.find(L"inverted") != std::wstring::npos ||
+                                            tabDir == L"vertical_inverted" ||
+                                            tabDir == L"vertical_down") {
+                                            step = -step;
+                                        }
+                                        g_activeTabTransitionAxis.store(1);  // animate vertically
+                                        StepIdleTab(step);
+                                        s_touchStartTime = 0;
+                                        return 0;
+                                    }
                                 } else {
-                                    // Vertical: Vuốt Lên (dy < 0) -> Tab Kế tiếp (+1), Vuốt Xuống (dy > 0) -> Tab Trước (-1)
-                                    step = (dy < 0) ? 1 : -1;
-                                    if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
-                                        tabDir.find(L"invert_swipe") != std::wstring::npos ||
-                                        tabDir == L"vertical_inverted" ||
-                                        tabDir == L"vertical_down") {
-                                        step = -step;
+                                    // Auto: whichever axis has dominant travel >= 45px
+                                    const bool horizDominant = (abs(dx) >= abs(dy));
+                                    const int travel = horizDominant ? abs(dx) : abs(dy);
+                                    if (travel >= 45) {
+                                        s_lastTabSwitchTime = now;
+                                        int step = 0;
+                                        if (horizDominant) {
+                                            step = (dx < 0) ? 1 : -1;
+                                            if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
+                                                tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                                                tabDir == L"horizontal_inverted") {
+                                                step = -step;
+                                            }
+                                            g_activeTabTransitionAxis.store(0);
+                                        } else {
+                                            step = (dy < 0) ? 1 : -1;
+                                            if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
+                                                tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                                                tabDir == L"vertical_inverted" ||
+                                                tabDir == L"vertical_down") {
+                                                step = -step;
+                                            }
+                                            g_activeTabTransitionAxis.store(1);
+                                        }
+                                        StepIdleTab(step);
+                                        s_touchStartTime = 0;
+                                        return 0;
                                     }
-                                    g_activeTabTransitionAxis.store(1);  // animate vertically
                                 }
-                                StepIdleTab(step);
-                                s_touchStartTime = 0;
-                                return 0;
                             }
                         }
                     }
@@ -22935,10 +23003,6 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                         return 0; // consumed click to expand
                     }
                 }
-
-                RECT clientRect;
-                GetClientRect(hwnd, &clientRect);
-                const float height = static_cast<float>(clientRect.bottom - clientRect.top);
 
                 const int currentTab = NormalizedTabIndex(g_settings);
 
@@ -23148,7 +23212,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         }
 
         case WM_MBUTTONUP: {
-            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
+            RECT clientRect;
+            GetClientRect(hwnd, &clientRect);
+            const bool isExpanded = (clientRect.bottom - clientRect.top > 60) || g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
                 std::wstring action;
                 {
@@ -23167,7 +23233,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
             if (delta == 0) return 0;
 
-            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
+            RECT clientRect;
+            GetClientRect(hwnd, &clientRect);
+            const bool isExpanded = (clientRect.bottom - clientRect.top > 60) || g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
                 bool swipeEnabled = false;
                 std::wstring swipeDir;
@@ -23176,12 +23244,11 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     swipeEnabled = g_settings.collapsedSwipeEnabled;
                     swipeDir = g_settings.collapsedSwipeDirection;
                 }
-                if (swipeEnabled) {
+                // If collapsed swipe is strictly locked to horizontal, do not trigger from vertical mouse wheel
+                if (swipeEnabled && swipeDir.find(L"horizontal") == std::wstring::npos) {
                     // Wheel UP = Tăng (+1), Wheel DOWN = Giảm (-1)
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
-                        swipeDir.find(L"invert_both") != std::wstring::npos ||
-                        swipeDir == L"vertical_inverted" ||
+                    if (swipeDir.find(L"inverted") != std::wstring::npos ||
                         swipeDir == L"vertical_down_inc") {
                         step = -step;
                     }
@@ -23222,11 +23289,14 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 std::lock_guard lock(g_settingsMutex);
                 tabDir = g_settings.tabSwitchDirection;
             }
-            g_activeTabTransitionAxis.store(1);  // vertical animation
+            if (tabDir.find(L"horizontal") != std::wstring::npos) {
+                g_activeTabTransitionAxis.store(0);  // animate horizontally to match tabSwitchDirection
+            } else {
+                g_activeTabTransitionAxis.store(1);  // animate vertically
+            }
             // Natural wheel: Cuộn XUỐNG (s_wheelAccum < 0) = Kế tiếp (+1), Cuộn LÊN (s_wheelAccum > 0) = Trước (-1)
             int tabStep = (s_wheelAccum < 0) ? 1 : -1;
-            if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
-                tabDir.find(L"invert_swipe") != std::wstring::npos ||
+            if (tabDir.find(L"inverted") != std::wstring::npos ||
                 tabDir == L"vertical_down" || tabDir == L"horizontal_left") {
                 tabStep = -tabStep;
             }
@@ -23239,7 +23309,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
             if (delta == 0) return 0;
 
-            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
+            RECT clientRect;
+            GetClientRect(hwnd, &clientRect);
+            const bool isExpanded = (clientRect.bottom - clientRect.top > 60) || g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
                 bool swipeEnabled = false;
                 std::wstring swipeDir;
@@ -23248,11 +23320,11 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     swipeEnabled = g_settings.collapsedSwipeEnabled;
                     swipeDir = g_settings.collapsedSwipeDirection;
                 }
-                if (swipeEnabled) {
+                // If collapsed swipe is strictly locked to vertical, do not trigger from horizontal tilt wheel
+                if (swipeEnabled && swipeDir.find(L"vertical") == std::wstring::npos) {
                     // Tilt RIGHT = Tăng (+1), Tilt LEFT = Giảm (-1)
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
-                        swipeDir.find(L"invert_both") != std::wstring::npos ||
+                    if (swipeDir.find(L"inverted") != std::wstring::npos ||
                         swipeDir == L"horizontal_inverted") {
                         step = -step;
                     }
@@ -23268,8 +23340,7 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 g_activeTabTransitionAxis.store(0);  // horizontal animation
                 // Tilt RIGHT = Kế tiếp (+1), Tilt LEFT = Trước (-1)
                 int tabStep = (delta > 0) ? 1 : -1;
-                if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
-                    tabDir.find(L"invert_swipe") != std::wstring::npos ||
+                if (tabDir.find(L"inverted") != std::wstring::npos ||
                     tabDir == L"horizontal_left") {
                     tabStep = -tabStep;
                 }
