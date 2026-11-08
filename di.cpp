@@ -1554,6 +1554,7 @@ struct MediaSnapshot {
     int64_t positionTicks = 0;
     int64_t endTicks = 0;
     int64_t lastUpdatedTicks = 0;
+    double playbackRate = 1.0;
 };
 
 // One SMTC media session the dock can switch to.
@@ -1876,6 +1877,8 @@ HANDLE g_lyricsRefreshEvent = nullptr;             // wakes LyricsThreadProc imm
 std::atomic<bool> g_isPendingNewTimeline{false};   // true on track change until new timeline arrives from GSMTC
 std::atomic<double> g_lastTrackChangeTime{0.0};
 std::atomic<bool> g_wasExpandedAtTrackChange{false};
+std::atomic<double> g_modStartTime{0.0};
+std::atomic<bool> g_dndFirstWnfIgnored{false};
 std::atomic<bool> g_hardResyncRequested{false};
 std::atomic<bool> g_lyricsResetRenderStateRequested{false};
 void ForceResyncLyricsWithSystemAudio();
@@ -5593,6 +5596,17 @@ DWORD WINAPI MediaThreadProc(void*) {
                     next.artist = properties.Artist().c_str();
                     next.albumTitle = properties.AlbumTitle().c_str();
 
+                    double currentRate = 1.0;
+                    try {
+                        if (auto rateRef = playback.PlaybackRate()) {
+                            currentRate = rateRef.Value();
+                            if (currentRate <= 0.05 || _isnan(currentRate)) currentRate = 1.0;
+                        }
+                    } catch (...) {
+                        currentRate = 1.0;
+                    }
+                    next.playbackRate = currentRate;
+
                     if (timeline) {
                         const bool isHardResync = g_hardResyncRequested.exchange(false);
                         const int64_t rawPos = timeline.Position().count();
@@ -5603,7 +5617,7 @@ DWORD WINAPI MediaThreadProc(void*) {
                         if (g_isPendingNewTimeline.load(std::memory_order_relaxed)) {
                             if (rawPos <= 50000000LL || isHardResync) {
                                 g_isPendingNewTimeline.store(false);
-                                Wh_Log(L"New timeline confirmed for track: pos=%lld ms, duration=%lld ms", rawPos / 10000, ne / 10000);
+                                Wh_Log(L"New timeline confirmed for track: pos=%lld ms, duration=%lld ms, rate=%.2fx", rawPos / 10000, ne / 10000, currentRate);
                             } else {
                                 np = 0;
                             }
@@ -5615,7 +5629,7 @@ DWORD WINAPI MediaThreadProc(void*) {
                                 const auto lastUpdated = timeline.LastUpdatedTime();
                                 const int64_t ageTicks = (winrt::clock::now() - lastUpdated).count();
                                 if (ageTicks > 0 && ageTicks < 10 * 10000000LL) {
-                                    np = rawPos + ageTicks;
+                                    np = rawPos + static_cast<int64_t>(ageTicks * currentRate);
                                 }
                             } catch (...) {
                             }
@@ -5645,15 +5659,15 @@ DWORD WINAPI MediaThreadProc(void*) {
 
                             if (sameTrackPlaying) {
                                 const int64_t predictedNow = g_state.media.positionTicks +
-                                    (static_cast<int64_t>(GetTickCount64()) - g_state.media.lastUpdatedTicks) * 10000;
+                                    static_cast<int64_t>((static_cast<int64_t>(GetTickCount64()) - g_state.media.lastUpdatedTicks) * 10000.0 * currentRate);
 
                                 if (np < predictedNow - kJitterToleranceTicks) {
                                     const ULONGLONG nowTicks64 = GetTickCount64();
                                     bool confirmed = false;
                                     if (pendingSeekBaseline >= 0) {
                                         const int64_t expectedIfRealSeek = pendingSeekBaseline +
-                                            (static_cast<int64_t>(nowTicks64) -
-                                             static_cast<int64_t>(pendingSeekBaselineTickCount)) * 10000;
+                                            static_cast<int64_t>((static_cast<int64_t>(nowTicks64) -
+                                             static_cast<int64_t>(pendingSeekBaselineTickCount)) * 10000.0 * currentRate);
                                         const int64_t diff = np - expectedIfRealSeek;
                                         if ((diff < 0 ? -diff : diff) < kConfirmToleranceTicks) {
                                             confirmed = true;
@@ -5673,12 +5687,17 @@ DWORD WINAPI MediaThreadProc(void*) {
                             } else {
                                 pendingSeekBaseline = -1;
                             }
+                            const bool rateChanged = std::fabs(next.playbackRate - g_state.media.playbackRate) > 0.05;
                             if (np != g_state.media.positionTicks ||
                                 ne != g_state.media.endTicks ||
-                                npP != g_state.media.playing) {
+                                npP != g_state.media.playing ||
+                                rateChanged) {
                                 next.positionTicks = np;
                                 next.endTicks = ne;
                                 next.lastUpdatedTicks = GetTickCount64();
+                                if (rateChanged) {
+                                    g_layoutDirty = true;
+                                }
                             } else {
                                 next.positionTicks = g_state.media.positionTicks;
                                 next.endTicks = g_state.media.endTicks;
@@ -5983,8 +6002,15 @@ NTSTATUS NTAPI WnfDndCallback(
         val = *reinterpret_cast<const int*>(buffer);
     }
     const bool active = (val != 0);
-    static std::atomic<bool> s_firstWnf = true;
-    if (s_firstWnf.exchange(false)) {
+
+    // Always ignore the initial callback triggered upon registration
+    if (!g_dndFirstWnfIgnored.exchange(true)) {
+        g_isDnDActive.store(active);
+        return 0;
+    }
+
+    // Suppress DND notifications during the first 15 seconds after mod startup
+    if (NowSeconds() - g_modStartTime.load() < 15.0) {
         g_isDnDActive.store(active);
         return 0;
     }
@@ -6003,6 +6029,7 @@ NTSTATUS NTAPI WnfDndCallback(
 }
 
 void SubscribeDndNotification() {
+    g_dndFirstWnfIgnored.store(false);
     HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
     if (!hNtdll) return;
 
@@ -14867,13 +14894,14 @@ class Renderer {
         if (state.lyrics.synced) {
             const bool isPendingTimeline = g_isPendingNewTimeline.load(std::memory_order_relaxed);
             double currentPositionSec = isPendingTimeline ? 0.0 : (state.media.positionTicks / 10000000.0);
+            const double rate = (state.media.playbackRate > 0.05) ? state.media.playbackRate : 1.0;
             if (!isPendingTimeline && state.media.playing && state.media.lastUpdatedTicks > 0) {
-                currentPositionSec += (GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0;
+                currentPositionSec += ((GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0) * rate;
             }
 
             // The reported position lags what you hear by a bit; nudge it forward.
             // Raise this if lyrics feel late, lower it if they feel early.
-            const double kLyricsLookaheadSec = LyricsLookaheadSec();  // 0.49 baseline + speaker/Bluetooth offset
+            const double kLyricsLookaheadSec = LyricsLookaheadSec() * rate;  // 0.49 baseline + speaker/Bluetooth offset
             if (!isPendingTimeline && state.media.playing) {
                 currentPositionSec += kLyricsLookaheadSec;
             }
@@ -16367,8 +16395,9 @@ class Renderer {
                 const bool isPendingTimeline = g_isPendingNewTimeline.load(std::memory_order_relaxed);
                 double currentPosition = isPendingTimeline ? 0.0 : (state.media.positionTicks / 10000000.0);
                 double duration = state.media.endTicks / 10000000.0;
+                const double rate = (state.media.playbackRate > 0.05) ? state.media.playbackRate : 1.0;
                 if (!isPendingTimeline && state.media.playing && state.media.lastUpdatedTicks > 0) {
-                    currentPosition += (GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0;
+                    currentPosition += ((GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0) * rate;
                 }
                 currentPosition = std::max(0.0, std::min(currentPosition, duration));
 
@@ -16906,11 +16935,12 @@ class Renderer {
             // Same position math as the Lyrics tab, including the sync offset.
             const bool isPendingTimeline = g_isPendingNewTimeline.load(std::memory_order_relaxed);
             double posSec = isPendingTimeline ? 0.0 : (state.media.positionTicks / 10000000.0);
+            const double rate = (state.media.playbackRate > 0.05) ? state.media.playbackRate : 1.0;
             if (!isPendingTimeline && state.media.playing && state.media.lastUpdatedTicks > 0) {
-                posSec += (GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0;
+                posSec += ((GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0) * rate;
             }
             if (!isPendingTimeline && state.media.playing) {
-                posSec += LyricsLookaheadSec();
+                posSec += LyricsLookaheadSec() * rate;
             }
             const int64_t posMs = isPendingTimeline ? 0 : std::max<int64_t>(0, static_cast<int64_t>(posSec * 1000.0));
 
@@ -17208,11 +17238,12 @@ class Renderer {
             // Same position math as the Lyrics tab, including the lookahead nudge.
             const bool isPendingTimeline = g_isPendingNewTimeline.load(std::memory_order_relaxed);
             double posSec = isPendingTimeline ? 0.0 : (state.media.positionTicks / 10000000.0);
+            const double rate = (state.media.playbackRate > 0.05) ? state.media.playbackRate : 1.0;
             if (!isPendingTimeline && state.media.playing && state.media.lastUpdatedTicks > 0) {
-                posSec += (GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0;
+                posSec += ((GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0) * rate;
             }
             if (!isPendingTimeline && state.media.playing) {
-                posSec += LyricsLookaheadSec();
+                posSec += LyricsLookaheadSec() * rate;
             }
             const int64_t posMs = isPendingTimeline ? 0 : std::max<int64_t>(0, static_cast<int64_t>(posSec * 1000.0));
 
@@ -17366,11 +17397,12 @@ class Renderer {
             // Same position math as the Lyrics tab, including the lookahead nudge.
             const bool isPendingTimeline = g_isPendingNewTimeline.load(std::memory_order_relaxed);
             double posSec = isPendingTimeline ? 0.0 : (state.media.positionTicks / 10000000.0);
+            const double rate = (state.media.playbackRate > 0.05) ? state.media.playbackRate : 1.0;
             if (!isPendingTimeline && state.media.playing && state.media.lastUpdatedTicks > 0) {
-                posSec += (GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0;
+                posSec += ((GetTickCount64() - state.media.lastUpdatedTicks) / 1000.0) * rate;
             }
             if (!isPendingTimeline && state.media.playing) {
-                posSec += LyricsLookaheadSec();
+                posSec += LyricsLookaheadSec() * rate;
             }
             posMs = isPendingTimeline ? 0 : std::max<int64_t>(0, static_cast<int64_t>(posSec * 1000.0));
 
@@ -20677,45 +20709,28 @@ Activity ActivityForKind(IslandKind kind, const Settings& settings, const Shared
             activity.height = 44.0f;
             break;
         case IslandKind::Progress:
-            activity.width = 230.0f;
+            activity.width = 280.0f;
             activity.height = 48.0f;
             break;
         case IslandKind::Clipboard:
-            activity.width = 340.0f;
-            activity.height = 56.0f;
+            activity.width = 320.0f;
+            activity.height = 50.0f;
             break;
         case IslandKind::Notification:
-            activity.width = 360.0f;
-            activity.height = 58.0f;
+            activity.width = 320.0f;
+            activity.height = 50.0f;
             break;
         case IslandKind::Volume:
         case IslandKind::Brightness:
-            activity.width = 300.0f;
-            activity.height = 54.0f;
-            break;
         case IslandKind::BatteryLow:
-            activity.width = 290.0f;
-            activity.height = 52.0f;
-            break;
         case IslandKind::CapsLock:
-            activity.width = 180.0f;
-            activity.height = 42.0f;
-            break;
         case IslandKind::Device:
-            activity.width = 240.0f;
-            activity.height = 50.0f;
-            break;
         case IslandKind::Bluetooth:
-            activity.width = 280.0f;
-            activity.height = 54.0f;
-            break;
         case IslandKind::Timer:
-            activity.width = 260.0f;
-            activity.height = 54.0f;
-            break;
         case IslandKind::DoNotDisturb:
-            activity.width = 220.0f;
-            activity.height = 42.0f;
+            // Unified standard dimensions for all transient status pills (Volume, Brightness, DND, Caps, BT, Device, Battery, Timer)
+            activity.width = 280.0f;
+            activity.height = 48.0f;
             break;
         case IslandKind::Idle:
         default:
@@ -23773,6 +23788,7 @@ void StopThreads() {
 }  // namespace
 
 BOOL WhTool_ModInit() {
+    g_modStartTime.store(NowSeconds());
     LoadSettings();
 
     if (!StartThreads()) {
