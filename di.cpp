@@ -1,9 +1,9 @@
 // ==WindhawkMod==
 // @id              new-mod-2
-// @name            Dynamic Island for Windows (Custom)
-// @description     A living, breathing pill overlay inspired by iPhone's Dynamic Island with Hard Resync & Track Change lyrics sync.
-// @version         1.4.1
-// @author          Himanshu & Custom
+// @name            Dynamic Island for Windows
+// @description     Living pill overlay for Windows desktops with smooth fluid animations and rich dashboard modules.
+// @version         1.5.0
+// @author          Thao (Private Edition)
 // @include         windhawk.exe
 // @compilerOptions -lole32 -loleaut32 -lshcore -ld2d1 -ldwrite -ldwmapi -lgdi32 -luser32 -lshell32 -lruntimeobject -lwindowscodecs -lsetupapi -lwinhttp -lpdh -lwinmm -lbcrypt
 // @license         MIT
@@ -11,104 +11,39 @@
 
 // ==WindhawkModReadme==
 /*
-# Dynamic Island for Windows
+# Dynamic Island for Windows (Private Edition)
 
-A fluid, living overlay inspired by Apple's Dynamic Island, bringing a beautiful, highly-responsive UI to your Windows desktop. Built natively with hardware-accelerated Direct2D rendering for a buttery-smooth 60 FPS experience.
-
-![Dynamic Island running on the desktop](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/desktop.png)
-
-![Dynamic Island surfaces](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/Full-preview-v2.png)
+Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và tối ưu hóa toàn diện, mang lại giao diện viên thuốc sống động, thanh lịch với hiệu ứng chuyển động vật lý đàn hồi mượt mà (Apple Fluid Springs) và tiết kiệm tài nguyên hệ thống.
 
 ---
 
-## 🚀 Modules & Dashboards
+## 🚀 Các Tính Năng & Mô-đun Nổi Bật
 
-The Dynamic Island intelligently expands to display context-aware dashboards. You can easily navigate between different views using your mouse scroll wheel.
+- **Trình phát nhạc Media & Lời bài hát thông minh:**
+  - Hỗ trợ bắt tốc độ phát linh hoạt (x1.0, x1.25, x1.5, x2.0,...) tự động đồng bộ lời theo thời gian thực.
+  - Tự động tìm kiếm lời bài hát theo thứ tự ưu tiên: **ZingMP3 / NhacCuaTui -> LRCLIB**.
+  - Hiển thị nhãn nguồn lời bài hát (ZingMP3, LRCLIB) trực quan ngay trên tiêu đề bài hát (tự động chạy chữ marquee nếu tên bài dài).
+  - Tinh chỉnh đồng bộ lời bài hát nhanh qua menu chuột phải (+-150ms, +-500ms, +-950ms).
+  - Khi chuyển bài hát, Dynamic Island giữ nguyên trạng thái mở rộng đang xem thay vì bị co nhỏ đột ngột.
 
-| Module | Description | Preview |
-| :--- | :--- | :--- |
-| **Media Player** | Shows live album art, track details, audio waveforms, and full playback controls. | ![Media](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/media-v2.png) |
-| **Live Lyrics** | Real-time synchronized lyrics with inline collapsed view and full lyrics tab. | ![Live Lyrics](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/main/previews/lyrics.png) |
-| **Blur & Acrylic** | Genuine Windows DWM blur and acrylic backdrop effects for modern depth. | ![Blur & Acrylic](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/main/previews/blur-acrylic.png) |
-| **Calendar** | A monthly grid that always fits its rows, with today marked in the accent colour. | ![Calendar](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/calendar.png) |
-| **Weather** | Real-time weather stats powered by wttr.in, including wind speed, humidity, and "feels like" temperature. | ![Weather](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/weather-v2.png) |
-| **Hardware Monitor** | CPU, RAM, GPU, disk and live network throughput, with load bars that turn amber past 75% and red past 90%. | ![Hardware Monitor](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/hardware-monitor.png) |
-| **Game Overlay** | Real-time FPS, CPU, GPU, RAM and disk, sized to whichever metrics you enable. | ![Gamebar](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/gamebar-v2.png) |
-| **Idle View** | A minimal dashboard with your battery status, digital clock, and sleek pagination dots. | ![Idle](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/idle-v2.png) |
-| **Camera Privacy** | Shows a green dot when an app is actively using your webcam. | ![Camera](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/camera-detected-v2.png) |
-| **Mic Privacy** | Shows an orange dot when an app is actively using your microphone. | ![Mic](https://raw.githubusercontent.com/devcode90/Dynamic-Island-for-Windows/793cf954d51aa9748c39d544187fab6e25ecd0fb/previews/mic-detected-v2.png) |
+- **Hiệu ứng nảy Dynamic Island mượt mà:**
+  - Chuyển động vật lý đàn hồi tự nhiên mô phỏng chính xác Apple Dynamic Island, loại bỏ hoàn toàn hiện tượng giật khựng vị trí khi nảy popup.
+  - Kích thước thẻ thông báo trạng thái (Âm lượng, Độ sáng, Pin, Caps Lock, DND, Bluetooth) được quy chuẩn siêu gọn gàng, không che khuất màn hình.
 
----
+- **Khay lưu tệp & Bộ nhớ tạm (File Tray):**
+  - Tự động bắt và lưu danh sách tệp tin, văn bản khi sao chép (Ctrl+C).
+  - Hỗ trợ kéo thả trực tiếp tệp từ ngoài vào Island để ghim tạm và nhấp chuột để mở.
 
-## ✨ Core Features
-
-- **Hardware Privacy Indicators:** A pulsing orange dot appears when your microphone is active, and a green dot when your camera is in use. Rate-limited polling ensures absolutely no CPU drain.
-- **High-Res Clipboard & Notifications:** Instantly see what you copied or your latest Windows notifications, featuring crisp, high-fidelity 64px app icons extracted directly from system executables.
-- **360Hz+ Dynamic Fluid Animations:** Ultra-smooth resizing and splitting with native support for high refresh rate monitors (up to 360Hz/500Hz+) and zero idle CPU drain.
-- **Eight Curated Themes:** Obsidian, Graphite, Slate, Nord, Evergreen, Espresso, Plum and a light Porcelain, all switchable from the right-click menu's Theme submenu — or dial in your exact hex colors.
-- **Clean Flat Material:** Surfaces are built from soft downward depth shading, a drop shadow, and an accent wash tinted live from your album art. No rim lighting, no glass highlights, no outlined cards — nothing traces a bright line along an edge.
-- **Real Blur & Acrylic Backdrop:** Optionally paint genuine Windows blur or frosted acrylic behind the island so your desktop shows through it, exactly like the system's own surfaces. Requires Windows' **Transparency effects** to be turned on (see Usage & Settings below).
-- **Translucent Backgrounds:** Hex colors accept an alpha channel (`#RRGGBBAA`), so you can make the island see-through while keeping text and icons perfectly crisp.
-- **Your Language:** The island's own labels follow your Windows display language across 12 languages, or you can pick one explicitly.
-- **File Tray:** Drag any file onto the island to park it on a shelf, then click to open it. You can now drag files back out into any folder or app, and remove them one by one. The island itself only references files, it never copies or moves them.
-- **Lyrics on the Collapsed Island:** Switch on "Show lyrics on collapsed island" from the right-click menu and the pill widens to show the current line as it's sung, sliding in with every new line. When there are no synced lyrics it shows the song title instead.
-- **Quick Lookup:** Once enabled under Modules, press **Ctrl+Alt+Space** to open a search box right on the island. Type a word or phrase, press Enter, and get a definition or a short summary. Your clipboard text and recent searches are one click away.
-- **Lyrics Sync Offset:** Nudge lyric timing in milliseconds when lyrics feel early or late, with a separate value for Bluetooth audio output that is picked automatically from your default audio device. Set it in Mod Settings or from the right-click menu's "Lyrics sync" submenu.
-- **Typography & Clock Control:** Scale all island text independently of the island's size, choose 12- or 24-hour time, show seconds, and set a custom date pattern — including CJK forms like `yyyy年MM月dd日`.
+- **Tối ưu hóa hiệu năng & Phần cứng:**
+  - Logic giám sát CPU / GPU / RAM / Network chỉ kích hoạt khi bạn cuộn tới tab Giám sát phần cứng, giải quyết triệt để tình trạng sụt khung hình.
+  - Tự động ngắt render về 0% CPU khi màn hình khóa (Lock Screen) hoặc khi ở chế độ toàn màn hình.
 
 ---
 
-## ⚙️ Usage & Settings
-
-- **Hover & Scroll:** Hover over the island to seamlessly expand it. Use your mouse scroll wheel to swipe between the Media, Calendar, Weather, Hardware Monitor, File Tray, and Lyrics tabs.
-- **File Tray:** Enable the File Tray module, then drag files onto the island. It jumps to the shelf to confirm the drop. Click a row to open that file, drag a row out to drop the file into any folder or app, or press the small ✕ on a row to remove just that file. The bin button in the header clears the whole shelf.
-- **Lyrics on the Collapsed Island:** Right-click the island and tick "Show lyrics on collapsed island". This choice is remembered across restarts. Long lines pan across as they are sung.
-- **Cross-Source Media Switching:** If multiple apps are playing media at the same time, you can smoothly swap between their active playback controls directly from the island without opening the apps.
-- **Quick Lookup:** Enable "Quick Lookup (hotkey)" under Modules, then press the hotkey (default **Ctrl+Alt+Space**, changeable in the **Shortcuts** tab) to open the search box. Type a word or phrase and press Enter. Up/Down picks a row and Esc closes it. With an empty box it suggests your clipboard text and your recent lookups. Results come from Wiktionary and Wikipedia, with dictionaryapi.dev as a backup. Nothing is sent anywhere until you press Enter, and recent lookups are kept in memory only.
-- **Right-Click Menu:** Right-click the island to access Theme presets, Transparency settings, collapsed-island lyrics, and to pin the island open.
-- **⚠️ Right-click choices are per-session:** The right-click menu is a quick way to try things out, not a place to configure the mod. **Theme**, **shape style** (Pill / Notch / Windows 11) and **pin open** are all re-applied from your Windhawk settings whenever the mod restarts — so a reboot, a mod update, or toggling the mod off and on will discard them. Anything you want to keep, set in the **Mod Settings** tab instead. (Transparency and Expand-on-hover do persist, but the settings tab is still the reliable place for them.)
-- **Windhawk Settings:** Visit the Mod Settings tab to change the island's Position, Size Scale, Refresh Rate (Target FPS), Animation Style (Smooth/Default/Bouncy/Snappy), Animation Speed, and toggle specific modules. You can also perfectly align the island using the `Offset X` and `Offset Y` settings, and select exactly which monitor the island should appear on (including a "Follow Mouse" mode!).
-- **Blur & Acrylic need Transparency effects:** Windows does not enable this by default on every PC, and the Blur and Acrylic backdrop will not show without it (you will only see a flat tint instead). Turn it on in **Settings > Personalization > Colors > Transparency effects** (on Windows 11 you can also find it under **Settings > Accessibility > Visual effects > Transparency effects**). Also make sure **Battery saver** is off, because it disables these effects too. Then pick a material under **Mod Settings > Themes > Backdrop material**; the change applies live, no restart needed.
-- **Notifications:** Windows must allow apps to read notifications: turn on **Settings > Privacy & security > Notifications > "Let apps access your notifications"**. Without that permission Windows denies the listener and the module stays silent. Nothing needs to be added to the process inclusion list; the island runs in its own process and reads notifications from there. Note: notifications from command-line consoles and terminal hosts (PowerShell, cmd.exe, conhost) are filtered out by default to avoid toast spam from terminal scripts and build jobs.
-- **Quick Hide/Show:** Right-click the island and choose "Hide Island" to collapse it completely — CPU usage drops to ~0% while hidden since the mod fully parks its render thread. Bring it back instantly with the configurable hotkey (default **Ctrl+Alt+D**, changeable in the **Shortcuts** settings tab). Because a hidden island can't be right-clicked, the hotkey is the *only* way back once hidden — if you turn the hotkey off while hidden, re-enable it (or disable the mod) from Windhawk's settings.
-
----
-
-## 💾 Lyrics Cache
-
-**Why it matters:** instant lyrics, less load on the free LRCLIB server, tiny disk footprint, and you can wipe it anytime.
-
-- **Source:** lyrics come from [LRCLIB](https://lrclib.net), a free open-source lyrics database.
-- **Where:** inside the mod's storage folder (`lyrics` subfolder), one small file per song.
-- **What's inside:** when fetching lyrics, the title, artist, album, and duration of the track being shown are sent to LRCLIB to look up matching lyrics. The retrieved lyrics and track metadata are then saved locally in the cache on your PC.
-- **Size & expiry:** capped at 25 MB by default (10 / 25 / 100 MB or Off in settings); the least recently used files are deleted first. Only songs that have lyrics are cached (refreshed after 90 days). Songs without lyrics, and failed requests, are never saved, so they are simply looked up again each time they play.
-- **Turn it off:** Mod Settings > Modules > "Lyrics cache (disk)", or set the size limit to Off. Lyrics are then not read from or written to disk at all.
-- **Clear it:** right-click the island > "Clear lyrics cache" (shows how many songs and how much space it uses).
-- **By hand:** you can clear or delete the cache at any time. It is stored in Windhawk's mod storage and is automatically cleaned up if the mod is uninstalled.
-
----
-
-## 📝 Feedback & Credits
-
-### Feedback / Support / Bug Reports
-- Please use [Windhawk Mods Issues](https://github.com/ramensoftware/windhawk-mods/issues) or [dynamic-island-for-windows issues](https://github.com/devcode90/dynamic-island-for-windows/issues) to report bugs, request features, or share feedback.
-- Clear descriptions, screenshots, or steps to reproduce help improve fixes and updates.
-- Suggestions for UI/UX or new integrations are always welcome.
-
-### Credits
-- **[Sarthak Singh (sarthakaksh) @GitHub](https://github.com/sarthakaksh)**: Major feature overhaul including smoothing animations, right-click focus timer, lyrics for songs, quick lookup, Cross-Source Media Switching, hover clock, robust media controls, zero-CPU instant hide shortcut, Bluetooth battery integration, image clipboard thumbnails, and full-screen autohide fixes.
-- **[ciizerr @GitHub](https://github.com/ciizerr)**: Improved the UI by refining layout alignment, fixing dashboard scaling, and enhancing calendar and weather module integration.
-- **[ChrisSch-dev @GitHub](https://github.com/ChrisSch-dev)**: Added album title support, word wrapping for weather descriptions, sleep resume fixes, and various performance/movement stability improvements.
-- **[thevioletto @GitHub](https://github.com/thevioletto)**: Added custom font support, Windows Do Not Disturb integration and status alerts, improved album art color sampling, reorganized settings, and addressed various UI/media edge cases.
-- **[David Ravelo (DavidRaveloU) @GitHub](https://github.com/DavidRaveloU)**: Added selectable audio spectrum styles with a live frequency analyzer, new progress bar styles, optional track-change animations for the title, cover flip, playback controls and pill cover spin, an optional clock in the collapsed media pill, and a brightness slider flyout.
-- **[Retr0dev-jpg @GitHub](https://github.com/Retr0dev-jpg)**: Event-driven volume flyout with animated bar and default device switching, plus a calendar that follows the Windows locale for weekday initials and first day of the week (with a Monday/Sunday override).
-
-### 🤝 Contributing
-We love community contributions! To ensure high-quality updates, please follow these rules:
-1. **Fork & Branch:** Fork the repository and apply your feature or fix.
-2. **Respect Existing Features:** Do not outright remove or break other people's features unless fully explained why in your PR. You are highly encouraged to refine and improve existing features!
-3. **Credit Yourself:** After completing your feature, add your name and a short summary of your contribution to the **Credits** section in both the Mod UI here and the GitHub `README.md`!
-
+## ⚙️ Thao Tác Nhanh
+- **Rê chuột / Cuộn chuột:** Rê chuột vào Island để mở rộng. Cuộn chuột để chuyển đổi giữa các tab: Media, Lịch âm dương, Thời tiết, Giám sát phần cứng, Khay tệp.
+- **Chuột phải:** Menu tùy chỉnh nhanh chủ đề giao diện, độ trong suốt, tinh chỉnh lời bài hát.
+- **Phím tắt ẩn/hiện tức thì:** Mặc định `Ctrl + Alt + D`.
 */
 // ==/WindhawkModReadme==
 
@@ -142,38 +77,6 @@ We love community contributions! To ensure high-quality updates, please follow t
   - OffsetY: 0
     $name: Độ lệch dọc Y
     $description: Điều chỉnh vị trí theo chiều dọc (pixel). Giá trị dương dịch xuống dưới, giá trị âm dịch lên trên.
-  - SeparateExpandedOffsetY: false
-    $name: Dùng độ lệch Y riêng khi mở rộng
-    $description: Cho phép Island ở một độ cao khi thu nhỏ và một độ cao khác khi mở rộng. Tiện lợi để đặt thanh thu nhỏ sát mép trên màn hình mà bảng mở rộng vẫn ở vị trí dễ thao tác.
-  - OffsetYExpanded: 0
-    $name: Độ lệch dọc Y (khi mở rộng)
-    $description: Vị trí chiều dọc (pixel) khi Island mở rộng. Chỉ dùng khi tùy chọn độ lệch Y riêng phía trên được bật.
-  - BorderMergedMode: false
-    $name: Chế độ dính sát mép viền
-    $description: Đặt Island dính sát mép trên màn hình, không để khoảng cách nổi.
-  - ShapeStyle: default
-    $name: Kiểu dáng hình dạng Island
-    $description: Thay đổi kiểu dáng tổng thể của Island (Viên thuốc iPhone, Hộp bo góc Windows 11, hoặc Tai thỏ macOS).
-    $options:
-      - default: Mặc định (Viên thuốc iPhone)
-      - w11: Windows 11 (Hộp bo góc tròn)
-      - notch: Tai thỏ macOS (Dính sát mép trên)
-  - ProgressStyle: slim
-    $name: Kiểu thanh tiến trình nhạc
-    $description: Kiểu dáng của thanh tiến trình bài hát trong trình phát mở rộng. Kiểu Sóng lượn và Gợn sóng sẽ chuyển động nhịp nhàng khi nhạc phát.
-    $options:
-      - slim: Mảnh (Thanh chuẩn cổ điển)
-      - wavy: Sóng lượn
-      - squiggle: Gợn sóng nhẹ
-      - bar: Thanh dày (Thanh đậm kèm vạch trỏ)
-  - SpectrumStyle: bars
-    $name: Kiểu sóng âm thanh (Audio Visualizer)
-    $description: Hiệu ứng sóng nhạc cạnh ảnh bìa bài hát. Sử dụng phân tích tần số âm thanh thực của hệ thống.
-    $options:
-      - bars: Cột sóng cổ điển
-      - led: Ma trận vạch LED
-      - plasma: Dải sóng Plasma
-      - orb: Quả cầu xung nhịp
   - SizeScale: '1.0'
     $name: Tỷ lệ kích thước
     $description: Phóng to hoặc thu nhỏ toàn bộ Island và nội dung bên trong.
@@ -184,7 +87,6 @@ We love community contributions! To ensure high-quality updates, please follow t
       - '1.5': 1.5x
       - '1.8': 1.8x
       - '2.0': 2.0x (Phóng to)
-      - '2.5': 2.5x (Rất lớn)
   - AutoDpiScale: true
     $name: Tự động điều chỉnh theo DPI màn hình
     $description: Tự động căn chỉnh kích thước Island theo độ phân giải DPI của màn hình. Khuyên dùng cho màn hình 2K/4K.
@@ -226,7 +128,6 @@ We love community contributions! To ensure high-quality updates, please follow t
       - '165': 165 FPS
       - '240': 240 FPS
       - '360': 360 FPS (Siêu mượt)
-      - '500': 500 FPS (Tối đa / Không giới hạn)
   - AnimationStyle: default
     $name: Kiểu độ nảy hiệu ứng
     $description: Điều chỉnh cơ chế vật lý độ nảy đàn hồi của chuyển động.
@@ -239,19 +140,11 @@ We love community contributions! To ensure high-quality updates, please follow t
     $name: Tốc độ chuyển động
     $description: Tốc độ mở rộng và thu nhỏ của Island.
     $options:
-      - very-slow: Rất chậm (0.5x)
       - slow: Chậm (0.75x)
       - normal: Bình thường (1.0x)
       - fast: Nhanh (1.35x)
       - very-fast: Rất nhanh (1.65x)
-      - ultra-fast: Siêu nhanh (2.0x)
-  - ExpandedMediaTransitions: false
-    $name: Hiệu ứng chuyển cảnh trình phát mở rộng
-    $description: Tạo chuyển động mượt mà cho ảnh bìa, tên bài hát và ca sĩ khi chuyển bài.
-  - PillCoverSpin: false
-    $name: Xoay đĩa bìa nhạc khi chuyển bài
-    $description: Xoay tròn ảnh bìa bài hát trên thanh thu nhỏ khi có bài hát mới bắt đầu.
-  $name: Hiệu ứng & Hiệu năng
+  $name: Hiệu ứng chuyển động
 - Themes:
   - ThemePreset: obsidian
     $name: Mẫu chủ đề giao diện
@@ -269,34 +162,13 @@ We love community contributions! To ensure high-quality updates, please follow t
   - PillOpacity: 96
     $name: Độ trong suốt của Island
     $description: Từ 35 đến 100. Giá trị càng thấp Island càng nhìn xuyên thấu.
-  - TintIntensity: 72
-    $name: Độ đậm của màu nền
-    $description: Từ 0 đến 100. Điều chỉnh độ tối/đậm của lớp màu nền phía sau Island.
   - BackdropMaterial: none
     $name: Chất liệu nền kính (Hiệu ứng Blur Windows thật)
-    $description: Vẽ hiệu ứng làm mờ Blur hoặc kính mờ Acrylic thật của Windows phía sau Island. Yêu cầu bật tùy chọn Transparency effects trong Cài đặt Windows (Cá nhân hóa > Màu sắc > Hiệu ứng trong suốt).
+    $description: Vẽ hiệu ứng làm mờ Blur hoặc kính mờ Acrylic thật của Windows phía sau Island.
     $options:
       - none: Tắt (Nền màu liền)
       - blur: Làm mờ (Blur)
       - acrylic: Kính mờ Acrylic (Frosted)
-  - BackdropFillOpacity: 45
-    $name: Độ đậm nền trên lớp mờ
-    $description: Từ 0 đến 100. Chỉ có tác dụng khi bật chất liệu nền kính. Giá trị càng thấp thì hình ảnh mờ của màn hình máy tính phía sau càng hiện rõ.
-  - BackdropTint: 55
-    $name: Cường độ màu nền Acrylic
-    $description: Từ 0 đến 100. Mức độ màu nền của bạn nhuộm lên lớp kính mờ.
-  - MaterialDepth: true
-    $name: Đổ bóng tạo chiều sâu 3D
-    $description: Thêm lớp bóng đổ nhẹ hướng xuống dưới và vệt sáng điểm nhấn giúp Island có chiều sâu thay vì phẳng lì.
-  - DropShadow: true
-    $name: Bóng đổ mềm phía dưới
-    $description: Tạo bóng đổ mềm mại dưới đáy Island giúp nổi bật trên màn hình nền.
-  - AccentBloom: 100
-    $name: Độ phát quang ánh sáng điểm nhấn
-    $description: Từ 0 đến 200. Cường độ vệt sáng màu điểm nhấn lan tỏa từ phía trên Island. Khi chọn Tự động, màu này sẽ được trích xuất từ ảnh bìa album nhạc.
-  - TextScale: 100
-    $name: Kích thước chữ
-    $description: Từ 70 đến 160. Phóng to/thu nhỏ cỡ chữ độc lập với kích thước Island, giúp đọc đồng hồ và các nhãn chữ rõ ràng hơn.
   - AccentColorMode: auto
     $name: Chế độ màu điểm nhấn
     $description: Cách thức chọn màu điểm nhấn phát sáng. Tự động sẽ lấy từ màu chủ đạo của ảnh bìa bài hát.
@@ -307,54 +179,14 @@ We love community contributions! To ensure high-quality updates, please follow t
   - CustomAccentHex: "#4cc9f0"
     $name: Mã màu Hex điểm nhấn tùy chỉnh
     $description: Mã màu Hex sử dụng khi Chế độ màu điểm nhấn được đặt là Tùy chỉnh.
-  - CalendarAccent: red
-    $name: Màu điểm nhấn cho Lịch
-    $description: Màu điểm nhấn cho tên tháng và ô đánh dấu ngày hôm nay trên lịch.
-    $options:
-      - red: Mặc định (Theo màu điểm nhấn của Island)
-      - system: Hệ thống (Theo màu điểm nhấn Windows)
-  - ClockAccentGlow: true
-    $name: Vòng sáng phát quang sau đồng hồ
-    $description: Hiển thị vòng tròn ánh sáng phát quang nhẹ phía sau giờ trong tab đồng hồ mở rộng.
-  - FontFamily: ""
-    $name: Phông chữ tùy chỉnh
-    $description: "Tên phông chữ tùy chỉnh cho văn bản trên Island (ví dụ: Segoe UI, Aptos, Arial, Consolas). Để trống để sử dụng phông chữ mặc định hệ thống."
-  - ContourBorderMode: default
-    $name: Kiểu đường viền ngoài
-    $description: Chọn kiểu viền bao quanh Island. Mặc định dùng viền theo chủ đề, Tự động lấy màu viền từ ảnh bìa bài hát, và Không viền sẽ loại bỏ viền ngoài.
-    $options:
-      - default: Mặc định
-      - auto: Tự động (Lấy từ ảnh bìa bài hát)
-      - borderless: Không viền
-  - ContourBorderHex: "#1E1E22"
-    $name: Mã màu Hex đường viền
-    $description: Mã màu Hex cho nét vẽ đường viền bao quanh Island.
-  - PillBgColor: "#08080A"
-    $name: Mã màu Hex nền Island
-    $description: "Mã màu Hex cho màu nền Island. Hỗ trợ dạng 8 chữ số RRGGBBAA để tạo nền trong suốt (ví dụ: 0D0D0FB0)."
-  - TextPrimaryColor: "#FFFFFF"
-    $name: Màu chữ chính
-    $description: Mã màu Hex cho tiêu đề và các nội dung văn bản chính.
-  - TextSecondaryColor: "#9B9BA5"
-    $name: Màu chữ phụ
-    $description: Mã màu Hex cho tên ca sĩ và các nhãn phụ mờ hơn.
-  $name: Màu sắc & Giao diện
+  - TextScale: 100
+    $name: Kích thước chữ
+    $description: Từ 70 đến 160. Phóng to/thu nhỏ cỡ chữ độc lập với kích thước Island.
+  $name: Màu sắc & Chủ đề
 - Indicators:
   - PrivacyDots: true
     $name: Bật chỉ báo quyền riêng tư (Mic & Camera)
-    $description: Công tắc chính để hiển thị chấm tròn quyền riêng tư kiểu iOS khi microphone hoặc camera đang hoạt động.
-  - PrivacyDotsMic: true
-    $name: Chỉ báo Microphone (Chấm màu cam)
-    $description: Hiển thị chấm cam khi có ứng dụng đang dùng micro. Tắt nếu có ứng dụng chạy ngầm (như Discord/OBS) giữ micro bật liên tục.
-  - PrivacyDotsMicHex: "#FF9500"
-    $name: Mã màu chấm Microphone
-    $description: Mã màu Hex tùy chỉnh cho chấm chỉ báo micro.
-  - PrivacyDotsCam: true
-    $name: Chỉ báo Camera (Chấm màu xanh lá)
-    $description: Hiển thị chấm xanh lá khi webcam/camera đang được ứng dụng sử dụng.
-  - PrivacyDotsCamHex: "#34C759"
-    $name: Mã màu chấm Camera
-    $description: Mã màu Hex tùy chỉnh cho chấm chỉ báo camera.
+    $description: Hiển thị chấm tròn quyền riêng tư kiểu iOS khi microphone (màu cam) hoặc camera (màu xanh lá) đang hoạt động.
   $name: Chỉ báo Quyền riêng tư
 - Modules:
   - Media: true
@@ -362,173 +194,58 @@ We love community contributions! To ensure high-quality updates, please follow t
     $description: Hiển thị ảnh bìa album, tên bài hát, ca sĩ và các nút điều khiển khi nhạc hoặc video đang phát.
   - MediaAutoExpand: false
     $name: Tự động mở rộng khi đổi bài hát
-    $description: Tự động mở rộng Island khi có bài hát hoặc video mới bắt đầu phát. Nếu tắt, thông tin cập nhật êm ái trên thanh thu nhỏ mà không tự bung rộng.
-  - MediaPillClock: false
-    $name: Hiện đồng hồ trên thanh thu nhỏ khi phát nhạc
-    $description: Khi đang phát nhạc, thanh thu nhỏ hiển thị thêm giờ hiện tại ở phía bên trái, cách ảnh bìa một vạch ngăn mảnh.
+    $description: Tự động bung mở rộng Island khi có bài hát mới. Nếu tắt, chỉ hiển thị êm ái trên thanh thu nhỏ.
   - Volume: true
-    $name: Thanh trượt âm lượng (Volume flyout)
-    $description: Hiển thị banner thanh trượt âm lượng trên Island khi bạn tăng/giảm âm lượng hệ thống.
+    $name: Banner thanh âm lượng siêu gọn
+    $description: Hiển thị banner âm lượng siêu nhỏ gọn khi tăng/giảm âm lượng hệ thống.
   - Brightness: true
-    $name: Thanh trượt độ sáng màn hình (Brightness flyout)
-    $description: Hiển thị banner thanh trượt độ sáng trên Island khi bạn thay đổi độ sáng màn hình laptop.
+    $name: Banner thanh độ sáng màn hình
+    $description: Hiển thị banner độ sáng khi thay đổi độ sáng màn hình laptop.
   - CapsLock: true
     $name: Chỉ báo phím Caps Lock / Num Lock
-    $description: Hiển thị thông báo nổi tức thì khi trạng thái Caps Lock hoặc Num Lock thay đổi.
+    $description: Hiển thị thông báo nhanh khi bật/tắt phím Caps Lock hoặc Num Lock.
   - Battery: true
     $name: Mô-đun cảnh báo Pin laptop
     $description: Hiển thị cảnh báo khi pin laptop sắp hết hoặc khi cắm/rút sạc.
   - BluetoothIndicator: true
     $name: Chỉ báo kết nối thiết bị Bluetooth
-    $description: Hiển thị thẻ thông báo kèm tên thiết bị, biểu tượng phân loại và phần trăm pin khi thiết bị Bluetooth kết nối hoặc ngắt kết nối.
-  - BluetoothShowBattery: true
-    $name: Hiện mức pin thiết bị Bluetooth
-    $description: Đọc và hiển thị mức pin qua chuẩn BLE GATT khi thiết bị có hỗ trợ.
-  - Progress: true
-    $name: Vòng tiến trình sao chép / tải tệp
-    $description: Hiển thị vòng tròn tiến trình xung quanh Island khi có tác vụ tải tệp hoặc sao chép dữ liệu.
-  - TimerModule: true
-    $name: Hẹn giờ tập trung (Pomodoro Focus Timer)
-    $description: Kích hoạt đồng hồ hẹn giờ làm việc tập trung / nghỉ giải lao kiểu Pomodoro, bắt đầu từ menu chuột phải của Island.
+    $description: Hiển thị thẻ thông báo kèm tên thiết bị, biểu tượng và phần trăm pin khi thiết bị Bluetooth kết nối hoặc ngắt kết nối.
   - Clipboard: true
     $name: Xem nhanh bộ nhớ tạm (Clipboard)
-    $description: Hiển thị thẻ xem nhanh nội dung văn bản hoặc hình ảnh bạn vừa sao chép (Ctrl+C).
-  - StatusCountdownProgress: false
-    $name: Thanh đếm ngược thời gian thông báo
-    $description: Hiển thị thanh đếm ngược tiến trình mảnh ở dưới cùng của các thẻ thông báo tạm thời (như Clipboard, Thông báo, Thiết bị).
+    $description: Hiển thị thẻ xem nhanh nội dung văn bản hoặc hình ảnh vừa sao chép (Ctrl+C).
   - DoNotDisturbIndicator: true
     $name: Chỉ báo chế độ Không làm phiền
-    $description: Hiển thị thẻ thông báo trạng thái khi bạn bật/tắt chế độ Không làm phiền (Do Not Disturb) trong Windows.
-  - NotificationRespectDnD: true
-    $name: Tôn trọng chế độ Không làm phiền
-    $description: Tắt hiển thị các thông báo nổi trên Island khi Windows đang ở chế độ Không làm phiền.
+    $description: Hiển thị thông báo trạng thái khi bạn bật/tắt chế độ Không làm phiền (Do Not Disturb) trong Windows.
   - HardwareMonitorModule: true
     $name: Thẻ Giám sát phần cứng khi cuộn chuột
-    $description: Thêm thẻ hiển thị thông số CPU, GPU, RAM, FPS và Tốc độ mạng vào vòng lặp cuộn chuột của Island.
-  - GameOverlay: false
-    $name: Chế độ hiển thị thông số game (Game Overlay)
-    $description: Thay thế đồng hồ bằng các thông số thời gian thực như FPS, mức sử dụng CPU và RAM khi chơi game.
-  - ShowMetricText: false
-    $name: Hiện chữ nhãn trên vạch thông số game
-    $description: Thêm chữ nhãn (như 'CPU', 'RAM') bên trong các thanh đo thông số game.
+    $description: Thêm thẻ hiển thị thông số CPU, GPU, RAM, FPS và Tốc độ mạng vào vòng lặp cuộn chuột của Island (chỉ kích hoạt lấy mẫu khi mở thẻ).
   - Weather: true
     $name: Mô-đun Thời tiết
-    $description: Hiển thị thời tiết ở phía bên phải thanh thu nhỏ và trên tab mở rộng. Tắt để chỉ hiển thị đồng hồ.
+    $description: Hiển thị thời tiết ở phía bên phải thanh thu nhỏ và trên tab mở rộng.
   - WeatherCity: ""
     $name: Thành phố thời tiết (Tùy chọn)
-    $description: "Nhập tên thành phố của bạn (ví dụ: Hà Nội, Hồ Chí Minh, Đà Nẵng, Tokyo). Để trống để tự động định vị vị trí chính xác theo IP."
-  - WeatherFahrenheit: false
-    $name: Sử dụng độ F (Fahrenheit)
-    $description: Hiển thị nhiệt độ theo độ F và tốc độ gió theo mph. Tắt để sử dụng độ C (°C) và km/h chuẩn Việt Nam.
+    $description: Nhập tên thành phố (ví dụ: Ha Noi, Ho Chi Minh, Da Nang). Để trống để tự động định vị theo IP.
   - MediaTabLyrics: false
     $name: Lời bài hát trong tab Media
-    $description: Thêm nút lời bài hát vào thanh điều khiển nhạc để mở giao diện lời bài hát ngay trên tab Media.
-  - Lyrics: false
+    $description: Hiển thị nút mở lời bài hát trực tiếp ngay trên thanh điều khiển của tab Media.
+  - Lyrics: true
     $name: Tab Lời bài hát mở rộng
-    $description: Hiển thị lời bài hát đồng bộ thời gian thực cho bài hát đang phát (lấy từ cơ sở dữ liệu miễn phí LRCLIB). Cuộn đến tab Lời bài hát để xem.
-  - LyricsVisualizer: true
-    $name: Sóng âm trong tab Lời bài hát
-    $description: Hiển thị sóng âm thanh nhỏ trực tiếp bên cạnh tiêu đề Lời bài hát khi nhạc đang phát.
+    $description: Hiển thị lời bài hát đồng bộ thời gian thực cho bài hát đang phát (ZingMP3 / NhacCuaTui / LRCLIB).
   - KaraokeLyrics: true
-    $name: Phát sáng chữ theo phong cách Karaoke
-    $description: Chạy ánh sáng điểm nhấn từ trái qua phải theo đúng từng nhịp ca sĩ hát.
-  - KaraokeLetterGlow: true
-    $name: Phát sáng từng chữ cái Karaoke
-    $description: Khi vệt sáng quét qua, từng chữ cái sẽ phát quang dịu nhẹ và mờ dần phía sau nhịp hát.
+    $name: Chữ phát sáng phong cách Karaoke
+    $description: Chạy ánh sáng điểm nhấn từ trái qua phải theo đúng nhịp điệu ca sĩ hát.
   - LyricsOffsetMs: 0
-    $name: Độ lệch đồng bộ lời - Loa ngoài / Tai nghe có dây (ms)
-    $description: "Tinh chỉnh thời gian lời bài hát tính bằng mili-giây (-3000 đến 3000 ms, bước nhảy 1 ms). Dương = lời hiện SỚM hơn, âm = lời hiện TRỄ hơn. Tăng nếu thấy lời bị trễ, giảm nếu lời ra quá sớm."
+    $name: Độ lệch đồng bộ lời - Loa ngoài / Tai nghe dây (ms)
+    $description: Tinh chỉnh thời gian lời bài hát (-3000 đến 3000 ms). Dương = sớm hơn, âm = trễ hơn.
   - LyricsOffsetBluetoothMs: 0
     $name: Độ lệch đồng bộ lời - Tai nghe Bluetooth (ms)
-    $description: "Tương tự như trên (-3000 đến 3000 ms), nhưng tự động áp dụng khi thiết bị phát âm thanh mặc định là Bluetooth. Bluetooth thường có độ trễ âm thanh, nên lời thường cần chỉnh TRỄ hơn (giá trị âm)."
-  - LyricsNeighborLinesVisible: false
-    $name: Hiện rõ các câu hát xung quanh
-    $description: Mặc định các câu hát trước và sau câu đang hát chỉ mờ nhẹ. Bật tùy chọn này để hiển thị rõ ràng dễ đọc hơn.
-  - LyricsCache: true
-    $name: Bộ nhớ đệm lời bài hát (Ổ cứng)
-    $description: Lưu lời bài hát đã tải về máy để lần sau phát tức thì, không cần tải lại, tiết kiệm mạng.
-  - LyricsCacheMaxMB: '25'
-    $name: Giới hạn dung lượng bộ nhớ đệm lời bài hát
-    $description: Các tệp ít dùng nhất sẽ tự động được xóa khi bộ nhớ đệm vượt quá giới hạn này. Chọn Tắt để ngừng lưu đệm.
-    $options:
-      - '0': Tắt
-      - '10': 10 MB
-      - '25': 25 MB (Mặc định)
-      - '100': 100 MB
-  - Language: vi
-    $name: Ngôn ngữ hiển thị
-    $description: Ngôn ngữ cho các nhãn chữ hiển thị trên Dynamic Island. Chọn Tự động để theo ngôn ngữ của Windows.
-    $options:
-      - vi: Tiếng Việt
-      - auto: Tự động (Theo ngôn ngữ Windows)
-      - en: English (Tiếng Anh)
-      - fr: Français (Tiếng Pháp)
-      - es: Español (Tiếng Tây Ban Nha)
-      - de: Deutsch (Tiếng Đức)
-      - pt: Português (Tiếng Bồ Đào Nha)
-      - it: Italiano (Tiếng Ý)
-      - ru: Русский (Tiếng Nga)
-      - tr: Türkçe (Tiếng Thổ Nhĩ Kỳ)
-      - hi: हिन्दी (Tiếng Hindi)
-      - zh: 简体中文 (Tiếng Trung giản thể)
-      - ja: 日本語 (Tiếng Nhật)
-      - ko: 한국어 (Tiếng Hàn)
-  - ClockFormat: system
-    $name: Định dạng đồng hồ
-    $description: Chọn kiểu hiển thị 12 giờ hoặc 24 giờ, hoặc theo cài đặt vùng của Windows.
-    $options:
-      - system: Theo cài đặt vùng Windows
-      - 12h: "12 giờ (Ví dụ: 3:07 CH)"
-      - 24h: "24 giờ (Ví dụ: 15:07)"
-  - ShowSeconds: false
-    $name: Hiện giây trên đồng hồ
-    $description: Hiển thị thêm số giây trong tab đồng hồ mở rộng.
-  - DateFormat: ""
-    $name: Định dạng ngày tùy chỉnh
-    $description: 'Mẫu định dạng ngày tùy chỉnh cho bảng điều khiển. Để trống để theo cài đặt Windows. Hỗ trợ: yyyy (năm), MM / M (tháng), dd / d (ngày), MMM (tháng viết tắt), MMMM (tháng đầy đủ), ddd / dddd (thứ). Hỗ trợ định dạng tiếng Việt và CJK như yyyy年MM月dd日.'
-  - DateFirst: false
-    $name: Hiện ngày tháng phía trên giờ
-    $description: Đảo vị trí bảng điều khiển để ngày tháng làm tiêu đề lớn và giờ nằm ở phía dưới.
-  - FirstDayOfWeek: auto
-    $name: Ngày đầu tuần trong lịch
-    $description: Thứ mà bảng lưới lịch bắt đầu. Tự động sẽ theo định dạng vùng Windows của bạn.
-    $options:
-      - auto: Tự động (Theo Windows)
-      - monday: Thứ Hai
-      - sunday: Chủ Nhật
-  - FileTrayModule: false
+    $description: Áp dụng riêng khi thiết bị phát là Bluetooth để bù trừ độ trễ không dây.
+  - FileTrayModule: true
     $name: Khay lưu tệp kéo thả (File Tray)
-    $description: Thêm thẻ Khay tệp vào vòng lặp cuộn chuột. Kéo bất kỳ tệp nào thả vào Island để giữ tạm ở đó, nhấp chuột để mở tệp.
+    $description: Thêm thẻ Khay tệp vào vòng lặp cuộn chuột. Kéo bất kỳ tệp nào thả vào Island để lưu tạm, nhấp chuột để mở tệp.
   - FileTrayAutoCapture: true
-    $name: Tự động lưu tệp khi sao chép (Ctrl+C)
-    $description: Tự động thêm đường dẫn tệp tin vào Khay tệp mỗi khi sao chép tệp trong File Explorer (Ctrl+C).
-  - FileTrayMaxItems: 10
-    $name: Sức chứa của khay tệp
-    $description: Từ 1 đến 25. Số lượng tệp tối đa khay có thể lưu trữ trước khi tệp cũ nhất bị đẩy ra.
-  - FileTrayPersist: true
-    $name: Ghi nhớ tệp qua các lần khởi động lại
-    $description: Giữ nguyên danh sách tệp trong khay sau khi khởi động lại máy tính. Chỉ lưu đường dẫn tệp, không sao chép dữ liệu tệp thật.
-  - MediaExpandBlocklist: ""
-    $name: Danh sách ứng dụng không tự bung Island
-    $description: 'Danh sách tên ứng dụng hoặc trang web (phân cách bằng dấu phẩy) mà bạn không muốn Island tự động mở rộng khi đổi bài hát (ví dụ: chrome, tiktok, youtube).'
-  - GameOverlayShowFps: true
-    $name: Bảng game - Hiện FPS
-    $description: Hiển thị tốc độ khung hình (FPS) trên dải thông số game.
-  - GameOverlayShowCpu: true
-    $name: Bảng game - Hiện CPU
-    $description: Hiển thị mức sử dụng CPU trên dải thông số game.
-  - GameOverlayShowGpu: true
-    $name: Bảng game - Hiện GPU
-    $description: Hiển thị mức sử dụng GPU trên dải thông số game.
-  - GameOverlayShowRam: true
-    $name: Bảng game - Hiện RAM
-    $description: Hiển thị dung lượng RAM sử dụng trên dải thông số game.
-  - GameOverlayShowDisk: true
-    $name: Bảng game - Hiện Ổ đĩa (Disk)
-    $description: Hiển thị mức độ hoạt động của ổ đĩa trên dải thông số game.
-  - GameOverlayCompact: false
-    $name: Bảng game - Kích thước siêu gọn
-    $description: Thu nhỏ bảng game thành một dải hẹp vừa vặn đặt trên thanh tác vụ.
+    $name: Tự động lưu khi sao chép (Ctrl+C)
+    $description: Tự động bắt và thêm tệp hoặc văn bản vào Khay mỗi khi nhấn Ctrl+C.
   $name: Mô-đun & Tính năng
 - Shortcuts:
   - HideShowHotkeyEnabled: true
@@ -542,11 +259,10 @@ We love community contributions! To ensure high-quality updates, please follow t
       - ctrl_shift: Ctrl + Shift
       - alt_shift: Alt + Shift
       - win_alt: Win + Alt
-      - ctrl_alt_shift: Ctrl + Alt + Shift
   - HideShowKey: "D"
-    $name: Phím chữ/số cho phím tắt Ẩn/Hiện
-    $description: Một phím chữ cái A-Z hoặc số 0-9 kết hợp với các phím bổ trợ phía trên. Mặc định là 'D'.
-  $name: Phím tắt & Thao tác nhanh
+    $name: Phím chữ cho phím tắt Ẩn/Hiện
+    $description: Phím chữ kết hợp với phím bổ trợ phía trên. Mặc định là 'D' (Ctrl + Alt + D).
+  $name: Phím tắt thao tác nhanh
 */
 // ==/WindhawkModSettings==
 
@@ -1858,6 +1574,7 @@ std::atomic<int> g_lyricsEffectiveOffsetBtMs{0};      // Bluetooth output: setti
 std::atomic<bool> g_volumeEndpointStale{true};
 std::atomic<bool> g_layoutDirty = true;
 std::atomic<bool> g_clickExpanded = false;
+std::atomic<bool> g_sessionLocked{false};
 std::atomic<int> g_pressedMediaButton = -1;
 std::atomic<int> g_hoveredMediaButton = -1;
 std::atomic<unsigned> g_skipTriggerPrev{0};  // bumped on click, the render thread plays the prev button's animation
@@ -7681,9 +7398,9 @@ DWORD WINAPI WeatherThreadProc(void*) {
 }
 
 // ── Lyrics (LRCLIB, https://lrclib.net) ──────────────────────────────────────
-// User-Agent sent to LRCLIB.
+// User-Agent sent to lyric services.
 constexpr wchar_t kLyricsUserAgent[] =
-    L"DynamicIslandForWindows/" WH_MOD_VERSION L" (https://github.com/devcode90/Dynamic-Island-for-Windows)";
+    L"DynamicIslandForWindows/" WH_MOD_VERSION L" (Personal Custom Edition)";
 
 bool IsUrlSafeChar(unsigned char c) {
     return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
@@ -19695,7 +19412,7 @@ class Renderer {
     }
 
     void DrawClipboard(const SharedState& state, D2D1_RECT_F rect) {
-        if (rect.bottom - rect.top < 40.0f || rect.right - rect.left < 100.0f) return;
+        if (rect.bottom - rect.top < 30.0f || rect.right - rect.left < 100.0f) return;
         const double now = NowSeconds();
         const float ttl = 2.5f;
         const float remaining = Clamp(static_cast<float>(state.clipboard.expiresAt - now), 0.0f, ttl);
@@ -19765,7 +19482,7 @@ class Renderer {
     }
 
     void DrawNotification(const SharedState& state, D2D1_RECT_F rect) {
-        if (rect.bottom - rect.top < 48.0f || rect.right - rect.left < 120.0f) return;
+        if (rect.bottom - rect.top < 32.0f || rect.right - rect.left < 120.0f) return;
         const double now = NowSeconds();
         const float ttl = 4.0f;
         const float remaining = Clamp(static_cast<float>(state.notification.expiresAt - now), 0.0f, ttl);
@@ -20709,16 +20426,16 @@ Activity ActivityForKind(IslandKind kind, const Settings& settings, const Shared
             activity.height = 44.0f;
             break;
         case IslandKind::Progress:
-            activity.width = 280.0f;
-            activity.height = 48.0f;
+            activity.width = 230.0f;
+            activity.height = 38.0f;
             break;
         case IslandKind::Clipboard:
-            activity.width = 320.0f;
-            activity.height = 50.0f;
+            activity.width = 265.0f;
+            activity.height = 44.0f;
             break;
         case IslandKind::Notification:
-            activity.width = 320.0f;
-            activity.height = 50.0f;
+            activity.width = 265.0f;
+            activity.height = 44.0f;
             break;
         case IslandKind::Volume:
         case IslandKind::Brightness:
@@ -20728,9 +20445,9 @@ Activity ActivityForKind(IslandKind kind, const Settings& settings, const Shared
         case IslandKind::Bluetooth:
         case IslandKind::Timer:
         case IslandKind::DoNotDisturb:
-            // Unified standard dimensions for all transient status pills (Volume, Brightness, DND, Caps, BT, Device, Battery, Timer)
-            activity.width = 280.0f;
-            activity.height = 48.0f;
+            // Unified ultra-compact dimensions for all transient status pills (Volume, Brightness, DND, Caps, BT, Device, Battery, Timer)
+            activity.width = 230.0f;
+            activity.height = 38.0f;
             break;
         case IslandKind::Idle:
         default:
@@ -21670,6 +21387,17 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             if (g_shellHookMessage == 0) g_shellHookMessage = RegisterWindowMessageW(L"SHELLHOOK");
             if (g_taskbarCreatedMessage == 0) g_taskbarCreatedMessage = RegisterWindowMessageW(L"TaskbarCreated");
             RegisterShellHookWindow(hwnd);
+            {
+                HMODULE hWts = LoadLibraryW(L"wtsapi32.dll");
+                if (hWts) {
+                    typedef BOOL (WINAPI *pfnWTSRegisterSessionNotification)(HWND, DWORD);
+                    auto pRegister = reinterpret_cast<pfnWTSRegisterSessionNotification>(GetProcAddress(hWts, "WTSRegisterSessionNotification"));
+                    if (pRegister) {
+                        pRegister(hwnd, 0 /* NOTIFY_FOR_THIS_SESSION */);
+                    }
+                    FreeLibrary(hWts);
+                }
+            }
             // File Tray (#33). An OLE drop target (instead of DragAcceptFiles) so the
             // island can react while a drag is still hovering. The module being off is
             // handled inside TrayDropTarget::DragEnter.
@@ -21759,6 +21487,17 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         }
 
         case WM_DESTROY:
+            {
+                HMODULE hWts = LoadLibraryW(L"wtsapi32.dll");
+                if (hWts) {
+                    typedef BOOL (WINAPI *pfnWTSUnRegisterSessionNotification)(HWND);
+                    auto pUnregister = reinterpret_cast<pfnWTSUnRegisterSessionNotification>(GetProcAddress(hWts, "WTSUnRegisterSessionNotification"));
+                    if (pUnregister) {
+                        pUnregister(hwnd);
+                    }
+                    FreeLibrary(hWts);
+                }
+            }
             RevokeDragDrop(hwnd);
             if (g_oleInitialized) {
                 OleUninitialize();
@@ -21855,6 +21594,18 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 UpdateBatterySnapshot();
             }
             return TRUE;
+        }
+
+        case WM_WTSSESSION_CHANGE: {
+            // WTS_SESSION_LOCK = 0x7, WTS_SESSION_UNLOCK = 0x8
+            if (wParam == 0x7) {
+                g_sessionLocked.store(true);
+            } else if (wParam == 0x8) {
+                g_sessionLocked.store(false);
+                g_layoutDirty = true;
+                TriggerNudge();
+            }
+            return 0;
         }
 
         case WM_CLIPBOARDUPDATE:
@@ -22714,8 +22465,9 @@ DWORD WINAPI RenderThreadProc(void*) {
         MSG message = {};
         while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
             if (message.message == WM_APP_NEW_EVENT) {
-                nudgeSpring.value = -6.0f;
-                nudgeSpring.velocity = 0.0f;
+                // Smooth physical impulse instead of instantaneous coordinate teleportation:
+                // preserves continuous position while launching a fluid Apple-style spring bounce.
+                nudgeSpring.velocity = -75.0f;
                 nudgeSpring.target = 0.0f;
                 lastInteractionTime = NowSeconds();
                 continue;
@@ -22725,6 +22477,14 @@ DWORD WINAPI RenderThreadProc(void*) {
         }
 
         BindVolumeEndpoint();
+
+        // Lock screen power saving & privacy: park render thread with zero CPU usage while session is locked
+        if (g_sessionLocked.load()) {
+            ShowWindow(hwnd, SW_HIDE);
+            DwmBackdrop::HideAll();
+            MsgWaitForMultipleObjects(1, &g_stopEvent, FALSE, 250, QS_ALLINPUT);
+            continue;
+        }
 
         bool justUnhidden = false;
 
@@ -22921,13 +22681,11 @@ DWORD WINAPI RenderThreadProc(void*) {
                     // AnimateToIdleState: when media session ends or changes to idle, unexpand immediately
                     g_clickExpanded.store(false);
                     g_pinnedExpanded.store(false);
-                    nudgeSpring.value = 4.0f;
-                    nudgeSpring.velocity = 0.0f;
+                    nudgeSpring.velocity = 40.0f;
                     nudgeSpring.target = 0.0f;
                 }
             } else {
-                nudgeSpring.value = -6.0f;
-                nudgeSpring.velocity = 0.0f;
+                nudgeSpring.velocity = -75.0f;
                 nudgeSpring.target = 0.0f;
             }
             lastInteractionTime = now;
@@ -23227,22 +22985,22 @@ DWORD WINAPI RenderThreadProc(void*) {
 
         const float speed = g_settings.animationSpeed;
         float widthStiffness = 280.0f * styleStiffnessMult;
-        float widthDamping = 24.0f * styleDampingMult;
+        float widthDamping = 26.0f * styleDampingMult;
         if (targetWidth > widthSpring.value) {
-            widthStiffness = 380.0f * styleStiffnessMult;
-            widthDamping = 26.0f * styleDampingMult;
+            widthStiffness = 320.0f * styleStiffnessMult;
+            widthDamping = 30.5f * styleDampingMult;
         } else if (targetWidth < widthSpring.value) {
-            widthStiffness = 200.0f * styleStiffnessMult;
+            widthStiffness = 240.0f * styleStiffnessMult;
             widthDamping = 28.0f * styleDampingMult;
         }
 
         float heightStiffness = 280.0f * styleStiffnessMult;
-        float heightDamping = 24.0f * styleDampingMult;
+        float heightDamping = 26.0f * styleDampingMult;
         if (targetHeight > heightSpring.value) {
-            heightStiffness = 380.0f * styleStiffnessMult;
-            heightDamping = 26.0f * styleDampingMult;
+            heightStiffness = 320.0f * styleStiffnessMult;
+            heightDamping = 30.5f * styleDampingMult;
         } else if (targetHeight < heightSpring.value) {
-            heightStiffness = 200.0f * styleStiffnessMult;
+            heightStiffness = 240.0f * styleStiffnessMult;
             heightDamping = 28.0f * styleDampingMult;
         }
 
