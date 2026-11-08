@@ -1422,6 +1422,7 @@ struct FileTrayItem {
     uint64_t sizeBytes = 0;
     bool isDirectory = false;
     bool isText = false;     // a pasted text snippet rather than a file reference
+    bool isImage = false;    // a captured/pasted image snippet
     std::wstring text;       // full snippet when isText is set
     PixelsRef icon;
 };
@@ -1573,6 +1574,7 @@ std::atomic<bool> g_volumeEndpointStale{true};
 std::atomic<bool> g_layoutDirty = true;
 std::atomic<bool> g_clickExpanded = false;
 std::atomic<bool> g_sessionLocked{false};
+std::atomic<bool> g_internalClipboardCopy{false};
 std::atomic<int> g_pressedMediaButton = -1;
 std::atomic<int> g_hoveredMediaButton = -1;
 std::atomic<unsigned> g_skipTriggerPrev{0};  // bumped on click, the render thread plays the prev button's animation
@@ -1999,7 +2001,7 @@ const wchar_t* Loc(const wchar_t* english) {
         {L"Wind", {nullptr, L"Vent", L"Viento", L"Wind", L"Vento", L"Vento", L"Ветер", L"Rüzgar", L"हवा", L"风速", L"風", L"바람", L"Gió"}},
         {L"Feels Like", {nullptr, L"Ressenti", L"Sensación", L"Gefühlt", L"Sensação", L"Percepita", L"Ощущается", L"Hissedilen", L"महसूस", L"体感", L"体感", L"체감", L"Cảm giác như"}},
         {L"Humidity", {nullptr, L"Humidité", L"Humedad", L"Luftfeuchte", L"Umidade", L"Umidità", L"Влажность", L"Nem", L"नमी", L"湿度", L"湿度", L"습도", L"Độ ẩm"}},
-        {L"Drag files here", {nullptr, L"Déposez des fichiers ici", L"Arrastra archivos aquí", L"Dateien hierher ziehen", L"Arraste arquivos aqui", L"Trascina i file qui", L"Перетащите файлы сюда", L"Dosyaları buraya sürükleyin", L"फ़ाइलें यहाँ खींचें", L"将文件拖到此处", L"ここにファイルをドラッグ", L"여기에 파일을 끌어다 놓으세요", L"Kéo thả tệp vào đây"}},
+        {L"Drag files here", {nullptr, L"Déposez des fichiers ici", L"Arrastra archivos aquí", L"Dateien hierher ziehen", L"Arraste arquivos aqui", L"Trascina i file qui", L"Перетащите файлы сюда", L"Dosyaları buraya sürükleyin", L"फ़ाइलें यहाँ खींचें", L"将文件拖到此处", L"ここにファイルをドラッグ", L"여기에 파일을 끌어다 놓으세요", L"Kéo tệp hoặc sao chép chữ/ảnh (Ctrl+C)"}},
         {L"No devices", {nullptr, L"Aucun appareil", L"Sin dispositivos", L"Keine Geräte", L"Nenhum dispositivo", L"Nessun dispositivo", L"Нет устройств", L"Cihaz yok", L"कोई डिवाइस नहीं", L"无设备", L"デバイスなし", L"장치 없음", L"Không có thiết bị"}},
         {L"item", {nullptr, L"élément", L"elemento", L"Element", L"item", L"elemento", L"элемент", L"öğe", L"आइटम", L"项", L"項目", L"항목", L"tệp"}},
         {L"items", {nullptr, L"éléments", L"elementos", L"Elemente", L"itens", L"elementi", L"элементов", L"öğe", L"आइटम", L"项", L"項目", L"항목", L"tệp"}},
@@ -10288,7 +10290,7 @@ bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
     UINT srcH = static_cast<UINT>(bm.bmHeight);
     UINT dstW = srcW;
     UINT dstH = srcH;
-    if (srcW > maxDim || srcH > maxDim) {
+    if (maxDim > 0 && (srcW > maxDim || srcH > maxDim)) {
         const float scale = static_cast<float>(maxDim) / static_cast<float>(std::max(srcW, srcH));
         dstW = std::max<UINT>(1, static_cast<UINT>(srcW * scale));
         dstH = std::max<UINT>(1, static_cast<UINT>(srcH * scale));
@@ -14105,7 +14107,7 @@ class Renderer {
                 DrawBitmapPixels(*item.icon, iconRect, fileTrayIconBitmap_, fileTrayIconGeneration_, 0.98f);
             } else if (iconFormat_) {
                 const wchar_t* glyph = item.isText ? L"\uE8D2"
-                                                   : (item.isDirectory ? L"\uE8B7" : L"\uE7C3");
+                                                   : (item.isImage ? L"\uEB9F" : (item.isDirectory ? L"\uE8B7" : L"\uE7C3"));
                 accentBrush_->SetOpacity(0.85f);
                 target_->DrawTextW(glyph, 1, iconFormat_.Get(), iconRect, accentBrush_.Get(),
                                    D2D1_DRAW_TEXT_OPTIONS_NONE);
@@ -14115,6 +14117,14 @@ class Renderer {
             wchar_t sizeBuf[40] = {};
             if (item.isText) {
                 swprintf_s(sizeBuf, L"%zu ch", item.text.size());
+            } else if (item.isImage) {
+                if (item.sizeBytes >= 1048576ull) {
+                    swprintf_s(sizeBuf, L"%.1f MB", static_cast<double>(item.sizeBytes) / 1048576.0);
+                } else if (item.sizeBytes >= 1024ull) {
+                    swprintf_s(sizeBuf, L"%.0f KB", static_cast<double>(item.sizeBytes) / 1024.0);
+                } else {
+                    wcscpy_s(sizeBuf, L"Image");
+                }
             } else if (item.isDirectory) {
                 wcscpy_s(sizeBuf, L"—");
             } else if (item.sizeBytes >= 1073741824ull) {
@@ -20754,6 +20764,14 @@ bool ResolvePaths(std::wstring* dir, std::wstring* file) {
     return true;
 }
 
+bool ResolveImageDir(std::wstring* imgDir) {
+    std::wstring dir, file;
+    if (!ResolvePaths(&dir, &file)) return false;
+    *imgDir = dir + L"\\images";
+    SHCreateDirectoryExW(nullptr, imgDir->c_str(), nullptr);
+    return true;
+}
+
 std::string Escape(const std::wstring& value) {
     std::string out;
     for (const char c : LyricsCache::WideToUtf8(value)) {
@@ -20789,6 +20807,175 @@ std::wstring Unescape(const std::string& value) {
 
 }  // namespace FileTrayStore
 
+bool SaveBitmapPixelsToPng(const BitmapPixels& pixels, const std::wstring& filePath) {
+    if (pixels.width == 0 || pixels.height == 0 || pixels.bgra.empty()) {
+        return false;
+    }
+
+    ComPtr<IWICImagingFactory> factory;
+    HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+                                  IID_PPV_ARGS(&factory));
+    if (FAILED(hr) || !factory) return false;
+
+    ComPtr<IWICStream> stream;
+    hr = factory->CreateStream(&stream);
+    if (FAILED(hr) || !stream) return false;
+
+    hr = stream->InitializeFromFilename(filePath.c_str(), GENERIC_WRITE);
+    if (FAILED(hr)) return false;
+
+    ComPtr<IWICBitmapEncoder> encoder;
+    hr = factory->CreateEncoder(GUID_ContainerFormatPng, nullptr, &encoder);
+    if (FAILED(hr) || !encoder) return false;
+
+    hr = encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache);
+    if (FAILED(hr)) return false;
+
+    ComPtr<IWICBitmapFrameEncode> frame;
+    ComPtr<IPropertyBag2> props;
+    hr = encoder->CreateNewFrame(&frame, &props);
+    if (FAILED(hr) || !frame) return false;
+
+    hr = frame->Initialize(props.Get());
+    if (FAILED(hr)) return false;
+
+    hr = frame->SetSize(pixels.width, pixels.height);
+    if (FAILED(hr)) return false;
+
+    WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA;
+    hr = frame->SetPixelFormat(&format);
+    if (FAILED(hr)) return false;
+
+    const UINT stride = pixels.width * 4;
+    const UINT bufferSize = static_cast<UINT>(pixels.bgra.size());
+    hr = frame->WritePixels(pixels.height, stride, bufferSize, const_cast<BYTE*>(pixels.bgra.data()));
+    if (FAILED(hr)) return false;
+
+    hr = frame->Commit();
+    if (FAILED(hr)) return false;
+
+    hr = encoder->Commit();
+    return SUCCEEDED(hr);
+}
+
+bool LoadImagePixelsFromPngFile(const std::wstring& path, BitmapPixels* outPixels, UINT maxDim = 0) {
+    if (!outPixels) return false;
+    ComPtr<IWICImagingFactory> factory;
+    HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+                                  IID_PPV_ARGS(&factory));
+    if (FAILED(hr) || !factory) return false;
+
+    ComPtr<IWICBitmapDecoder> decoder;
+    hr = factory->CreateDecoderFromFilename(path.c_str(), nullptr, GENERIC_READ,
+                                            WICDecodeMetadataCacheOnLoad, &decoder);
+    if (FAILED(hr) || !decoder) return false;
+
+    ComPtr<IWICBitmapFrameDecode> frame;
+    hr = decoder->GetFrame(0, &frame);
+    if (FAILED(hr) || !frame) return false;
+
+    UINT w = 0, h = 0;
+    hr = frame->GetSize(&w, &h);
+    if (FAILED(hr) || w == 0 || h == 0) return false;
+
+    ComPtr<IWICBitmapSource> source = frame;
+    if (maxDim > 0 && (w > maxDim || h > maxDim)) {
+        const float scale = static_cast<float>(maxDim) / static_cast<float>(std::max(w, h));
+        const UINT dstW = std::max<UINT>(1, static_cast<UINT>(w * scale));
+        const UINT dstH = std::max<UINT>(1, static_cast<UINT>(h * scale));
+        ComPtr<IWICBitmapScaler> scaler;
+        hr = factory->CreateBitmapScaler(&scaler);
+        if (SUCCEEDED(hr) && scaler) {
+            hr = scaler->Initialize(frame.Get(), dstW, dstH, WICBitmapInterpolationModeFant);
+            if (SUCCEEDED(hr)) {
+                source = scaler;
+                w = dstW;
+                h = dstH;
+            }
+        }
+    }
+
+    ComPtr<IWICFormatConverter> converter;
+    hr = factory->CreateFormatConverter(&converter);
+    if (FAILED(hr) || !converter) return false;
+
+    hr = converter->Initialize(source.Get(), GUID_WICPixelFormat32bppBGRA,
+                               WICBitmapDitherTypeNone, nullptr, 0.0,
+                               WICBitmapPaletteTypeCustom);
+    if (FAILED(hr)) return false;
+
+    outPixels->width = w;
+    outPixels->height = h;
+    outPixels->bgra.resize(static_cast<size_t>(w) * h * 4);
+    hr = converter->CopyPixels(nullptr, w * 4, static_cast<UINT>(outPixels->bgra.size()),
+                               outPixels->bgra.data());
+    return SUCCEEDED(hr);
+}
+
+bool CopyImageFileToClipboard(HWND hwnd, const std::wstring& filePath) {
+    if (filePath.empty() || !OpenClipboard(hwnd)) return false;
+    EmptyClipboard();
+
+    // 1. Put CF_HDROP
+    DROPFILES df = {};
+    df.pFiles = sizeof(DROPFILES);
+    df.fWide = TRUE;
+    const size_t pathBytes = (filePath.size() + 2) * sizeof(wchar_t);
+    HGLOBAL hDrop = GlobalAlloc(GMEM_MOVEABLE, sizeof(DROPFILES) + pathBytes);
+    if (hDrop) {
+        BYTE* dst = static_cast<BYTE*>(GlobalLock(hDrop));
+        if (dst) {
+            memcpy(dst, &df, sizeof(DROPFILES));
+            memcpy(dst + sizeof(DROPFILES), filePath.c_str(), (filePath.size() + 1) * sizeof(wchar_t));
+            reinterpret_cast<wchar_t*>(dst + sizeof(DROPFILES))[filePath.size() + 1] = L'\0';
+            GlobalUnlock(hDrop);
+            SetClipboardData(CF_HDROP, hDrop);
+        } else {
+            GlobalFree(hDrop);
+        }
+    }
+
+    // 2. Put CF_DIB
+    BitmapPixels px;
+    if (LoadImagePixelsFromPngFile(filePath, &px, 0) && px.width > 0 && px.height > 0) {
+        const DWORD rowStride = ((px.width * 32 + 31) / 32) * 4;
+        const DWORD imageBytes = rowStride * px.height;
+        const DWORD totalBytes = sizeof(BITMAPINFOHEADER) + imageBytes;
+        HGLOBAL hDib = GlobalAlloc(GMEM_MOVEABLE, totalBytes);
+        if (hDib) {
+            BYTE* pMem = static_cast<BYTE*>(GlobalLock(hDib));
+            if (pMem) {
+                BITMAPINFOHEADER* bih = reinterpret_cast<BITMAPINFOHEADER*>(pMem);
+                bih->biSize = sizeof(BITMAPINFOHEADER);
+                bih->biWidth = static_cast<LONG>(px.width);
+                bih->biHeight = static_cast<LONG>(px.height); // standard bottom-up DIB
+                bih->biPlanes = 1;
+                bih->biBitCount = 32;
+                bih->biCompression = BI_RGB;
+                bih->biSizeImage = imageBytes;
+                bih->biXPelsPerMeter = 0;
+                bih->biYPelsPerMeter = 0;
+                bih->biClrUsed = 0;
+                bih->biClrImportant = 0;
+
+                BYTE* pDstBits = pMem + sizeof(BITMAPINFOHEADER);
+                for (UINT y = 0; y < px.height; ++y) {
+                    const BYTE* srcRow = px.bgra.data() + (px.height - 1 - y) * (px.width * 4);
+                    BYTE* dstRow = pDstBits + y * rowStride;
+                    memcpy(dstRow, srcRow, px.width * 4);
+                }
+                GlobalUnlock(hDib);
+                SetClipboardData(CF_DIB, hDib);
+            } else {
+                GlobalFree(hDib);
+            }
+        }
+    }
+
+    CloseClipboard();
+    return true;
+}
+
 // Writes the current tray to disk. Safe to call from any thread, and never call
 // it while holding g_stateMutex. With persistence off, or an empty tray, the
 // saved file is removed instead.
@@ -20801,6 +20988,7 @@ void SaveFileTray() {
 
     struct Row {
         bool isText;
+        bool isImage;
         std::wstring name;
         std::wstring value;
     };
@@ -20809,7 +20997,7 @@ void SaveFileTray() {
         std::lock_guard lock(g_stateMutex);
         rows.reserve(g_state.fileTrayItems.size());
         for (const FileTrayItem& item : g_state.fileTrayItems) {
-            rows.push_back(Row{item.isText, item.name, item.isText ? item.text : item.path});
+            rows.push_back(Row{item.isText, item.isImage, item.name, item.isText ? item.text : item.path});
         }
     }
 
@@ -20830,6 +21018,9 @@ void SaveFileTray() {
     for (const Row& row : rows) {
         if (row.isText) {
             data += "T\t" + FileTrayStore::Escape(row.name) + "\t" +
+                    FileTrayStore::Escape(row.value) + "\n";
+        } else if (row.isImage) {
+            data += "I\t" + FileTrayStore::Escape(row.name) + "\t" +
                     FileTrayStore::Escape(row.value) + "\n";
         } else {
             data += "F\t" + FileTrayStore::Escape(row.value) + "\n";
@@ -20911,6 +21102,27 @@ void LoadFileTray() {
             item.text = FileTrayStore::Unescape(rest.substr(tab + 1));
             if (item.text.empty()) continue;
             if (item.name.empty()) item.name = L"Text";
+        } else if (line[0] == 'I') {
+            const std::string rest = line.substr(2);
+            const size_t tab = rest.find('\t');
+            if (tab == std::string::npos) continue;
+            item.isImage = true;
+            item.name = FileTrayStore::Unescape(rest.substr(0, tab));
+            item.path = FileTrayStore::Unescape(rest.substr(tab + 1));
+            if (item.path.empty()) continue;
+            if (item.name.empty()) item.name = L"Image";
+
+            WIN32_FILE_ATTRIBUTE_DATA attr = {};
+            if (GetFileAttributesExW(item.path.c_str(), GetFileExInfoStandard, &attr)) {
+                item.sizeBytes =
+                    (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+                BitmapPixels thumb;
+                if (LoadImagePixelsFromPngFile(item.path, &thumb, 48)) {
+                    static uint64_t s_loadGen = 5000;
+                    thumb.generation = ++s_loadGen;
+                    item.icon = PixelsRef(std::move(thumb));
+                }
+            }
         } else if (line[0] == 'F') {
             item.path = FileTrayStore::Unescape(line.substr(2));
             if (item.path.empty()) continue;
@@ -21149,34 +21361,132 @@ void CopyTextToClipboard(HWND hwnd, const std::wstring& text) {
     CloseClipboard();
 }
 
-// Pastes whatever is on the clipboard into the tray: copied files first
-// (as references), otherwise copied text.
-void PasteIntoFileTray(HWND hwnd) {
-    std::vector<std::wstring> paths;
-    if (OpenClipboard(hwnd)) {
-        HANDLE data = GetClipboardData(CF_HDROP);
-        if (data) {
-            HDROP drop = reinterpret_cast<HDROP>(data);
-            const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
-            for (UINT i = 0; i < count; ++i) {
-                const UINT len = DragQueryFileW(drop, i, nullptr, 0);
-                if (len == 0) {
-                    continue;
-                }
-                std::wstring path(len, L'\0');
-                DragQueryFileW(drop, i, path.data(), len + 1);
-                paths.push_back(std::move(path));
-            }
-        }
-        CloseClipboard();
+void AddImageToFileTrayFromClipboard(HWND hwnd) {
+    std::wstring imgDir;
+    if (!FileTrayStore::ResolveImageDir(&imgDir)) {
+        return;
     }
 
-    if (!paths.empty()) {
-        AddPathsToFileTray(paths);
-    } else {
-        AddTextToFileTray(ReadClipboardText(hwnd));
-        SaveFileTray();
+    BitmapPixels fullPixels;
+    if (!ReadClipboardImagePixels(hwnd, &fullPixels, 2560) || fullPixels.width == 0 || fullPixels.height == 0 || fullPixels.bgra.empty()) {
+        return;
     }
+
+    wchar_t fileName[128];
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+    swprintf_s(fileName, L"clip_%lu_%lu.png", ft.dwHighDateTime, ft.dwLowDateTime);
+    std::wstring filePath = imgDir + L"\\" + fileName;
+
+    if (!SaveBitmapPixelsToPng(fullPixels, filePath)) {
+        return;
+    }
+
+    BitmapPixels thumb;
+    if (!LoadImagePixelsFromPngFile(filePath, &thumb, 48)) {
+        DeleteFileW(filePath.c_str());
+        return;
+    }
+
+    // Check duplicate: if identical to current top item, avoid duplicate save
+    {
+        std::lock_guard lock(g_stateMutex);
+        if (!g_state.fileTrayItems.empty()) {
+            const auto& last = g_state.fileTrayItems.back();
+            if (last.isImage && last.icon && last.icon->bgra.size() == thumb.bgra.size() &&
+                memcmp(last.icon->bgra.data(), thumb.bgra.data(), thumb.bgra.size()) == 0) {
+                DeleteFileW(filePath.c_str());
+                return;
+            }
+        }
+    }
+
+    static uint64_t s_imgGen = 6000;
+    thumb.generation = ++s_imgGen;
+
+    FileTrayItem item;
+    item.isImage = true;
+    item.path = filePath;
+    item.name = L"Ảnh " + std::to_wstring(fullPixels.width) + L"x" + std::to_wstring(fullPixels.height);
+    item.icon = PixelsRef(std::move(thumb));
+
+    WIN32_FILE_ATTRIBUTE_DATA attr = {};
+    if (GetFileAttributesExW(filePath.c_str(), GetFileExInfoStandard, &attr)) {
+        item.sizeBytes = (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+    }
+
+    int maxItems = 10;
+    {
+        std::lock_guard lock(g_settingsMutex);
+        maxItems = std::max(1, g_settings.fileTrayMaxItems);
+    }
+
+    std::vector<std::wstring> filesToDelete;
+    {
+        std::lock_guard lock(g_stateMutex);
+        auto& items = g_state.fileTrayItems;
+        items.push_back(std::move(item));
+        while (items.size() > static_cast<size_t>(maxItems)) {
+            if (items.front().isImage && !items.front().path.empty()) {
+                filesToDelete.push_back(items.front().path);
+            }
+            items.erase(items.begin());
+        }
+    }
+
+    for (const auto& f : filesToDelete) {
+        DeleteFileW(f.c_str());
+    }
+
+    SaveFileTray();
+}
+
+void AutoCaptureClipboardToFileTray(HWND hwnd) {
+    if (!OpenClipboard(hwnd)) {
+        return;
+    }
+    const bool hasFiles = (GetClipboardData(CF_HDROP) != nullptr);
+    const bool hasText = (GetClipboardData(CF_UNICODETEXT) != nullptr);
+    const bool hasBitmap = (GetClipboardData(CF_BITMAP) != nullptr || GetClipboardData(CF_DIB) != nullptr);
+    CloseClipboard();
+
+    if (hasFiles) {
+        std::vector<std::wstring> paths;
+        if (OpenClipboard(hwnd)) {
+            HANDLE data = GetClipboardData(CF_HDROP);
+            if (data) {
+                HDROP drop = reinterpret_cast<HDROP>(data);
+                const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
+                for (UINT i = 0; i < count; ++i) {
+                    const UINT len = DragQueryFileW(drop, i, nullptr, 0);
+                    if (len > 0) {
+                        std::wstring path(len, L'\0');
+                        DragQueryFileW(drop, i, path.data(), len + 1);
+                        paths.push_back(std::move(path));
+                    }
+                }
+            }
+            CloseClipboard();
+        }
+        if (!paths.empty()) {
+            AddPathsToFileTray(paths);
+        }
+    } else if (hasBitmap && !hasText) {
+        AddImageToFileTrayFromClipboard(hwnd);
+    } else if (hasText) {
+        std::wstring text = ReadClipboardText(hwnd);
+        if (!text.empty()) {
+            AddTextToFileTray(text);
+            SaveFileTray();
+        }
+    } else if (hasBitmap) {
+        AddImageToFileTrayFromClipboard(hwnd);
+    }
+}
+
+// Pastes whatever is on the clipboard into the tray: files, screenshots/images, or text.
+void PasteIntoFileTray(HWND hwnd) {
+    AutoCaptureClipboardToFileTray(hwnd);
 
     const int tab = FileTrayTabIndex(GetSettingsCopy());
     if (tab >= 0) {
@@ -21602,35 +21912,19 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             return 0;
         }
 
-        case WM_CLIPBOARDUPDATE:
-            // Tự động lưu tệp vào File Tray khi sao chép tệp trong Windows (Yêu cầu 6)
+        case WM_CLIPBOARDUPDATE: {
+            if (g_internalClipboardCopy.exchange(false)) {
+                return 0;
+            }
             if (g_settings.fileTrayModule && g_settings.fileTrayAutoCapture) {
-                if (OpenClipboard(hwnd)) {
-                    HANDLE data = GetClipboardData(CF_HDROP);
-                    if (data) {
-                        HDROP drop = reinterpret_cast<HDROP>(data);
-                        const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
-                        std::vector<std::wstring> paths;
-                        for (UINT i = 0; i < count; ++i) {
-                            const UINT len = DragQueryFileW(drop, i, nullptr, 0);
-                            if (len > 0) {
-                                std::wstring path(len, L'\0');
-                                DragQueryFileW(drop, i, path.data(), len + 1);
-                                paths.push_back(std::move(path));
-                            }
-                        }
-                        if (!paths.empty()) {
-                            AddPathsToFileTray(paths);
-                            g_layoutDirty = true;
-                        }
-                    }
-                    CloseClipboard();
-                }
+                AutoCaptureClipboardToFileTray(hwnd);
+                g_layoutDirty = true;
             }
             if (g_settings.clipboard) {
                 CaptureClipboard(hwnd);
             }
             return 0;
+        }
 
 
 
@@ -22067,11 +22361,17 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
                     std::wstring toOpen;
                     std::wstring toCopy;
+                    std::wstring toCopyImage;
                     bool changed = false;
                     {
                         std::lock_guard lock(g_stateMutex);
                         const int count = static_cast<int>(g_state.fileTrayItems.size());
                         if (count > 0 && FileTrayClearHitTest(cp)) {
+                            for (const auto& item : g_state.fileTrayItems) {
+                                if (item.isImage && !item.path.empty()) {
+                                    DeleteFileW(item.path.c_str());
+                                }
+                            }
                             g_state.fileTrayItems.clear();
                             changed = true;
                         } else {
@@ -22080,6 +22380,9 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                                 // Rows render newest-first, so map back from the end.
                                 const size_t index = static_cast<size_t>(count - 1 - row);
                                 if (FileTrayRemoveHitTest(cp, row)) {
+                                    if (g_state.fileTrayItems[index].isImage && !g_state.fileTrayItems[index].path.empty()) {
+                                        DeleteFileW(g_state.fileTrayItems[index].path.c_str());
+                                    }
                                     g_state.fileTrayItems.erase(
                                         g_state.fileTrayItems.begin() + static_cast<std::ptrdiff_t>(index));
                                     changed = true;
@@ -22087,6 +22390,8 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                                     const FileTrayItem& clicked = g_state.fileTrayItems[index];
                                     if (clicked.isText) {
                                         toCopy = clicked.text;
+                                    } else if (clicked.isImage) {
+                                        toCopyImage = clicked.path;
                                     } else {
                                         toOpen = clicked.path;
                                     }
@@ -22102,7 +22407,15 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                         return 0;
                     }
                     if (!toCopy.empty()) {
+                        g_internalClipboardCopy.store(true);
                         CopyTextToClipboard(hwnd, toCopy);
+                        TriggerNudge();
+                        return 0;
+                    }
+                    if (!toCopyImage.empty()) {
+                        g_internalClipboardCopy.store(true);
+                        CopyImageFileToClipboard(hwnd, toCopyImage);
+                        TriggerNudge();
                         return 0;
                     }
                     if (!toOpen.empty()) {
