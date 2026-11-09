@@ -28,7 +28,7 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
 
 - **Hiệu ứng nảy Dynamic Island mượt mà:**
   - Chuyển động vật lý đàn hồi tự nhiên mô phỏng chính xác Apple Dynamic Island, loại bỏ hoàn toàn hiện tượng giật khựng vị trí khi nảy popup.
-  - Kích thước thẻ thông báo trạng thái (Âm lượng, Độ sáng, Pin, Caps Lock, DND, Bluetooth) được quy chuẩn siêu gọn gàng, không che khuất màn hình.
+  - Kích thước thẻ thông báo trạng thái (Âm lượng, Độ sáng, Pin, Caps Lock, Bluetooth) được quy chuẩn siêu gọn gàng, không che khuất màn hình.
 
 - **Khay lưu tệp & Bộ nhớ tạm (File Tray):**
   - Tự động bắt và lưu danh sách tệp tin, văn bản khi sao chép (Ctrl+C).
@@ -213,9 +213,6 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
   - Clipboard: true
     $name: Xem nhanh bộ nhớ tạm (Clipboard)
     $description: Hiển thị thẻ xem nhanh nội dung văn bản hoặc hình ảnh vừa sao chép (Ctrl+C).
-  - DoNotDisturbIndicator: true
-    $name: Chỉ báo chế độ Không làm phiền
-    $description: Hiển thị thông báo trạng thái khi bạn bật/tắt chế độ Không làm phiền (Do Not Disturb) trong Windows.
   - HardwareMonitorModule: true
     $name: Thẻ Giám sát phần cứng khi cuộn chuột
     $description: Thêm thẻ hiển thị thông số CPU, GPU, RAM, FPS và Tốc độ mạng vào vòng lặp cuộn chuột của Island (chỉ kích hoạt lấy mẫu khi mở thẻ).
@@ -244,11 +241,8 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $name: Khay lưu tệp kéo thả (File Tray)
     $description: Thêm thẻ Khay tệp vào vòng lặp cuộn chuột. Kéo bất kỳ tệp nào thả vào Island để lưu tạm, nhấp chuột để mở tệp.
   - FileTrayAutoCapture: true
-    $name: Tự động lưu Clipboard vào Khay (Ctrl+C / Win+Shift+S)
-    $description: Tự động bắt và thêm văn bản sao chép, ảnh chụp màn hình hoặc tệp vào Khay tệp (hoạt động như Clipboard History Windows + V).
-  - FileTrayMaxItems: 20
-    $name: Số lượng mục tối đa trong Khay tệp
-    $description: Giới hạn số lượng mục lưu trữ trong Khay tệp (từ 1 đến 50 mục).
+    $name: Tự động lưu khi sao chép (Ctrl+C)
+    $description: Tự động bắt và thêm tệp hoặc văn bản vào Khay mỗi khi nhấn Ctrl+C.
   - FileTrayExpireHours: '0'
     $name: Thời hạn lưu trữ Khay tệp & Bộ nhớ tạm
     $description: Tự động dọn dẹp các tệp và đoạn sao chép sau thời gian quy định (các mục được Ghim sẽ không bao giờ bị xóa).
@@ -272,22 +266,22 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $options:
       - volume: Âm lượng hệ thống (Volume)
       - brightness: Độ sáng màn hình (Brightness)
-  - CollapsedSwipeDirection: horizontal
-    $name: Hướng vuốt khi thu nhỏ (Khóa hướng di chuyển)
-    $description: Khóa cử chỉ vuốt theo hướng đã chọn. Khi chọn Ngang, chỉ nhận vuốt Trái/Phải; khi chọn Dọc, chỉ nhận vuốt Lên/Xuống (không bị loạn hướng).
+  - CollapsedSwipeDirection: natural
+    $name: Hướng & Đảo chiều vuốt khi thu nhỏ
+    $description: Cả 4 hướng (Trái/Phải/Lên/Xuống) đều hoạt động đồng thời. Bạn có thể tùy chọn chiều tăng giảm tự nhiên hoặc đảo chiều.
     $options:
-      - horizontal: Khóa Chiều Ngang (Vuốt Phải = Tăng, Vuốt Trái = Giảm) (Mặc định khuyên dùng)
-      - horizontal_inverted: Khóa Chiều Ngang Đảo Ngược (Vuốt Phải = Giảm, Vuốt Trái = Tăng)
-      - vertical: Khóa Chiều Dọc (Vuốt Lên = Tăng, Vuốt Xuống = Giảm)
-      - vertical_inverted: Khóa Chiều Dọc Đảo Ngược (Vuốt Xuống = Tăng, Vuốt Lên = Giảm)
-      - natural: Tự do cả 2 trục (Nhận cả Ngang và Dọc)
+      - natural: Tự nhiên (Vuốt Phải hoặc Vuốt Lên = Tăng, Vuốt Trái hoặc Vuốt Xuống = Giảm)
+      - invert_vertical: Đảo chiều dọc (Vuốt Xuống = Tăng, Vuốt Lên = Giảm)
+      - invert_horizontal: Đảo chiều ngang (Vuốt Trái = Tăng, Vuốt Phải = Giảm)
+      - invert_both: Đảo cả 2 chiều
+      - horizontal: Vuốt Ngang (Phải = Tăng, Trái = Giảm)
+      - vertical: Vuốt Dọc (Lên = Tăng, Xuống = Giảm)
   - CollapsedDoubleClickAction: play_pause
     $name: Hành động khi Nhấp Đúp trên Island thu nhỏ
     $description: Thao tác thực hiện khi nhấp đúp chuột trái vào viên thuốc (không bị kẹt ghim mở rộng).
     $options:
       - play_pause: Phát / Tạm dừng nhạc (Play/Pause)
       - mute_toggle: Bật / Tắt tiếng nhanh
-      - open_filetray: Mở thẳng vào Khay tệp & Lịch sử sao chép
       - pin_toggle: Ghim / Bỏ ghim mở rộng Island
       - none: Mở rộng bình thường
   - CollapsedMiddleClickAction: mute_toggle
@@ -298,15 +292,23 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
       - play_pause: Phát / Tạm dừng nhạc
       - screenshot: Chụp màn hình nhanh (Win + Shift + S)
       - dismiss: Đóng nhanh thông báo đang hiện
-  - TabSwitchDirection: horizontal
-    $name: Hướng trượt cửa sổ tab mở rộng (Khóa hướng di chuyển)
-    $description: Khóa hướng vuốt đổi tab. Khi chọn Ngang, chỉ nhận vuốt Trái/Phải để lướt ngang; khi chọn Dọc, chỉ nhận vuốt Lên/Xuống để lướt dọc.
+  - TabSwitchDirection: auto
+    $name: Hướng trượt cửa sổ / tab mở rộng
+    $description: Tự do vuốt theo cả 4 hướng để đổi tab. Hiệu ứng trượt mượt mà sẽ thích ứng theo hướng bạn vuốt (ngang hoặc dọc).
     $options:
-      - horizontal: Khóa Trượt Ngang (Vuốt Trái / Cuộn Xuống -> Kế tiếp, Vuốt Phải / Cuộn Lên -> Trước) (Mặc định)
-      - horizontal_inverted: Khóa Trượt Ngang Đảo Ngược (Vuốt Phải -> Kế tiếp, Vuốt Trái -> Trước)
-      - vertical: Khóa Trượt Dọc (Vuốt Lên / Cuộn Xuống -> Kế tiếp, Vuốt Xuống / Cuộn Lên -> Trước)
-      - vertical_inverted: Khóa Trượt Dọc Đảo Ngược (Vuốt Xuống -> Kế tiếp, Vuốt Lên -> Trước)
-      - auto: Tự do cả 2 trục (Tự động thích ứng)
+      - auto: Tự động 4 hướng (Vuốt Trái hoặc Vuốt Lên -> Kế tiếp, Vuốt Phải hoặc Vuốt Xuống -> Trước)
+      - invert_swipe: Đảo chiều vuốt (Vuốt Phải hoặc Vuốt Xuống -> Kế tiếp, Vuốt Trái hoặc Vuốt Lên -> Trước)
+      - horizontal: Ưu tiên trượt ngang (Vuốt Trái/Phải)
+      - vertical: Ưu tiên trượt dọc (Vuốt Lên/Xuống)
+  - TabSwitchDelayMs: 180
+    $name: Độ trễ mỗi bước chuyển tab khi vuốt
+    $description: Tăng mốc này để giảm độ nhạy và giữ cảm giác neo giữa các tab khi cuộn bằng touchpad / bàn di chuột. Mức cao hơn = chậm và ổn định hơn.
+    $options:
+      - '120': 120 ms
+      - '180': 180 ms (mặc định)
+      - '240': 240 ms
+      - '320': 320 ms
+      - '500': 500 ms
   - CollapsedTitleMarquee: true
     $name: Tự động cuộn chữ khi tên bài hát dài
     $description: Tự động cuộn chạy chữ êm ái khi tên bài hát dài vượt quá không gian của thanh thu nhỏ (tránh bị sóng nhạc cắt cụt chữ).
@@ -989,7 +991,6 @@ enum class IslandKind {
     Device,
     Bluetooth,
     Timer,
-    DoNotDisturb,
     Split,
 };
 
@@ -1246,7 +1247,6 @@ struct Settings {
     D2D1_COLOR_F micDotColor = D2D1::ColorF(1.0f, 0.584f, 0.0f, 1.0f); // #FF9500
     D2D1_COLOR_F camDotColor = D2D1::ColorF(0.204f, 0.780f, 0.349f, 1.0f); // #34C759
     bool hardwareMonitorModule = true;
-    bool doNotDisturbIndicator = true;
     bool notificationRespectDnD = true;
 
     // ── Premium material / redesign ──────────────────────────────────────────
@@ -1280,10 +1280,11 @@ struct Settings {
     // ── Gestures & Swipe ─────────────────────────────────────────────────────
     bool collapsedSwipeEnabled = true;
     std::wstring collapsedSwipeTarget = L"volume";
-    std::wstring collapsedSwipeDirection = L"horizontal";
+    std::wstring collapsedSwipeDirection = L"natural";
     std::wstring collapsedDoubleClickAction = L"play_pause";
     std::wstring collapsedMiddleClickAction = L"mute_toggle";
-    std::wstring tabSwitchDirection = L"horizontal";
+    std::wstring tabSwitchDirection = L"auto";
+    int tabSwitchDelayMs = 180;
     bool collapsedTitleMarquee = true;
     bool collapsedFluidFill = true;
 
@@ -1486,12 +1487,6 @@ struct WeatherSnapshot {
     double lastUpdated = 0.0;
 };
 
-struct DoNotDisturbSnapshot {
-    bool active = false;
-    bool enabled = false;
-    double expiresAt = 0.0;
-};
-
 // One file parked on the island's shelf (#33). Kept deliberately small: the
 // tray holds references, never copies of the files themselves.
 struct FileTrayItem {
@@ -1554,7 +1549,6 @@ struct SharedState {
     TimerSnapshot timer;
     DeviceSnapshot device;
     BluetoothDeviceSnapshot bluetoothDevice;
-    DoNotDisturbSnapshot doNotDisturb;
     BatterySnapshot battery;
     ProgressSnapshot progress;
     SystemSnapshot system;
@@ -1618,7 +1612,7 @@ Settings GetSettingsCopy() {
     return g_settings;
 }
 
-std::mutex g_stateMutex;
+std::recursive_mutex g_stateMutex;
 SharedState g_state;
 std::atomic<uint64_t> g_artGenerationCounter = 0;
 
@@ -1658,6 +1652,7 @@ std::atomic<bool> g_internalClipboardCopy{false};
 std::atomic<float> g_fluidFillFraction{0.0f};
 std::atomic<double> g_fluidFillUntil{0.0};
 std::atomic<int> g_activeTabTransitionAxis{0};  // 0 = horizontal (transX), 1 = vertical (transY)
+std::atomic<int> g_lastTabDirection{1};        // +1 = forward/next, -1 = backward/prev
 std::atomic<int> g_pressedMediaButton = -1;
 std::atomic<int> g_hoveredMediaButton = -1;
 std::atomic<unsigned> g_skipTriggerPrev{0};  // bumped on click, the render thread plays the prev button's animation
@@ -1927,14 +1922,39 @@ int FileTrayTabIndex(const Settings& settings) {
            MediaTabIndex(settings);
 }
 
-// Moves the dashboard one tab (+1 = next, -1 = previous). Clamped at both ends:
-// pushing past the first or last tab is ignored completely (no wrap, no bounce),
-// so a free-spinning wheel or touchpad inertia can never make the edge tabs twitch.
+// Moves the dashboard one tab (+1 = next, -1 = previous). The tab strip snaps to
+// a single tab at a time and wraps seamlessly from the last tab back to the first
+// so repeated wheel/touch movement feels continuous instead of stopping at the edge.
 void StepIdleTab(int direction) {
+    if (direction == 0) return;
+    g_lastTabDirection.store(direction > 0 ? 1 : -1, std::memory_order_relaxed);
+
     const Settings settings = GetSettingsCopy();
+    const int delayMs = ClampInt(settings.tabSwitchDelayMs, 60, 1000);
+
+    static std::atomic<ULONGLONG> s_lastTabStepMs{0};
+    const ULONGLONG now = GetTickCount64();
+    const ULONGLONG last = s_lastTabStepMs.load(std::memory_order_relaxed);
+    if (now - last < static_cast<ULONGLONG>(delayMs)) {
+        return;
+    }
+    s_lastTabStepMs.store(now, std::memory_order_relaxed);
+
     const int count = std::max(1, ActiveTabCount(settings));
-    const int next = NormalizedTabIndex(settings) + direction;
-    if (next < 0 || next >= count) {
+    if (count <= 1) {
+        g_idleTab = 0;
+        g_layoutDirty = true;
+        return;
+    }
+
+    const int current = NormalizedTabIndex(settings);
+    int next = current + direction;
+    if (next < 0) next = count - 1;
+    else if (next >= count) next = 0;
+
+    // Keep the motion infinitely one-directional: at the end of the loop, the next
+    // swipe simply continues from the first tab instead of reversing back.
+    if (next == current) {
         return;
     }
     g_idleTab = next;
@@ -3075,7 +3095,6 @@ void LoadSettings() {
 
     next.bluetoothIndicator = Wh_GetIntSetting(L"Modules.BluetoothIndicator") != 0;
     next.bluetoothShowBattery = Wh_GetIntSetting(L"Modules.BluetoothShowBattery") != 0;
-    next.doNotDisturbIndicator = Wh_GetIntSetting(L"Modules.DoNotDisturbIndicator") != 0;
     next.notificationRespectDnD = Wh_GetIntSetting(L"Modules.NotificationRespectDnD") != 0;
 
     // ── Premium material / redesign ──────────────────────────────────────────
@@ -3129,8 +3148,7 @@ void LoadSettings() {
     // ── File tray (#33) ──────────────────────────────────────────────────────
     next.fileTrayModule = Wh_GetIntSetting(L"Modules.FileTrayModule") != 0;
     next.fileTrayAutoCapture = Wh_GetIntSetting(L"Modules.FileTrayAutoCapture") != 0;
-    const int trayMax = Wh_GetIntSetting(L"Modules.FileTrayMaxItems");
-    next.fileTrayMaxItems = (trayMax > 0) ? ClampInt(trayMax, 1, 50) : 20;
+    next.fileTrayMaxItems = ClampInt(Wh_GetIntSetting(L"Modules.FileTrayMaxItems"), 1, 25);
     next.fileTrayPersist = Wh_GetIntSetting(L"Modules.FileTrayPersist") != 0;
     next.fileTrayExpireHours = ClampInt(Wh_GetIntSetting(L"Modules.FileTrayExpireHours"), 0, 720);
 
@@ -3156,6 +3174,7 @@ void LoadSettings() {
         std::wstring s = GetStringSettingCopy(L"Gestures.TabSwitchDirection");
         if (!s.empty()) next.tabSwitchDirection = s;
     }
+    next.tabSwitchDelayMs = ClampInt(Wh_GetIntSetting(L"Gestures.TabSwitchDelayMs"), 60, 1000);
     next.collapsedTitleMarquee = Wh_GetIntSetting(L"Gestures.CollapsedTitleMarquee") != 0;
     next.collapsedFluidFill = Wh_GetIntSetting(L"Gestures.CollapsedFluidFill") != 0;
 
@@ -5080,29 +5099,23 @@ std::vector<uint8_t> ReadWinRtStreamBytes(
         return bytes;
     }
 
-    try {
-        auto stream = reference.OpenReadAsync().get();
-        if (!stream) {
-            return bytes;
-        }
-
-        const uint64_t size64 = stream.Size();
-        if (size64 == 0 || size64 > 8 * 1024 * 1024) {
-            return bytes;
-        }
-
-        const uint32_t size = static_cast<uint32_t>(size64);
-        winrt::Windows::Storage::Streams::DataReader reader(stream.GetInputStreamAt(0));
-        reader.LoadAsync(size).get();
-        bytes.resize(size);
-        reader.ReadBytes(winrt::array_view<uint8_t>(bytes.data(), bytes.data() + bytes.size()));
-        return bytes;
-    } catch (...) {
+    auto stream = reference.OpenReadAsync().get();
+    if (!stream) {
         return bytes;
     }
-}
 
-void FetchOnlineArtworkAsync(std::wstring title, std::wstring artist);
+    const uint64_t size64 = stream.Size();
+    if (size64 == 0 || size64 > 8 * 1024 * 1024) {
+        return bytes;
+    }
+
+    const uint32_t size = static_cast<uint32_t>(size64);
+    winrt::Windows::Storage::Streams::DataReader reader(stream.GetInputStreamAt(0));
+    reader.LoadAsync(size).get();
+    bytes.resize(size);
+    reader.ReadBytes(winrt::array_view<uint8_t>(bytes.data(), bytes.data() + bytes.size()));
+    return bytes;
+}
 
 void TriggerNudge() {
     // If we're parked (auto-hidden), any real event must wake us regardless
@@ -5668,10 +5681,15 @@ DWORD WINAPI MediaThreadProc(void*) {
                     const bool metadataChanged = (sourceChanged || next.title != prevTitle || next.artist != prevArtist || (!prevPlaying && next.playing));
                     next.titleChangedAt = (metadataChanged && !next.title.empty() && next.playing) ? NowSeconds() : prevTitleChangedAt;
                     constexpr double kArtSettleSeconds = 3.0;
+                    constexpr double kArtRetrySeconds = 7.5;
                     const bool artSettled = !metadataChanged &&
                         (NowSeconds() - prevTitleChangedAt) > kArtSettleSeconds;
+                    const bool artRetryDue = next.playing &&
+                        (!next.art || prevArtChangedAt == 0.0) &&
+                        !metadataChanged &&
+                        ((prevArtChangedAt == 0.0) || (NowSeconds() - prevArtChangedAt) >= kArtRetrySeconds);
 
-                    if (artSettled && prevArt) {
+                    if (artSettled && prevArt && !artRetryDue) {
                         next.art = prevArt;
                         next.artGeneration = prevArtGeneration;
                         next.artChangedAt = prevArtChangedAt;
@@ -5687,30 +5705,25 @@ DWORD WINAPI MediaThreadProc(void*) {
                         }
                     }
 
-                    // If this particular poll's fetch came back empty (thumbnail
-                    // not ready yet), don't flash a blank cover for a track that
-                    // hasn't actually changed — keep the old art until a fresh
-                    // fetch succeeds. But never do this across an actual track
-                    // change, or we're back to showing the wrong song's art.
-                    if (!next.art && prevArt && !metadataChanged) {
+                    // Keep a previous cover only while it is still fresh; after the retry window
+                    // expires, permit a new fetch so browsers that delay artwork delivery can catch up.
+                    if (!next.art && prevArt && !metadataChanged && !artRetryDue) {
                         next.art = prevArt;
                         next.artGeneration = prevArtGeneration;
                         next.artChangedAt = prevArtChangedAt;
                     }
-
-                    // Check if online artwork fetch has populated artwork for this track in g_state:
-                    if (!next.art && next.playing && !next.title.empty()) {
-                        std::lock_guard lock(g_stateMutex);
-                        if (g_state.media.art && g_state.media.title == next.title && g_state.media.playing) {
-                            next.art = g_state.media.art;
-                            next.artGeneration = g_state.media.artGeneration;
-                            next.artChangedAt = g_state.media.artChangedAt;
+                    if (!next.art && artRetryDue && !metadataChanged && properties.Thumbnail()) {
+                        if (auto retryThumb = properties.Thumbnail()) {
+                            std::vector<uint8_t> retryBytes = ReadWinRtStreamBytes(retryThumb);
+                            if (!retryBytes.empty()) {
+                                BitmapPixels decoded;
+                                if (DecodeImageBytesToPixels(retryBytes, &decoded)) {
+                                    next.art = PixelsRef(std::move(decoded));
+                                    next.artGeneration = next.art->generation;
+                                    next.artChangedAt = NowSeconds();
+                                }
+                            }
                         }
-                    }
-
-                    // If artwork is still absent, launch asynchronous high-res online artwork fetch:
-                    if (!next.art && next.playing && !next.title.empty()) {
-                        FetchOnlineArtworkAsync(next.title, next.artist);
                     }
                 }
             }
@@ -5781,8 +5794,9 @@ DWORD WINAPI MediaThreadProc(void*) {
                        next.artist.c_str(), next.title.c_str());
             }
 
-            if (!next.art && g_state.media.art &&
-                next.title == g_state.media.title && next.artist == g_state.media.artist) {
+            if (g_state.media.art &&
+                next.title == g_state.media.title && next.artist == g_state.media.artist &&
+                next.positionTicks >= g_state.media.positionTicks) {
                 next.art = g_state.media.art;
                 next.artGeneration = g_state.media.artGeneration;
                 next.artChangedAt = g_state.media.artChangedAt;
@@ -5878,16 +5892,7 @@ NTSTATUS NTAPI WnfDndCallback(
         return 0;
     }
 
-    const bool prev = g_isDnDActive.exchange(active);
-    if (prev != active && g_settings.doNotDisturbIndicator) {
-        {
-            std::lock_guard lock(g_stateMutex);
-            g_state.doNotDisturb.active = true;
-            g_state.doNotDisturb.enabled = active;
-            g_state.doNotDisturb.expiresAt = NowSeconds() + 3.0;
-        }
-        TriggerNudge();
-    }
+    g_isDnDActive.store(active);
     return 0;
 }
 
@@ -9370,216 +9375,6 @@ bool FetchLyricsFromLrclib(const std::wstring& title, const std::wstring& artist
     return pick->found;
 }
 
-namespace ArtworkCache {
-    inline bool ResolveArtCacheDir(std::wstring* outDir) {
-        if (!outDir) return false;
-        wchar_t localAppData[MAX_PATH];
-        if (FAILED(SHGetFolderPathW(nullptr, CSIDL_LOCAL_APPDATA, nullptr, SHGFP_TYPE_CURRENT, localAppData))) {
-            return false;
-        }
-        *outDir = std::wstring(localAppData) + L"\\Windhawk\\DynamicIsland\\art_cache";
-        SHCreateDirectoryExW(nullptr, outDir->c_str(), nullptr);
-        return true;
-    }
-
-    inline std::wstring CacheKeyForTrack(const std::wstring& title, const std::wstring& artist) {
-        std::wstring combined = ToLowerCopy(title) + L"_" + ToLowerCopy(artist);
-        std::wstring safe;
-        for (wchar_t ch : combined) {
-            if ((ch >= L'a' && ch <= L'z') || (ch >= L'0' && ch <= L'9') || (ch >= 0x00C0 && ch <= 0x1EF9)) {
-                safe.push_back(ch);
-            } else if (ch == L' ' || ch == L'-' || ch == L'_') {
-                if (safe.empty() || safe.back() != L'_') safe.push_back(L'_');
-            }
-        }
-        if (safe.empty()) safe = L"unknown";
-        if (safe.size() > 60) safe.resize(60);
-        return safe;
-    }
-}
-
-void FetchOnlineArtworkAsync(std::wstring title, std::wstring artist) {
-    if (title.empty()) return;
-
-    static std::mutex s_artFetchMutex;
-    static std::wstring s_inFlightArtKey;
-    static std::wstring s_lastFailedArtKey;
-    static double s_lastFailedTime = 0.0;
-
-    std::wstring cleanTitle = CleanLyricsTitle(title);
-    std::wstring cleanArtist = PrimaryLyricsArtist(artist);
-    if (cleanTitle.empty()) cleanTitle = title;
-
-    const std::wstring trackKey = cleanTitle + L"|" + cleanArtist;
-
-    {
-        std::lock_guard lock(s_artFetchMutex);
-        if (s_inFlightArtKey == trackKey) {
-            return;
-        }
-        if (s_lastFailedArtKey == trackKey && (NowSeconds() - s_lastFailedTime) < 30.0) {
-            return;
-        }
-        s_inFlightArtKey = trackKey;
-    }
-
-    std::thread([cleanTitle, cleanArtist, title, artist, trackKey]() {
-        HRESULT hrCo = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-
-        auto finish = [&](bool success) {
-            {
-                std::lock_guard lock(s_artFetchMutex);
-                if (s_inFlightArtKey == trackKey) {
-                    s_inFlightArtKey.clear();
-                }
-                if (!success) {
-                    s_lastFailedArtKey = trackKey;
-                    s_lastFailedTime = NowSeconds();
-                }
-            }
-            if (SUCCEEDED(hrCo)) {
-                CoUninitialize();
-            }
-        };
-
-        // 1. Check disk cache first:
-        std::wstring cacheDir;
-        if (ArtworkCache::ResolveArtCacheDir(&cacheDir)) {
-            std::wstring cacheFile = cacheDir + L"\\" + ArtworkCache::CacheKeyForTrack(cleanTitle, cleanArtist) + L".jpg";
-            HANDLE hFile = CreateFileW(cacheFile.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-            if (hFile != INVALID_HANDLE_VALUE) {
-                DWORD size = GetFileSize(hFile, nullptr);
-                if (size > 0 && size < 8 * 1024 * 1024) {
-                    std::vector<uint8_t> bytes(size);
-                    DWORD read = 0;
-                    if (ReadFile(hFile, bytes.data(), size, &read, nullptr) && read == size) {
-                        CloseHandle(hFile);
-                        BitmapPixels decoded;
-                        if (DecodeImageBytesToPixels(bytes, &decoded)) {
-                            std::lock_guard lock(g_stateMutex);
-                            if (g_state.media.playing && g_state.media.title == title && !g_state.media.art) {
-                                g_state.media.art = PixelsRef(std::move(decoded));
-                                g_state.media.artGeneration = g_state.media.art->generation;
-                                g_state.media.artChangedAt = NowSeconds();
-                                g_layoutDirty = true;
-                                TriggerNudge();
-                                if (g_mediaRefreshEvent) SetEvent(g_mediaRefreshEvent);
-                            }
-                            finish(true);
-                            return;
-                        }
-                    } else {
-                        CloseHandle(hFile);
-                    }
-                } else {
-                    CloseHandle(hFile);
-                }
-            }
-        }
-
-        // 2. Query iTunes Search API:
-        std::vector<std::wstring> queries;
-        if (!cleanArtist.empty()) {
-            queries.push_back(cleanTitle + L" " + cleanArtist);
-        }
-        queries.push_back(cleanTitle);
-
-        std::string foundImageUrl;
-
-        for (const auto& q : queries) {
-            std::wstring encQ = AsciiToWide(UrlEncodeUtf8(q));
-            std::wstring path = L"/search?term=" + encQ + L"&entity=song&limit=1";
-            HttpResult res = HttpGetEx(L"itunes.apple.com", path.c_str(), true, L"Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
-            if (res.ok && res.status == 200 && !res.body.empty()) {
-                const std::string key = "\"artworkUrl100\"";
-                size_t pos = res.body.find(key);
-                if (pos != std::string::npos) {
-                    size_t colon = res.body.find(':', pos + key.size());
-                    if (colon != std::string::npos) {
-                        size_t q1 = res.body.find('"', colon + 1);
-                        if (q1 != std::string::npos) {
-                            size_t q2 = res.body.find('"', q1 + 1);
-                            if (q2 != std::string::npos) {
-                                std::string rawUrl = res.body.substr(q1 + 1, q2 - q1 - 1);
-                                std::string cleanUrl;
-                                for (size_t i = 0; i < rawUrl.size(); ++i) {
-                                    if (rawUrl[i] == '\\' && i + 1 < rawUrl.size() && rawUrl[i + 1] == '/') continue;
-                                    cleanUrl.push_back(rawUrl[i]);
-                                }
-                                const std::string thumb100 = "100x100bb";
-                                size_t szPos = cleanUrl.find(thumb100);
-                                if (szPos != std::string::npos) {
-                                    cleanUrl.replace(szPos, thumb100.size(), "600x600bb");
-                                }
-                                foundImageUrl = cleanUrl;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (foundImageUrl.empty()) {
-            finish(false);
-            return;
-        }
-
-        // 3. Download artwork image:
-        std::wstring host = L"is1-ssl.mzstatic.com";
-        std::wstring imgPath;
-        const std::string httpsPrefix = "https://";
-        if (foundImageUrl.rfind(httpsPrefix, 0) == 0) {
-            std::string noProto = foundImageUrl.substr(httpsPrefix.size());
-            size_t slash = noProto.find('/');
-            if (slash != std::string::npos) {
-                host = AsciiToWide(noProto.substr(0, slash));
-                imgPath = AsciiToWide(noProto.substr(slash));
-            }
-        }
-
-        if (imgPath.empty()) {
-            finish(false);
-            return;
-        }
-
-        HttpResult imgRes = HttpGetEx(host.c_str(), imgPath.c_str(), true, L"Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
-        if (imgRes.ok && imgRes.status == 200 && !imgRes.body.empty()) {
-            std::vector<uint8_t> bytes(imgRes.body.begin(), imgRes.body.end());
-
-            // Save to disk cache:
-            if (!cacheDir.empty()) {
-                std::wstring cacheFile = cacheDir + L"\\" + ArtworkCache::CacheKeyForTrack(cleanTitle, cleanArtist) + L".jpg";
-                HANDLE hFile = CreateFileW(cacheFile.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-                if (hFile != INVALID_HANDLE_VALUE) {
-                    DWORD written = 0;
-                    WriteFile(hFile, bytes.data(), static_cast<DWORD>(bytes.size()), &written, nullptr);
-                    CloseHandle(hFile);
-                }
-            }
-
-            // Decode:
-            BitmapPixels decoded;
-            if (DecodeImageBytesToPixels(bytes, &decoded)) {
-                std::lock_guard lock(g_stateMutex);
-                if (g_state.media.playing && g_state.media.title == title && !g_state.media.art) {
-                    g_state.media.art = PixelsRef(std::move(decoded));
-                    g_state.media.artGeneration = g_state.media.art->generation;
-                    g_state.media.artChangedAt = NowSeconds();
-                    g_layoutDirty = true;
-                    TriggerNudge();
-                    if (g_mediaRefreshEvent) SetEvent(g_mediaRefreshEvent);
-                    Wh_Log(L"[MediaArt] Online artwork successfully retrieved for: %s - %s", cleanArtist.c_str(), cleanTitle.c_str());
-                }
-                finish(true);
-                return;
-            }
-        }
-
-        finish(false);
-    }).detach();
-}
-
 DWORD WINAPI LyricsThreadProc(void*) {
     auto waitLyrics = [](DWORD timeoutMs) -> bool {
         HANDLE events[2] = {g_stopEvent, g_lyricsRefreshEvent};
@@ -10448,6 +10243,60 @@ void StepPanelBrightness(int deltaPercent) {
     TriggerNudge();
 }
 
+bool IsGestureAxisAllowed(const std::wstring& mode, bool horizontal) {
+    if (mode.empty() || mode == L"auto" || mode == L"natural") {
+        return true;
+    }
+    if (mode == L"horizontal" || mode == L"horizontal_left" || mode == L"horizontal_inverted" ||
+        mode == L"invert_horizontal") {
+        return horizontal;
+    }
+    if (mode == L"vertical" || mode == L"vertical_down" || mode == L"vertical_inverted" ||
+        mode == L"vertical_down_inc" || mode == L"invert_vertical") {
+        return !horizontal;
+    }
+    if (mode == L"invert_both" || mode == L"invert_swipe") {
+        return true;
+    }
+    return true;
+}
+
+int ResolveCollapsedSwipeStep(const std::wstring& mode, bool horizontal, int delta) {
+    int step = horizontal ? ((delta > 0) ? 1 : -1) : ((delta < 0) ? 1 : -1);
+
+    if (horizontal) {
+        if (mode.find(L"invert_horizontal") != std::wstring::npos ||
+            mode.find(L"invert_both") != std::wstring::npos ||
+            mode == L"horizontal_inverted" || mode == L"horizontal_left") {
+            step = -step;
+        }
+    } else {
+        if (mode.find(L"invert_vertical") != std::wstring::npos ||
+            mode.find(L"invert_both") != std::wstring::npos ||
+            mode == L"vertical_inverted" || mode == L"vertical_down_inc" || mode == L"vertical_down") {
+            step = -step;
+        }
+    }
+
+    return step;
+}
+
+int ResolveTabStep(const std::wstring& mode, bool horizontal, int delta) {
+    (void)horizontal;
+    int step = (delta < 0) ? 1 : -1;
+
+    if (mode.find(L"invert_horizontal") != std::wstring::npos ||
+        mode.find(L"invert_vertical") != std::wstring::npos ||
+        mode.find(L"invert_swipe") != std::wstring::npos ||
+        mode.find(L"invert_both") != std::wstring::npos ||
+        mode == L"horizontal_left" || mode == L"vertical_down" ||
+        mode == L"vertical_inverted" || mode == L"horizontal_inverted") {
+        step = -step;
+    }
+
+    return step;
+}
+
 void ApplyCollapsedSwipeStep(int direction) {
     const Settings s = GetSettingsCopy();
     if (!s.collapsedSwipeEnabled) return;
@@ -10671,17 +10520,9 @@ void UpdatePrivacyIndicators() {
 }
 
 
-bool OpenClipboardWithRetry(HWND hwnd, int maxRetries = 10, int delayMs = 25) {
-    for (int i = 0; i < maxRetries; ++i) {
-        if (OpenClipboard(hwnd)) return true;
-        Sleep(delayMs);
-    }
-    return false;
-}
-
 std::wstring ReadClipboardText(HWND hwnd) {
     std::wstring text;
-    if (!OpenClipboardWithRetry(hwnd)) {
+    if (!OpenClipboard(hwnd)) {
         return text;
     }
 
@@ -10698,17 +10539,25 @@ std::wstring ReadClipboardText(HWND hwnd) {
     return text;
 }
 
-// Decodes clipboard bitmap into a small BGRA thumbnail while the clipboard is ALREADY open.
-bool ReadClipboardImagePixelsInternal(BitmapPixels* outPixels, UINT maxDim) {
-    if (!outPixels) return false;
+// Decodes whatever bitmap is currently on the clipboard into a small BGRA
+// thumbnail, aspect-preserving and capped at maxDim on the longer side.
+// Requesting CF_BITMAP works regardless of which bitmap format the source
+// app actually placed on the clipboard (CF_DIB/CF_DIBV5) — Windows
+// synthesizes CF_BITMAP from those automatically.
+bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
+    if (!outPixels || !OpenClipboard(hwnd)) {
+        return false;
+    }
 
     HBITMAP sourceBitmap = static_cast<HBITMAP>(GetClipboardData(CF_BITMAP));
     if (!sourceBitmap) {
+        CloseClipboard();
         return false;
     }
 
     BITMAP bm = {};
     if (!GetObject(sourceBitmap, sizeof(bm), &bm) || bm.bmWidth <= 0 || bm.bmHeight <= 0) {
+        CloseClipboard();
         return false;
     }
 
@@ -10729,9 +10578,12 @@ bool ReadClipboardImagePixelsInternal(BitmapPixels* outPixels, UINT maxDim) {
     if (!srcDc || !dstDc) {
         if (srcDc) DeleteDC(srcDc);
         if (dstDc) DeleteDC(dstDc);
+        CloseClipboard();
         return false;
     }
 
+    // Selecting the clipboard's own HBITMAP into a scratch DC to read from it
+    // is the MSDN-documented way to do this; we must not DeleteObject it.
     HGDIOBJ oldSrc = SelectObject(srcDc, sourceBitmap);
 
     BITMAPINFO bi = {};
@@ -10748,6 +10600,7 @@ bool ReadClipboardImagePixelsInternal(BitmapPixels* outPixels, UINT maxDim) {
         SelectObject(srcDc, oldSrc);
         DeleteDC(srcDc);
         DeleteDC(dstDc);
+        CloseClipboard();
         return false;
     }
 
@@ -10777,18 +10630,8 @@ bool ReadClipboardImagePixelsInternal(BitmapPixels* outPixels, UINT maxDim) {
     SelectObject(srcDc, oldSrc);
     DeleteDC(srcDc);
     DeleteDC(dstDc);
-    return true;
-}
-
-// Decodes whatever bitmap is currently on the clipboard into a small BGRA
-// thumbnail, aspect-preserving and capped at maxDim on the longer side.
-bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
-    if (!outPixels || !OpenClipboardWithRetry(hwnd)) {
-        return false;
-    }
-    const bool ok = ReadClipboardImagePixelsInternal(outPixels, maxDim);
     CloseClipboard();
-    return ok;
+    return true;
 }
 
 bool IsLikelyToastWindow(HWND hwnd, const wchar_t* className, const wchar_t* title) {
@@ -13229,9 +13072,6 @@ class Renderer {
                 break;
             case IslandKind::Progress:
                 DrawProgress(state, unscaledRect);
-                break;
-            case IslandKind::DoNotDisturb:
-                DrawDoNotDisturb(state, unscaledRect);
                 break;
             case IslandKind::Idle:
             default:
@@ -16105,6 +15945,7 @@ class Renderer {
     void ResetTabTransition() {
         tabInit_ = false;
         tabAnimating_ = false;
+        tabLastDesiredTab_ = -1;
         g_tabAnimating.store(false, std::memory_order_relaxed);
         g_tabEdgeBump.store(0, std::memory_order_relaxed);
     }
@@ -16120,9 +15961,9 @@ class Renderer {
         tabIdx = ClampInt(tabIdx, 0, count - 1);
 
         // ── Feel: tweak these ──
-        constexpr float kStiffness = 180.0f;        // smooth & weighted spring (settles in ~0.35s)
-        constexpr float kDamping = 27.0f;           // ~1.0 critical damping: no overshoot or flashing
-        constexpr float kTravelPx = 34.0f;          // gap between neighbouring tabs
+        constexpr float kStiffness = 250.0f;        // higher = faster (settles in ~0.29s)
+        constexpr float kDamping = 31.0f;           // ~0.92 damping ratio: no visible overshoot
+        constexpr float kTravelPx = 34.0f;          // vertical gap between neighbouring tabs
         constexpr float kMinScale = 0.965f;         // size of a tab that is fully out of view
         constexpr float kFadePower = 1.4f;          // >1 thins the mid-point slightly so text never ghosts
 
@@ -16142,12 +15983,31 @@ class Renderer {
             tabTarget_ = tabPos_;
             tabVel_ = 0.0f;
             tabDir_ = 1.0f;
+            tabLastDesiredTab_ = tabIdx;
             tabAnimating_ = false;
         }
-        const float newTarget = static_cast<float>(tabIdx);
-        if (newTarget != tabTarget_) {
-            tabDir_ = newTarget > tabTarget_ ? 1.0f : -1.0f;  // remembered for the whole move
-            tabTarget_ = newTarget;
+
+        if (tabIdx != tabLastDesiredTab_) {
+            tabLastDesiredTab_ = tabIdx;
+            if (count > 1) {
+                const int currentLogical = ((static_cast<int>(std::lround(tabTarget_)) % count) + count) % count;
+                if (tabIdx != currentLogical) {
+                    int delta = 0;
+                    if (count == 2) {
+                        const int dir = g_lastTabDirection.load(std::memory_order_relaxed);
+                        delta = (dir >= 0) ? 1 : -1;
+                    } else {
+                        delta = tabIdx - currentLogical;
+                        if (delta > count / 2) {
+                            delta -= count;
+                        } else if (delta < -count / 2) {
+                            delta += count;
+                        }
+                    }
+                    tabDir_ = (delta >= 0) ? 1.0f : -1.0f;
+                    tabTarget_ += static_cast<float>(delta);
+                }
+            }
         }
 
         // The first and last tab are hard stops: there is no edge bump any more.
@@ -16160,21 +16020,21 @@ class Renderer {
                 tabVel_ += (-kStiffness * (tabPos_ - tabTarget_) - kDamping * tabVel_) * h;
                 tabPos_ += tabVel_ * h;
 
-                // Never travel past the first or last tab, and kill any velocity
-                // pushing further out, so the edge tabs cannot overshoot or twitch.
-                const float maxTabPos = static_cast<float>(count - 1);
-                if (tabPos_ < 0.0f) {
-                    tabPos_ = 0.0f;
-                    if (tabVel_ < 0.0f) tabVel_ = 0.0f;
-                } else if (tabPos_ > maxTabPos) {
-                    tabPos_ = maxTabPos;
-                    if (tabVel_ > 0.0f) tabVel_ = 0.0f;
-                }
+                // Keep the scroll in a continuous loop rather than clamping at the
+                // ends. When the user keeps swiping in one direction, the position is
+                // allowed to cross the wrap boundary and the modulo math in drawLayer
+                // makes the carousel look seamless instead of like a reverse rewind.
                 remaining -= h;
             }
             if (std::fabs(tabPos_ - tabTarget_) < 0.0008f && std::fabs(tabVel_) < 0.02f) {
                 tabPos_ = tabTarget_;
                 tabVel_ = 0.0f;
+                if (count > 0) {
+                    const int normInt = ((static_cast<int>(std::lround(tabTarget_)) % count) + count) % count;
+                    const float shift = static_cast<float>(normInt) - tabTarget_;
+                    tabPos_ += shift;
+                    tabTarget_ += shift;
+                }
             }
         }
 
@@ -16201,11 +16061,8 @@ class Renderer {
         // "arriving" / "leaving" roles. Motion is therefore continuous even when you
         // reverse mid-scroll, and the tabs travel as one rigid strip (a fixed gap
         // apart), which is what reads as real scrolling rather than two fading cards.
-        auto drawLayer = [&](int index) {
-            if (index < 0 || index >= count) {
-                return;
-            }
-            const float d = static_cast<float>(index) - tabPos_;  // <0 above, >0 below
+        auto drawLayer = [&](int slot) {
+            const float d = static_cast<float>(slot) - tabPos_;  // <0 above, >0 below; wrap stays continuous
             const float ad = Clamp(std::fabs(d), 0.0f, 1.0f);
             const float eased = SmoothStep01(ad);
 
@@ -16220,11 +16077,12 @@ class Renderer {
             const bool isHoriz = (g_activeTabTransitionAxis.load(std::memory_order_relaxed) == 0);
 
             if (isHoriz) {
-                transX = d * kTravelPx * 2.0f;
+                transX = d * kTravelPx * 2.5f;
             } else {
                 transY = d * kTravelPx * 1.5f;
             }
 
+            const int wrappedIndex = ((slot % count) + count) % count;
             target_->SetTransform(D2D1::Matrix3x2F::Scale(scale, scale, center) *
                                   D2D1::Matrix3x2F::Translation(transX, transY) * oldTransform);
             if (alpha < 0.995f && tabLayer_) {
@@ -16233,10 +16091,10 @@ class Renderer {
                                           D2D1::IdentityMatrix(), alpha, nullptr,
                                           D2D1_LAYER_OPTIONS_NONE),
                     tabLayer_.Get());
-                drawTab(tabIds[index]);
+                drawTab(tabIds[wrappedIndex]);
                 target_->PopLayer();
             } else {
-                drawTab(tabIds[index]);  // fully opaque: skip the layer, much cheaper
+                drawTab(tabIds[wrappedIndex]);  // fully opaque: skip the layer, much cheaper
             }
             target_->SetTransform(oldTransform);
         };
@@ -16263,6 +16121,9 @@ class Renderer {
         }
 
         const bool isHorizontal = (g_settings.tabSwitchDirection.find(L"horizontal") != std::wstring::npos);
+        const float wrappedPos = std::fmod(tabPos_, static_cast<float>(tabCount));
+        const float pos = (wrappedPos < 0.0f) ? wrappedPos + static_cast<float>(tabCount) : wrappedPos;
+
         if (isHorizontal) {
             const float dotY = rect.bottom - 10.0f;
             const float spacing = 11.0f;
@@ -16270,17 +16131,31 @@ class Renderer {
             const float startX = (rect.left + rect.right) * 0.5f - spacing * (tabCount - 1) * 0.5f;
 
             for (int i = 0; i < tabCount; ++i) {
-                const float under = SmoothStep01(Clamp(1.0f - std::fabs(tabPos_ - static_cast<float>(i)), 0.0f, 1.0f));
+                float dist = std::fabs(pos - static_cast<float>(i));
+                if (dist > static_cast<float>(tabCount) * 0.5f) {
+                    dist = static_cast<float>(tabCount) - dist;
+                }
+                const float under = SmoothStep01(Clamp(1.0f - dist, 0.0f, 1.0f));
                 dotBrush->SetOpacity(0.22f * (1.0f - under) * settingsOpacity_);
                 target_->FillEllipse(D2D1::Ellipse(D2D1::Point2F(startX + spacing * static_cast<float>(i), dotY), r, r), dotBrush);
             }
 
-            const float pos = Clamp(tabPos_, -0.3f, static_cast<float>(tabCount) - 0.7f);
             const float stretch = Clamp(std::fabs(tabVel_) * 0.55f, 0.0f, 3.5f);
             const float halfW = r + 2.2f + stretch;
-            const float cx = startX + spacing * pos;
-            dotBrush->SetOpacity(0.90f * settingsOpacity_);
-            target_->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(cx - halfW, dotY - r, cx + halfW, dotY + r), r, r), dotBrush);
+            const float excess = pos - static_cast<float>(tabCount - 1);
+            if (excess > 0.0f) {
+                const float cxLast = startX + spacing * static_cast<float>(tabCount - 1);
+                dotBrush->SetOpacity((1.0f - excess) * 0.90f * settingsOpacity_);
+                target_->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(cxLast - halfW, dotY - r, cxLast + halfW, dotY + r), r, r), dotBrush);
+
+                const float cxFirst = startX;
+                dotBrush->SetOpacity(excess * 0.90f * settingsOpacity_);
+                target_->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(cxFirst - halfW, dotY - r, cxFirst + halfW, dotY + r), r, r), dotBrush);
+            } else {
+                const float cx = startX + spacing * pos;
+                dotBrush->SetOpacity(0.90f * settingsOpacity_);
+                target_->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(cx - halfW, dotY - r, cx + halfW, dotY + r), r, r), dotBrush);
+            }
         } else {
             const float dotX = rect.right - 10.0f;
             const float spacing = 9.0f;
@@ -16290,7 +16165,11 @@ class Renderer {
             // Resting dots. The one under the indicator fades out, so the pill reads
             // as travelling over the track instead of sitting on top of a dot.
             for (int i = 0; i < tabCount; ++i) {
-                const float under = SmoothStep01(Clamp(1.0f - std::fabs(tabPos_ - static_cast<float>(i)), 0.0f, 1.0f));
+                float dist = std::fabs(pos - static_cast<float>(i));
+                if (dist > static_cast<float>(tabCount) * 0.5f) {
+                    dist = static_cast<float>(tabCount) - dist;
+                }
+                const float under = SmoothStep01(Clamp(1.0f - dist, 0.0f, 1.0f));
                 dotBrush->SetOpacity(0.22f * (1.0f - under) * settingsOpacity_);
                 target_->FillEllipse(
                     D2D1::Ellipse(D2D1::Point2F(dotX, startY + spacing * static_cast<float>(i)), r, r),
@@ -16299,14 +16178,28 @@ class Renderer {
 
             // Travelling indicator: follows the spring exactly (so it also gives a little
             // at the ends) and stretches slightly with speed.
-            const float pos = Clamp(tabPos_, -0.3f, static_cast<float>(tabCount) - 0.7f);
             const float stretch = Clamp(std::fabs(tabVel_) * 0.55f, 0.0f, 3.5f);
             const float halfH = r + 2.2f + stretch;
-            const float cy = startY + spacing * pos;
-            dotBrush->SetOpacity(0.90f * settingsOpacity_);
-            target_->FillRoundedRectangle(
-                D2D1::RoundedRect(D2D1::RectF(dotX - r, cy - halfH, dotX + r, cy + halfH), r, r),
-                dotBrush);
+            const float excess = pos - static_cast<float>(tabCount - 1);
+            if (excess > 0.0f) {
+                const float cyLast = startY + spacing * static_cast<float>(tabCount - 1);
+                dotBrush->SetOpacity((1.0f - excess) * 0.90f * settingsOpacity_);
+                target_->FillRoundedRectangle(
+                    D2D1::RoundedRect(D2D1::RectF(dotX - r, cyLast - halfH, dotX + r, cyLast + halfH), r, r),
+                    dotBrush);
+
+                const float cyFirst = startY;
+                dotBrush->SetOpacity(excess * 0.90f * settingsOpacity_);
+                target_->FillRoundedRectangle(
+                    D2D1::RoundedRect(D2D1::RectF(dotX - r, cyFirst - halfH, dotX + r, cyFirst + halfH), r, r),
+                    dotBrush);
+            } else {
+                const float cy = startY + spacing * pos;
+                dotBrush->SetOpacity(0.90f * settingsOpacity_);
+                target_->FillRoundedRectangle(
+                    D2D1::RoundedRect(D2D1::RectF(dotX - r, cy - halfH, dotX + r, cy + halfH), r, r),
+                    dotBrush);
+            }
         }
     }
 
@@ -20385,69 +20278,6 @@ class Renderer {
         mutedBrush_->SetOpacity(0.58f);
     }
 
-    void DrawDoNotDisturb(const SharedState& state, D2D1_RECT_F rect) {
-        if (rect.bottom - rect.top < 24.0f || rect.right - rect.left < 110.0f) return;
-        const float cy = (rect.top + rect.bottom) * 0.5f;
-        const float badgeSz = (rect.bottom - rect.top) - 16.0f;
-        D2D1_RECT_F badge = D2D1::RectF(rect.left + 14.0f, cy - badgeSz * 0.5f,
-                                        rect.left + 14.0f + badgeSz, cy + badgeSz * 0.5f);
-        const float br = badgeSz * 0.35f;
-
-        ComPtr<ID2D1SolidColorBrush> badgeBg;
-        target_->CreateSolidColorBrush(material_.raisedStrong, &badgeBg);
-        target_->FillRoundedRectangle(D2D1::RoundedRect(badge, br, br), badgeBg.Get());
-
-        const bool isOn = state.doNotDisturb.enabled;
-        const wchar_t* glyph = isOn ? L"\uE7ED" : L"\uEA8F";
-        textBrush_->SetOpacity(0.95f);
-        if (iconFormat_) {
-            iconFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-            iconFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-            target_->DrawTextW(glyph, static_cast<UINT32>(wcslen(glyph)), iconFormat_.Get(), badge,
-                               textBrush_.Get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
-            iconFormat_->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-            iconFormat_->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-        }
-
-        ComPtr<ID2D1SolidColorBrush> ledBrush;
-        D2D1_COLOR_F ledColor = isOn
-            ? D2D1::ColorF(0.19f, 0.83f, 0.38f, 1.0f)
-            : D2D1::ColorF(1.0f,  1.0f,  1.0f,  0.22f);
-        target_->CreateSolidColorBrush(ledColor, &ledBrush);
-
-        const float ledR = 2.2f;
-        D2D1_POINT_2F ledCenter = D2D1::Point2F(badge.right - 5.5f, badge.top + 5.5f);
-        target_->FillEllipse(D2D1::Ellipse(ledCenter, ledR, ledR), ledBrush.Get());
-
-        const float tx = badge.right + 14.0f;
-        D2D1_RECT_F labelRect = D2D1::RectF(tx, cy - 9.0f, rect.right - 46.0f, cy + 11.0f);
-        textBrush_->SetOpacity(0.95f);
-        std::wstring label = Loc(L"Do Not Disturb");
-        target_->DrawTextW(label.c_str(), static_cast<UINT32>(label.size()),
-                           textFormat_.Get(), labelRect, textBrush_.Get(),
-                           D2D1_DRAW_TEXT_OPTIONS_CLIP);
-
-        std::wstring status = isOn ? Loc(L"On") : Loc(L"Off");
-        D2D1_RECT_F statusRect = D2D1::RectF(rect.right - 44.0f, cy - 9.0f, rect.right - 14.0f, cy + 11.0f);
-        if (isOn) {
-            textBrush_->SetOpacity(0.95f);
-            target_->DrawTextW(status.c_str(), static_cast<UINT32>(status.size()), textFormat_.Get(),
-                               statusRect, textBrush_.Get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
-        } else {
-            mutedBrush_->SetOpacity(0.75f);
-            target_->DrawTextW(status.c_str(), static_cast<UINT32>(status.size()), textFormat_.Get(),
-                               statusRect, mutedBrush_.Get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
-        }
-
-        const double now = NowSeconds();
-        const float ttl = 3.0f;
-        const float remaining = Clamp(static_cast<float>(state.doNotDisturb.expiresAt - now), 0.0f, ttl);
-        const float progress = remaining / ttl;
-        DrawCountdownProgress(tx, rect.right - 14.0f, rect.bottom - 4.0f, progress);
-        mutedBrush_->SetOpacity(0.58f);
-        textBrush_->SetOpacity(0.90f);
-    }
-
     void DrawBluetoothCategoryIcon(D2D1_RECT_F badge, BluetoothDeviceCategory category) {
         const wchar_t* glyph = L"\uE702";
         switch (category) {
@@ -20931,6 +20761,7 @@ void DrawBattery(const SharedState& state, D2D1_RECT_F rect) {
     int          tabCount_ = 0;
     bool         tabInit_ = false;      // false = next draw snaps to the selected tab
     bool         tabAnimating_ = false;
+    int          tabLastDesiredTab_ = -1;
     float        tabPos_ = 0.0f;        // continuous position the spring moves
     float        tabTarget_ = 0.0f;
     float        tabVel_ = 0.0f;
@@ -20980,8 +20811,7 @@ Activity ActivityForKind(IslandKind kind, const Settings& settings, const Shared
         case IslandKind::Device:
         case IslandKind::Bluetooth:
         case IslandKind::Timer:
-        case IslandKind::DoNotDisturb:
-            // Unified ultra-compact dimensions for all transient status pills (Volume, Brightness, DND, Caps, BT, Device, Battery, Timer)
+            // Unified ultra-compact dimensions for all transient status pills (Volume, Brightness, Caps, BT, Device, Battery, Timer)
             activity.width = 230.0f;
             activity.height = 38.0f;
             break;
@@ -21020,10 +20850,6 @@ std::vector<IslandKind> ChooseActivities(const SharedState& state, const Setting
     if (settings.bluetoothIndicator && state.bluetoothDevice.active &&
         now < state.bluetoothDevice.expiresAt) {
         activities.push_back(IslandKind::Bluetooth);
-    }
-    if (settings.doNotDisturbIndicator && state.doNotDisturb.active &&
-        now < state.doNotDisturb.expiresAt) {
-        activities.push_back(IslandKind::DoNotDisturb);
     }
     if (settings.volume && state.volume.active && now < state.volume.expiresAt) {
         activities.push_back(IslandKind::Volume);
@@ -21819,20 +21645,22 @@ void LoadFileTray() {
         return;
     }
 
-    std::lock_guard lock(g_stateMutex);
-    auto& items = g_state.fileTrayItems;
-    // Saved items are older than anything dropped since startup, so they go in front.
-    items.insert(items.begin(), std::make_move_iterator(loaded.begin()),
-                 std::make_move_iterator(loaded.end()));
-    while (items.size() > static_cast<size_t>(maxItems)) {
-        auto it = std::find_if(items.begin(), items.end(), [](const FileTrayItem& x) { return !x.isPinned; });
-        if (it != items.end()) {
-            items.erase(it);
-        } else {
-            break;
+    {
+        std::lock_guard lock(g_stateMutex);
+        auto& items = g_state.fileTrayItems;
+        // Saved items are older than anything dropped since startup, so they go in front.
+        items.insert(items.begin(), std::make_move_iterator(loaded.begin()),
+                     std::make_move_iterator(loaded.end()));
+        while (items.size() > static_cast<size_t>(maxItems)) {
+            auto it = std::find_if(items.begin(), items.end(), [](const FileTrayItem& x) { return !x.isPinned; });
+            if (it != items.end()) {
+                items.erase(it);
+            } else {
+                break;
+            }
         }
+        Wh_Log(L"File Tray: restored %zu item(s).", items.size());
     }
-    Wh_Log(L"File Tray: restored %zu item(s).", items.size());
     PruneExpiredFileTrayItems();
 }
 
@@ -22047,14 +21875,15 @@ void CopyTextToClipboard(HWND hwnd, const std::wstring& text) {
     CloseClipboard();
 }
 
-bool AddImagePixelsToFileTray(const BitmapPixels& fullPixels) {
-    if (fullPixels.width == 0 || fullPixels.height == 0 || fullPixels.bgra.empty()) {
-        return false;
-    }
-
+void AddImageToFileTrayFromClipboard(HWND hwnd) {
     std::wstring imgDir;
     if (!FileTrayStore::ResolveImageDir(&imgDir)) {
-        return false;
+        return;
+    }
+
+    BitmapPixels fullPixels;
+    if (!ReadClipboardImagePixels(hwnd, &fullPixels, 2560) || fullPixels.width == 0 || fullPixels.height == 0 || fullPixels.bgra.empty()) {
+        return;
     }
 
     wchar_t fileName[128];
@@ -22064,13 +21893,13 @@ bool AddImagePixelsToFileTray(const BitmapPixels& fullPixels) {
     std::wstring filePath = imgDir + L"\\" + fileName;
 
     if (!SaveBitmapPixelsToPng(fullPixels, filePath)) {
-        return false;
+        return;
     }
 
     BitmapPixels thumb;
     if (!LoadImagePixelsFromPngFile(filePath, &thumb, 48)) {
         DeleteFileW(filePath.c_str());
-        return false;
+        return;
     }
 
     // Check duplicate: if identical to current top item, avoid duplicate save
@@ -22081,7 +21910,7 @@ bool AddImagePixelsToFileTray(const BitmapPixels& fullPixels) {
             if (last.isImage && last.icon && last.icon->bgra.size() == thumb.bgra.size() &&
                 memcmp(last.icon->bgra.data(), thumb.bgra.data(), thumb.bgra.size()) == 0) {
                 DeleteFileW(filePath.c_str());
-                return true;
+                return;
             }
         }
     }
@@ -22102,7 +21931,7 @@ bool AddImagePixelsToFileTray(const BitmapPixels& fullPixels) {
         item.sizeBytes = (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
     }
 
-    int maxItems = 20;
+    int maxItems = 10;
     {
         std::lock_guard lock(g_settingsMutex);
         maxItems = std::max(1, g_settings.fileTrayMaxItems);
@@ -22132,67 +21961,49 @@ bool AddImagePixelsToFileTray(const BitmapPixels& fullPixels) {
 
     PruneExpiredFileTrayItems();
     SaveFileTray();
-    return true;
-}
-
-void AddImageToFileTrayFromClipboard(HWND hwnd) {
-    BitmapPixels fullPixels;
-    if (ReadClipboardImagePixels(hwnd, &fullPixels, 2560)) {
-        AddImagePixelsToFileTray(fullPixels);
-    }
 }
 
 void AutoCaptureClipboardToFileTray(HWND hwnd) {
-    if (!OpenClipboardWithRetry(hwnd)) {
+    if (!OpenClipboard(hwnd)) {
         return;
     }
-
     const bool hasFiles = (GetClipboardData(CF_HDROP) != nullptr);
-    const bool hasBitmap = (GetClipboardData(CF_BITMAP) != nullptr || GetClipboardData(CF_DIB) != nullptr);
     const bool hasText = (GetClipboardData(CF_UNICODETEXT) != nullptr);
-
-    std::vector<std::wstring> paths;
-    BitmapPixels imgPixels;
-    std::wstring textContent;
-
-    if (hasFiles) {
-        HANDLE data = GetClipboardData(CF_HDROP);
-        if (data) {
-            HDROP drop = reinterpret_cast<HDROP>(data);
-            const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
-            for (UINT i = 0; i < count; ++i) {
-                const UINT len = DragQueryFileW(drop, i, nullptr, 0);
-                if (len > 0) {
-                    std::wstring path(len, L'\0');
-                    DragQueryFileW(drop, i, path.data(), len + 1);
-                    paths.push_back(std::move(path));
-                }
-            }
-        }
-    } else if (hasBitmap) {
-        // High priority for screenshots (Win+Shift+S) or browser image copy
-        ReadClipboardImagePixelsInternal(&imgPixels, 2560);
-    } else if (hasText) {
-        HANDLE data = GetClipboardData(CF_UNICODETEXT);
-        if (data) {
-            auto* locked = static_cast<const wchar_t*>(GlobalLock(data));
-            if (locked) {
-                textContent = locked;
-                GlobalUnlock(data);
-            }
-        }
-    }
-
+    const bool hasBitmap = (GetClipboardData(CF_BITMAP) != nullptr || GetClipboardData(CF_DIB) != nullptr);
     CloseClipboard();
 
-    if (!paths.empty()) {
-        AddPathsToFileTray(paths);
-    } else if (imgPixels.width > 0 && imgPixels.height > 0 && !imgPixels.bgra.empty()) {
-        AddImagePixelsToFileTray(imgPixels);
-    } else if (!textContent.empty()) {
-        AddTextToFileTray(textContent);
-        PruneExpiredFileTrayItems();
-        SaveFileTray();
+    if (hasFiles) {
+        std::vector<std::wstring> paths;
+        if (OpenClipboard(hwnd)) {
+            HANDLE data = GetClipboardData(CF_HDROP);
+            if (data) {
+                HDROP drop = reinterpret_cast<HDROP>(data);
+                const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
+                for (UINT i = 0; i < count; ++i) {
+                    const UINT len = DragQueryFileW(drop, i, nullptr, 0);
+                    if (len > 0) {
+                        std::wstring path(len, L'\0');
+                        DragQueryFileW(drop, i, path.data(), len + 1);
+                        paths.push_back(std::move(path));
+                    }
+                }
+            }
+            CloseClipboard();
+        }
+        if (!paths.empty()) {
+            AddPathsToFileTray(paths);
+        }
+    } else if (hasBitmap && !hasText) {
+        AddImageToFileTrayFromClipboard(hwnd);
+    } else if (hasText) {
+        std::wstring text = ReadClipboardText(hwnd);
+        if (!text.empty()) {
+            AddTextToFileTray(text);
+            PruneExpiredFileTrayItems();
+            SaveFileTray();
+        }
+    } else if (hasBitmap) {
+        AddImageToFileTrayFromClipboard(hwnd);
     }
 }
 
@@ -22396,21 +22207,13 @@ void ExecuteIslandQuickAction(const std::wstring& action, HWND hwnd) {
         SendMediaTransportCommand(1);
     } else if (action == L"mute_toggle") {
         ToggleEndpointMute();
-    } else if (action == L"open_filetray") {
-        const int tab = FileTrayTabIndex(GetSettingsCopy());
-        if (tab >= 0) g_idleTab = tab;
-        g_clickExpanded = true;
-        g_layoutDirty = true;
-        TriggerNudge();
     } else if (action == L"screenshot") {
-        INPUT inputs[6] = {};
-        inputs[0].type = INPUT_KEYBOARD; inputs[0].ki.wVk = VK_LWIN;
-        inputs[1].type = INPUT_KEYBOARD; inputs[1].ki.wVk = VK_SHIFT;
-        inputs[2].type = INPUT_KEYBOARD; inputs[2].ki.wVk = 'S';
-        inputs[3].type = INPUT_KEYBOARD; inputs[3].ki.wVk = 'S'; inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
-        inputs[4].type = INPUT_KEYBOARD; inputs[4].ki.wVk = VK_SHIFT; inputs[4].ki.dwFlags = KEYEVENTF_KEYUP;
-        inputs[5].type = INPUT_KEYBOARD; inputs[5].ki.wVk = VK_LWIN; inputs[5].ki.dwFlags = KEYEVENTF_KEYUP;
-        SendInput(6, inputs, sizeof(INPUT));
+        keybd_event(VK_LWIN, 0, 0, 0);
+        keybd_event(VK_SHIFT, 0, 0, 0);
+        keybd_event(static_cast<BYTE>('S'), 0, 0, 0);
+        keybd_event(static_cast<BYTE>('S'), 0, KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, 0);
     } else if (action == L"dismiss") {
         g_manuallyHidden = true;
         Wh_SetIntValue(L"ManuallyHidden", 1);
@@ -23054,21 +22857,18 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     return 0;
                 }
 
-                RECT clientRect;
-                GetClientRect(hwnd, &clientRect);
-                const float height = static_cast<float>(clientRect.bottom - clientRect.top);
-                const bool isIslandExpanded = (height > 60.0f) || g_clickExpanded.load() || g_pinnedExpanded.load();
-
                 int xPos = GET_X_LPARAM(lParam);
                 int yPos = GET_Y_LPARAM(lParam);
 
                 ULONGLONG now = GetTickCount64();
-                if (s_touchStartTime > 0 && (now - s_touchStartTime) < 550) {
+                if (s_touchStartTime > 0 && (now - s_touchStartTime) < 500) {
                     const int dx = xPos - s_touchStart.x;
                     const int dy = yPos - s_touchStart.y;
+                    const bool isIslandExpanded = g_clickExpanded.load() || g_pinnedExpanded.load();
 
                     if (!isIslandExpanded) {
-                        // Gesture on collapsed Dynamic Island: adjust volume or brightness
+                        // Gesture on collapsed Dynamic Island: lock to the selected axis/direction and
+                        // ignore the non-selected axes so the user can intentionally restrict it.
                         bool swipeEnabled = false;
                         std::wstring swipeDir;
                         {
@@ -23077,133 +22877,45 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                             swipeDir = g_settings.collapsedSwipeDirection;
                         }
                         if (swipeEnabled) {
-                            const bool isHorizOnly = (swipeDir.find(L"horizontal") != std::wstring::npos);
-                            const bool isVertOnly = (swipeDir.find(L"vertical") != std::wstring::npos);
-
-                            if (isHorizOnly) {
-                                // Strictly locked to horizontal: ignore vertical swipes
-                                if (abs(dx) >= 20 && abs(dx) > abs(dy) * 1.2f) {
-                                    int step = (dx > 0) ? 1 : -1;
-                                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
-                                    ApplyCollapsedSwipeStep(step);
+                            const bool horizDominant = (abs(dx) >= abs(dy));
+                            const int travel = horizDominant ? abs(dx) : abs(dy);
+                            if (travel >= 20) {
+                                if (!IsGestureAxisAllowed(swipeDir, horizDominant)) {
                                     s_touchStartTime = 0;
                                     return 0;
                                 }
-                            } else if (isVertOnly) {
-                                // Strictly locked to vertical: ignore horizontal swipes
-                                if (abs(dy) >= 20 && abs(dy) > abs(dx) * 1.2f) {
-                                    int step = (dy < 0) ? 1 : -1;
-                                    if (swipeDir.find(L"inverted") != std::wstring::npos) step = -step;
-                                    ApplyCollapsedSwipeStep(step);
-                                    s_touchStartTime = 0;
-                                    return 0;
-                                }
-                            } else {
-                                // Natural: allow both axes based on dominant travel
-                                const bool horizDominant = (abs(dx) >= abs(dy));
-                                const int travel = horizDominant ? abs(dx) : abs(dy);
-                                if (travel >= 20) {
-                                    int step = 0;
-                                    if (horizDominant) {
-                                        step = (dx > 0) ? 1 : -1;
-                                        if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
-                                            swipeDir.find(L"invert_both") != std::wstring::npos ||
-                                            swipeDir == L"horizontal_inverted") {
-                                            step = -step;
-                                        }
-                                    } else {
-                                        step = (dy < 0) ? 1 : -1;
-                                        if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
-                                            swipeDir.find(L"invert_both") != std::wstring::npos ||
-                                            swipeDir == L"vertical_inverted" ||
-                                            swipeDir == L"vertical_down_inc") {
-                                            step = -step;
-                                        }
-                                    }
-                                    ApplyCollapsedSwipeStep(step);
-                                    s_touchStartTime = 0;
-                                    return 0;
-                                }
+                                const int step = ResolveCollapsedSwipeStep(swipeDir, horizDominant, horizDominant ? dx : dy);
+                                ApplyCollapsedSwipeStep(step);
+                                s_touchStartTime = 0;
+                                return 0;
                             }
                         }
                     } else {
-                        // Gesture on expanded Dynamic Island: Switch tabs based on tabSwitchDirection
+                        // Gesture on expanded Dynamic Island: honor only the configured axis, and add a
+                        // short cooldown so individual tab switches stay controllable.
                         std::wstring tabDir;
                         {
                             std::lock_guard lock(g_settingsMutex);
                             tabDir = g_settings.tabSwitchDirection;
                         }
                         if (ActiveTabCount(GetSettingsCopy()) > 1) {
-                            const bool isHorizOnly = (tabDir.find(L"horizontal") != std::wstring::npos);
-                            const bool isVertOnly = (tabDir.find(L"vertical") != std::wstring::npos);
+                            const bool horizDominant = (abs(dx) >= abs(dy));
+                            const int travel = horizDominant ? abs(dx) : abs(dy);
                             const ULONGLONG elapsedPress = now - s_touchStartTime;
-
-                            // Debounce cooldown to prevent accidental rapid skips
-                            static ULONGLONG s_lastTabSwitchTime = 0;
-                            const bool canSwitchTab = (now - s_lastTabSwitchTime >= 240);
-
-                            if (canSwitchTab && elapsedPress >= 40) {
-                                if (isHorizOnly) {
-                                    // Strictly locked to horizontal tab switching: ignore vertical swipes
-                                    // Requires at least 45px travel with dominant horizontal direction
-                                    if (abs(dx) >= 45 && abs(dx) > abs(dy) * 1.2f) {
-                                        s_lastTabSwitchTime = now;
-                                        int step = (dx < 0) ? 1 : -1;  // Drag Left = Next (+1), Drag Right = Prev (-1)
-                                        if (tabDir.find(L"inverted") != std::wstring::npos ||
-                                            tabDir == L"horizontal_inverted") {
-                                            step = -step;
-                                        }
-                                        g_activeTabTransitionAxis.store(0);  // animate horizontally
-                                        StepIdleTab(step);
-                                        s_touchStartTime = 0;
-                                        return 0;
-                                    }
-                                } else if (isVertOnly) {
-                                    // Strictly locked to vertical tab switching: ignore horizontal swipes
-                                    // Requires at least 45px travel with dominant vertical direction
-                                    if (abs(dy) >= 45 && abs(dy) > abs(dx) * 1.2f) {
-                                        s_lastTabSwitchTime = now;
-                                        int step = (dy < 0) ? 1 : -1;  // Drag Up = Next (+1), Drag Down = Prev (-1)
-                                        if (tabDir.find(L"inverted") != std::wstring::npos ||
-                                            tabDir == L"vertical_inverted" ||
-                                            tabDir == L"vertical_down") {
-                                            step = -step;
-                                        }
-                                        g_activeTabTransitionAxis.store(1);  // animate vertically
-                                        StepIdleTab(step);
-                                        s_touchStartTime = 0;
-                                        return 0;
-                                    }
-                                } else {
-                                    // Auto: whichever axis has dominant travel >= 45px
-                                    const bool horizDominant = (abs(dx) >= abs(dy));
-                                    const int travel = horizDominant ? abs(dx) : abs(dy);
-                                    if (travel >= 45) {
-                                        s_lastTabSwitchTime = now;
-                                        int step = 0;
-                                        if (horizDominant) {
-                                            step = (dx < 0) ? 1 : -1;
-                                            if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
-                                                tabDir.find(L"invert_swipe") != std::wstring::npos ||
-                                                tabDir == L"horizontal_inverted") {
-                                                step = -step;
-                                            }
-                                            g_activeTabTransitionAxis.store(0);
-                                        } else {
-                                            step = (dy < 0) ? 1 : -1;
-                                            if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
-                                                tabDir.find(L"invert_swipe") != std::wstring::npos ||
-                                                tabDir == L"vertical_inverted" ||
-                                                tabDir == L"vertical_down") {
-                                                step = -step;
-                                            }
-                                            g_activeTabTransitionAxis.store(1);
-                                        }
-                                        StepIdleTab(step);
-                                        s_touchStartTime = 0;
-                                        return 0;
-                                    }
+                            if (travel >= 28 && elapsedPress >= 40) {
+                                if (!IsGestureAxisAllowed(tabDir, horizDominant)) {
+                                    s_touchStartTime = 0;
+                                    return 0;
                                 }
+                                const int step = ResolveTabStep(tabDir, horizDominant, horizDominant ? dx : dy);
+                                if (horizDominant) {
+                                    g_activeTabTransitionAxis.store(0);  // animate horizontally
+                                } else {
+                                    g_activeTabTransitionAxis.store(1);  // animate vertically
+                                }
+                                StepIdleTab(step);
+                                s_touchStartTime = 0;
+                                return 0;
                             }
                         }
                     }
@@ -23260,6 +22972,10 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                         return 0; // consumed click to expand
                     }
                 }
+
+                RECT clientRect;
+                GetClientRect(hwnd, &clientRect);
+                const float height = static_cast<float>(clientRect.bottom - clientRect.top);
 
                 const int currentTab = NormalizedTabIndex(g_settings);
 
@@ -23432,13 +23148,20 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 return 0;
             }
 
-            // If the island was pinned expanded, a double click unpins/collapses it back
+            const bool expanded = g_clickExpanded.load(std::memory_order_relaxed) ||
+                                  g_pinnedExpanded.load(std::memory_order_relaxed);
+
+            // If the island was pinned expanded, a double click unpins/collapses it back.
+            // For every other expanded state, the collapsed quick action must not fire.
             if (g_pinnedExpanded.load()) {
                 g_pinnedExpanded.store(false);
                 Wh_SetIntValue(L"PinnedExpanded", 0);
                 g_clickExpanded = false;
                 g_layoutDirty = true;
                 TriggerNudge();
+                return 0;
+            }
+            if (expanded) {
                 return 0;
             }
 
@@ -23469,9 +23192,7 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         }
 
         case WM_MBUTTONUP: {
-            RECT clientRect;
-            GetClientRect(hwnd, &clientRect);
-            const bool isExpanded = (clientRect.bottom - clientRect.top > 60) || g_clickExpanded || g_pinnedExpanded.load();
+            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
                 std::wstring action;
                 {
@@ -23490,9 +23211,7 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
             if (delta == 0) return 0;
 
-            RECT clientRect;
-            GetClientRect(hwnd, &clientRect);
-            const bool isExpanded = (clientRect.bottom - clientRect.top > 60) || g_clickExpanded || g_pinnedExpanded.load();
+            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
                 bool swipeEnabled = false;
                 std::wstring swipeDir;
@@ -23501,11 +23220,14 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     swipeEnabled = g_settings.collapsedSwipeEnabled;
                     swipeDir = g_settings.collapsedSwipeDirection;
                 }
-                // If collapsed swipe is strictly locked to horizontal, do not trigger from vertical mouse wheel
-                if (swipeEnabled && swipeDir.find(L"horizontal") == std::wstring::npos) {
-                    // Wheel UP = Tăng (+1), Wheel DOWN = Giảm (-1)
+                if (swipeEnabled) {
+                    if (!IsGestureAxisAllowed(swipeDir, false)) {
+                        return 0;
+                    }
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir.find(L"inverted") != std::wstring::npos ||
+                    if (swipeDir.find(L"invert_vertical") != std::wstring::npos ||
+                        swipeDir.find(L"invert_both") != std::wstring::npos ||
+                        swipeDir == L"vertical_inverted" ||
                         swipeDir == L"vertical_down_inc") {
                         step = -step;
                     }
@@ -23514,29 +23236,10 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 }
             }
 
-            // Khi mở rộng: Cuộn chuột để chuyển tab
-            static int s_wheelAccum = 0;
-            static ULONGLONG s_lastWheelEvent = 0;
             static ULONGLONG s_lastWheelStep = 0;
-
             const ULONGLONG wheelNow = GetTickCount64();
-
-            // New gesture (pause, or direction change): forget the leftover.
-            if (wheelNow - s_lastWheelEvent > 220 ||
-                (s_wheelAccum != 0 && ((delta > 0) != (s_wheelAccum > 0)))) {
-                s_wheelAccum = 0;
-            }
-            s_lastWheelEvent = wheelNow;
-            s_wheelAccum += delta;
-
-            if (abs(s_wheelAccum) < WHEEL_DELTA) return 0;
-
-            // Rate limit so a free-spinning wheel or touchpad inertia can't race
-            // through every tab. At most one notch is held pending, never a backlog.
-            const bool precise = abs(delta) < WHEEL_DELTA;
-            const ULONGLONG cooldown = precise ? 200 : 85;
-            if (wheelNow - s_lastWheelStep < cooldown) {
-                s_wheelAccum = s_wheelAccum > 0 ? WHEEL_DELTA : -WHEEL_DELTA;
+            const int stepDelayMs = ClampInt(GetSettingsCopy().tabSwitchDelayMs, 60, 1000);
+            if (wheelNow - s_lastWheelStep < static_cast<ULONGLONG>(stepDelayMs)) {
                 return 0;
             }
             s_lastWheelStep = wheelNow;
@@ -23546,19 +23249,17 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 std::lock_guard lock(g_settingsMutex);
                 tabDir = g_settings.tabSwitchDirection;
             }
-            if (tabDir.find(L"horizontal") != std::wstring::npos) {
-                g_activeTabTransitionAxis.store(0);  // animate horizontally to match tabSwitchDirection
-            } else {
-                g_activeTabTransitionAxis.store(1);  // animate vertically
+            if (!IsGestureAxisAllowed(tabDir, false)) {
+                return 0;
             }
-            // Natural wheel: Cuộn XUỐNG (s_wheelAccum < 0) = Kế tiếp (+1), Cuộn LÊN (s_wheelAccum > 0) = Trước (-1)
-            int tabStep = (s_wheelAccum < 0) ? 1 : -1;
-            if (tabDir.find(L"inverted") != std::wstring::npos ||
+            g_activeTabTransitionAxis.store(1);
+            int tabStep = (delta < 0) ? 1 : -1;
+            if (tabDir.find(L"invert_vertical") != std::wstring::npos ||
+                tabDir.find(L"invert_swipe") != std::wstring::npos ||
                 tabDir == L"vertical_down" || tabDir == L"horizontal_left") {
                 tabStep = -tabStep;
             }
             StepIdleTab(tabStep);
-            s_wheelAccum = 0;
             return 0;
         }
 
@@ -23566,9 +23267,7 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
             if (delta == 0) return 0;
 
-            RECT clientRect;
-            GetClientRect(hwnd, &clientRect);
-            const bool isExpanded = (clientRect.bottom - clientRect.top > 60) || g_clickExpanded || g_pinnedExpanded.load();
+            const bool isExpanded = g_clickExpanded || g_pinnedExpanded.load();
             if (!isExpanded) {
                 bool swipeEnabled = false;
                 std::wstring swipeDir;
@@ -23577,11 +23276,13 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     swipeEnabled = g_settings.collapsedSwipeEnabled;
                     swipeDir = g_settings.collapsedSwipeDirection;
                 }
-                // If collapsed swipe is strictly locked to vertical, do not trigger from horizontal tilt wheel
-                if (swipeEnabled && swipeDir.find(L"vertical") == std::wstring::npos) {
-                    // Tilt RIGHT = Tăng (+1), Tilt LEFT = Giảm (-1)
+                if (swipeEnabled) {
+                    if (!IsGestureAxisAllowed(swipeDir, true)) {
+                        return 0;
+                    }
                     int step = (delta > 0) ? 1 : -1;
-                    if (swipeDir.find(L"inverted") != std::wstring::npos ||
+                    if (swipeDir.find(L"invert_horizontal") != std::wstring::npos ||
+                        swipeDir.find(L"invert_both") != std::wstring::npos ||
                         swipeDir == L"horizontal_inverted") {
                         step = -step;
                     }
@@ -23589,15 +23290,26 @@ LRESULT CALLBACK OverlayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                     return 0;
                 }
             } else {
+                static ULONGLONG s_lastHwWheelStep = 0;
+                const ULONGLONG wheelNow = GetTickCount64();
+                const int stepDelayMs = ClampInt(GetSettingsCopy().tabSwitchDelayMs, 60, 1000);
+                if (wheelNow - s_lastHwWheelStep < static_cast<ULONGLONG>(stepDelayMs)) {
+                    return 0;
+                }
+                s_lastHwWheelStep = wheelNow;
+
                 std::wstring tabDir;
                 {
                     std::lock_guard lock(g_settingsMutex);
                     tabDir = g_settings.tabSwitchDirection;
                 }
-                g_activeTabTransitionAxis.store(0);  // horizontal animation
-                // Tilt RIGHT = Kế tiếp (+1), Tilt LEFT = Trước (-1)
+                if (!IsGestureAxisAllowed(tabDir, true)) {
+                    return 0;
+                }
+                g_activeTabTransitionAxis.store(0);
                 int tabStep = (delta > 0) ? 1 : -1;
-                if (tabDir.find(L"inverted") != std::wstring::npos ||
+                if (tabDir.find(L"invert_horizontal") != std::wstring::npos ||
+                    tabDir.find(L"invert_swipe") != std::wstring::npos ||
                     tabDir == L"horizontal_left") {
                     tabStep = -tabStep;
                 }
@@ -23715,7 +23427,6 @@ DWORD WINAPI RenderThreadProc(void*) {
     if (pChangeWindowMessageFilterEx) {
         if (g_shellHookMessage) pChangeWindowMessageFilterEx(hwnd, g_shellHookMessage, 1 /*MSGFLT_ALLOW*/, nullptr);
         if (g_taskbarCreatedMessage) pChangeWindowMessageFilterEx(hwnd, g_taskbarCreatedMessage, 1 /*MSGFLT_ALLOW*/, nullptr);
-        pChangeWindowMessageFilterEx(hwnd, WM_CLIPBOARDUPDATE, 1 /*MSGFLT_ALLOW*/, nullptr);
     } else {
         using ChangeWindowMessageFilter_t = BOOL(WINAPI*)(UINT, DWORD);
         static auto pChangeWindowMessageFilter = reinterpret_cast<ChangeWindowMessageFilter_t>(
@@ -23723,10 +23434,8 @@ DWORD WINAPI RenderThreadProc(void*) {
         if (pChangeWindowMessageFilter) {
             if (g_shellHookMessage) pChangeWindowMessageFilter(g_shellHookMessage, 1 /*MSGFLT_ADD*/);
             if (g_taskbarCreatedMessage) pChangeWindowMessageFilter(g_taskbarCreatedMessage, 1 /*MSGFLT_ADD*/);
-            pChangeWindowMessageFilter(WM_CLIPBOARDUPDATE, 1 /*MSGFLT_ADD*/);
         }
     }
-    AddClipboardFormatListener(hwnd);
     EnableBlurBehind(hwnd);
     ApplyBackdropMaterial(hwnd);
     ShowWindow(hwnd, SW_SHOWNOACTIVATE);
@@ -24139,7 +23848,6 @@ DWORD WINAPI RenderThreadProc(void*) {
                                  primary.kind == IslandKind::CapsLock ||
                                  primary.kind == IslandKind::Device ||
                                  primary.kind == IslandKind::Bluetooth ||
-                                 primary.kind == IslandKind::DoNotDisturb ||
                                  recentTrackChange);
 
         const bool inMouseTrap = g_settings.unhideOnHover && IsCursorInIslandMouseTrap(cursor);
@@ -24512,15 +24220,14 @@ DWORD WINAPI RenderThreadProc(void*) {
         // Transient alert pills. All expire within a few seconds, so treating them as
         // continuous cannot run away.
         //
-        // Device, Bluetooth and Do Not Disturb are here only when the countdown bar
+        // Device and Bluetooth are here only when the countdown bar
         // is switched on, since that bar is the one thing on them that moves.
         const auto isTransientPill = [](IslandKind kind) {
             return kind == IslandKind::BatteryLow || kind == IslandKind::Clipboard ||
                    kind == IslandKind::Notification;
         };
         const auto hasCountdownBar = [](IslandKind kind) {
-            return kind == IslandKind::Device || kind == IslandKind::Bluetooth ||
-                   kind == IslandKind::DoNotDisturb;
+            return kind == IslandKind::Device || kind == IslandKind::Bluetooth;
         };
         const bool countdownBarsOn = g_settings.statusCountdownProgress;
 
