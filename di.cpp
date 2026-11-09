@@ -244,8 +244,11 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
     $name: Khay lưu tệp kéo thả (File Tray)
     $description: Thêm thẻ Khay tệp vào vòng lặp cuộn chuột. Kéo bất kỳ tệp nào thả vào Island để lưu tạm, nhấp chuột để mở tệp.
   - FileTrayAutoCapture: true
-    $name: Tự động lưu khi sao chép (Ctrl+C)
-    $description: Tự động bắt và thêm tệp hoặc văn bản vào Khay mỗi khi nhấn Ctrl+C.
+    $name: Tự động lưu Clipboard vào Khay (Ctrl+C / Win+Shift+S)
+    $description: Tự động bắt và thêm văn bản sao chép, ảnh chụp màn hình hoặc tệp vào Khay tệp (hoạt động như Clipboard History Windows + V).
+  - FileTrayMaxItems: 20
+    $name: Số lượng mục tối đa trong Khay tệp
+    $description: Giới hạn số lượng mục lưu trữ trong Khay tệp (từ 1 đến 50 mục).
   - FileTrayExpireHours: '0'
     $name: Thời hạn lưu trữ Khay tệp & Bộ nhớ tạm
     $description: Tự động dọn dẹp các tệp và đoạn sao chép sau thời gian quy định (các mục được Ghim sẽ không bao giờ bị xóa).
@@ -3126,7 +3129,8 @@ void LoadSettings() {
     // ── File tray (#33) ──────────────────────────────────────────────────────
     next.fileTrayModule = Wh_GetIntSetting(L"Modules.FileTrayModule") != 0;
     next.fileTrayAutoCapture = Wh_GetIntSetting(L"Modules.FileTrayAutoCapture") != 0;
-    next.fileTrayMaxItems = ClampInt(Wh_GetIntSetting(L"Modules.FileTrayMaxItems"), 1, 25);
+    const int trayMax = Wh_GetIntSetting(L"Modules.FileTrayMaxItems");
+    next.fileTrayMaxItems = (trayMax > 0) ? ClampInt(trayMax, 1, 50) : 20;
     next.fileTrayPersist = Wh_GetIntSetting(L"Modules.FileTrayPersist") != 0;
     next.fileTrayExpireHours = ClampInt(Wh_GetIntSetting(L"Modules.FileTrayExpireHours"), 0, 720);
 
@@ -5076,23 +5080,29 @@ std::vector<uint8_t> ReadWinRtStreamBytes(
         return bytes;
     }
 
-    auto stream = reference.OpenReadAsync().get();
-    if (!stream) {
+    try {
+        auto stream = reference.OpenReadAsync().get();
+        if (!stream) {
+            return bytes;
+        }
+
+        const uint64_t size64 = stream.Size();
+        if (size64 == 0 || size64 > 8 * 1024 * 1024) {
+            return bytes;
+        }
+
+        const uint32_t size = static_cast<uint32_t>(size64);
+        winrt::Windows::Storage::Streams::DataReader reader(stream.GetInputStreamAt(0));
+        reader.LoadAsync(size).get();
+        bytes.resize(size);
+        reader.ReadBytes(winrt::array_view<uint8_t>(bytes.data(), bytes.data() + bytes.size()));
+        return bytes;
+    } catch (...) {
         return bytes;
     }
-
-    const uint64_t size64 = stream.Size();
-    if (size64 == 0 || size64 > 8 * 1024 * 1024) {
-        return bytes;
-    }
-
-    const uint32_t size = static_cast<uint32_t>(size64);
-    winrt::Windows::Storage::Streams::DataReader reader(stream.GetInputStreamAt(0));
-    reader.LoadAsync(size).get();
-    bytes.resize(size);
-    reader.ReadBytes(winrt::array_view<uint8_t>(bytes.data(), bytes.data() + bytes.size()));
-    return bytes;
 }
+
+void FetchOnlineArtworkAsync(std::wstring title, std::wstring artist);
 
 void TriggerNudge() {
     // If we're parked (auto-hidden), any real event must wake us regardless
@@ -5687,6 +5697,21 @@ DWORD WINAPI MediaThreadProc(void*) {
                         next.artGeneration = prevArtGeneration;
                         next.artChangedAt = prevArtChangedAt;
                     }
+
+                    // Check if online artwork fetch has populated artwork for this track in g_state:
+                    if (!next.art && next.playing && !next.title.empty()) {
+                        std::lock_guard lock(g_stateMutex);
+                        if (g_state.media.art && g_state.media.title == next.title && g_state.media.playing) {
+                            next.art = g_state.media.art;
+                            next.artGeneration = g_state.media.artGeneration;
+                            next.artChangedAt = g_state.media.artChangedAt;
+                        }
+                    }
+
+                    // If artwork is still absent, launch asynchronous high-res online artwork fetch:
+                    if (!next.art && next.playing && !next.title.empty()) {
+                        FetchOnlineArtworkAsync(next.title, next.artist);
+                    }
                 }
             }
         } catch (...) {
@@ -5756,9 +5781,8 @@ DWORD WINAPI MediaThreadProc(void*) {
                        next.artist.c_str(), next.title.c_str());
             }
 
-            if (g_state.media.art &&
-                next.title == g_state.media.title && next.artist == g_state.media.artist &&
-                next.positionTicks >= g_state.media.positionTicks) {
+            if (!next.art && g_state.media.art &&
+                next.title == g_state.media.title && next.artist == g_state.media.artist) {
                 next.art = g_state.media.art;
                 next.artGeneration = g_state.media.artGeneration;
                 next.artChangedAt = g_state.media.artChangedAt;
@@ -9346,6 +9370,216 @@ bool FetchLyricsFromLrclib(const std::wstring& title, const std::wstring& artist
     return pick->found;
 }
 
+namespace ArtworkCache {
+    inline bool ResolveArtCacheDir(std::wstring* outDir) {
+        if (!outDir) return false;
+        wchar_t localAppData[MAX_PATH];
+        if (FAILED(SHGetFolderPathW(nullptr, CSIDL_LOCAL_APPDATA, nullptr, SHGFP_TYPE_CURRENT, localAppData))) {
+            return false;
+        }
+        *outDir = std::wstring(localAppData) + L"\\Windhawk\\DynamicIsland\\art_cache";
+        SHCreateDirectoryExW(nullptr, outDir->c_str(), nullptr);
+        return true;
+    }
+
+    inline std::wstring CacheKeyForTrack(const std::wstring& title, const std::wstring& artist) {
+        std::wstring combined = ToLowerCopy(title) + L"_" + ToLowerCopy(artist);
+        std::wstring safe;
+        for (wchar_t ch : combined) {
+            if ((ch >= L'a' && ch <= L'z') || (ch >= L'0' && ch <= L'9') || (ch >= 0x00C0 && ch <= 0x1EF9)) {
+                safe.push_back(ch);
+            } else if (ch == L' ' || ch == L'-' || ch == L'_') {
+                if (safe.empty() || safe.back() != L'_') safe.push_back(L'_');
+            }
+        }
+        if (safe.empty()) safe = L"unknown";
+        if (safe.size() > 60) safe.resize(60);
+        return safe;
+    }
+}
+
+void FetchOnlineArtworkAsync(std::wstring title, std::wstring artist) {
+    if (title.empty()) return;
+
+    static std::mutex s_artFetchMutex;
+    static std::wstring s_inFlightArtKey;
+    static std::wstring s_lastFailedArtKey;
+    static double s_lastFailedTime = 0.0;
+
+    std::wstring cleanTitle = CleanLyricsTitle(title);
+    std::wstring cleanArtist = PrimaryLyricsArtist(artist);
+    if (cleanTitle.empty()) cleanTitle = title;
+
+    const std::wstring trackKey = cleanTitle + L"|" + cleanArtist;
+
+    {
+        std::lock_guard lock(s_artFetchMutex);
+        if (s_inFlightArtKey == trackKey) {
+            return;
+        }
+        if (s_lastFailedArtKey == trackKey && (NowSeconds() - s_lastFailedTime) < 30.0) {
+            return;
+        }
+        s_inFlightArtKey = trackKey;
+    }
+
+    std::thread([cleanTitle, cleanArtist, title, artist, trackKey]() {
+        HRESULT hrCo = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+        auto finish = [&](bool success) {
+            {
+                std::lock_guard lock(s_artFetchMutex);
+                if (s_inFlightArtKey == trackKey) {
+                    s_inFlightArtKey.clear();
+                }
+                if (!success) {
+                    s_lastFailedArtKey = trackKey;
+                    s_lastFailedTime = NowSeconds();
+                }
+            }
+            if (SUCCEEDED(hrCo)) {
+                CoUninitialize();
+            }
+        };
+
+        // 1. Check disk cache first:
+        std::wstring cacheDir;
+        if (ArtworkCache::ResolveArtCacheDir(&cacheDir)) {
+            std::wstring cacheFile = cacheDir + L"\\" + ArtworkCache::CacheKeyForTrack(cleanTitle, cleanArtist) + L".jpg";
+            HANDLE hFile = CreateFileW(cacheFile.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (hFile != INVALID_HANDLE_VALUE) {
+                DWORD size = GetFileSize(hFile, nullptr);
+                if (size > 0 && size < 8 * 1024 * 1024) {
+                    std::vector<uint8_t> bytes(size);
+                    DWORD read = 0;
+                    if (ReadFile(hFile, bytes.data(), size, &read, nullptr) && read == size) {
+                        CloseHandle(hFile);
+                        BitmapPixels decoded;
+                        if (DecodeImageBytesToPixels(bytes, &decoded)) {
+                            std::lock_guard lock(g_stateMutex);
+                            if (g_state.media.playing && g_state.media.title == title && !g_state.media.art) {
+                                g_state.media.art = PixelsRef(std::move(decoded));
+                                g_state.media.artGeneration = g_state.media.art->generation;
+                                g_state.media.artChangedAt = NowSeconds();
+                                g_layoutDirty = true;
+                                TriggerNudge();
+                                if (g_mediaRefreshEvent) SetEvent(g_mediaRefreshEvent);
+                            }
+                            finish(true);
+                            return;
+                        }
+                    } else {
+                        CloseHandle(hFile);
+                    }
+                } else {
+                    CloseHandle(hFile);
+                }
+            }
+        }
+
+        // 2. Query iTunes Search API:
+        std::vector<std::wstring> queries;
+        if (!cleanArtist.empty()) {
+            queries.push_back(cleanTitle + L" " + cleanArtist);
+        }
+        queries.push_back(cleanTitle);
+
+        std::string foundImageUrl;
+
+        for (const auto& q : queries) {
+            std::wstring encQ = AsciiToWide(UrlEncodeUtf8(q));
+            std::wstring path = L"/search?term=" + encQ + L"&entity=song&limit=1";
+            HttpResult res = HttpGetEx(L"itunes.apple.com", path.c_str(), true, L"Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+            if (res.ok && res.status == 200 && !res.body.empty()) {
+                const std::string key = "\"artworkUrl100\"";
+                size_t pos = res.body.find(key);
+                if (pos != std::string::npos) {
+                    size_t colon = res.body.find(':', pos + key.size());
+                    if (colon != std::string::npos) {
+                        size_t q1 = res.body.find('"', colon + 1);
+                        if (q1 != std::string::npos) {
+                            size_t q2 = res.body.find('"', q1 + 1);
+                            if (q2 != std::string::npos) {
+                                std::string rawUrl = res.body.substr(q1 + 1, q2 - q1 - 1);
+                                std::string cleanUrl;
+                                for (size_t i = 0; i < rawUrl.size(); ++i) {
+                                    if (rawUrl[i] == '\\' && i + 1 < rawUrl.size() && rawUrl[i + 1] == '/') continue;
+                                    cleanUrl.push_back(rawUrl[i]);
+                                }
+                                const std::string thumb100 = "100x100bb";
+                                size_t szPos = cleanUrl.find(thumb100);
+                                if (szPos != std::string::npos) {
+                                    cleanUrl.replace(szPos, thumb100.size(), "600x600bb");
+                                }
+                                foundImageUrl = cleanUrl;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (foundImageUrl.empty()) {
+            finish(false);
+            return;
+        }
+
+        // 3. Download artwork image:
+        std::wstring host = L"is1-ssl.mzstatic.com";
+        std::wstring imgPath;
+        const std::string httpsPrefix = "https://";
+        if (foundImageUrl.rfind(httpsPrefix, 0) == 0) {
+            std::string noProto = foundImageUrl.substr(httpsPrefix.size());
+            size_t slash = noProto.find('/');
+            if (slash != std::string::npos) {
+                host = AsciiToWide(noProto.substr(0, slash));
+                imgPath = AsciiToWide(noProto.substr(slash));
+            }
+        }
+
+        if (imgPath.empty()) {
+            finish(false);
+            return;
+        }
+
+        HttpResult imgRes = HttpGetEx(host.c_str(), imgPath.c_str(), true, L"Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+        if (imgRes.ok && imgRes.status == 200 && !imgRes.body.empty()) {
+            std::vector<uint8_t> bytes(imgRes.body.begin(), imgRes.body.end());
+
+            // Save to disk cache:
+            if (!cacheDir.empty()) {
+                std::wstring cacheFile = cacheDir + L"\\" + ArtworkCache::CacheKeyForTrack(cleanTitle, cleanArtist) + L".jpg";
+                HANDLE hFile = CreateFileW(cacheFile.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+                if (hFile != INVALID_HANDLE_VALUE) {
+                    DWORD written = 0;
+                    WriteFile(hFile, bytes.data(), static_cast<DWORD>(bytes.size()), &written, nullptr);
+                    CloseHandle(hFile);
+                }
+            }
+
+            // Decode:
+            BitmapPixels decoded;
+            if (DecodeImageBytesToPixels(bytes, &decoded)) {
+                std::lock_guard lock(g_stateMutex);
+                if (g_state.media.playing && g_state.media.title == title && !g_state.media.art) {
+                    g_state.media.art = PixelsRef(std::move(decoded));
+                    g_state.media.artGeneration = g_state.media.art->generation;
+                    g_state.media.artChangedAt = NowSeconds();
+                    g_layoutDirty = true;
+                    TriggerNudge();
+                    if (g_mediaRefreshEvent) SetEvent(g_mediaRefreshEvent);
+                    Wh_Log(L"[MediaArt] Online artwork successfully retrieved for: %s - %s", cleanArtist.c_str(), cleanTitle.c_str());
+                }
+                finish(true);
+                return;
+            }
+        }
+
+        finish(false);
+    }).detach();
+}
+
 DWORD WINAPI LyricsThreadProc(void*) {
     auto waitLyrics = [](DWORD timeoutMs) -> bool {
         HANDLE events[2] = {g_stopEvent, g_lyricsRefreshEvent};
@@ -10437,9 +10671,17 @@ void UpdatePrivacyIndicators() {
 }
 
 
+bool OpenClipboardWithRetry(HWND hwnd, int maxRetries = 10, int delayMs = 25) {
+    for (int i = 0; i < maxRetries; ++i) {
+        if (OpenClipboard(hwnd)) return true;
+        Sleep(delayMs);
+    }
+    return false;
+}
+
 std::wstring ReadClipboardText(HWND hwnd) {
     std::wstring text;
-    if (!OpenClipboard(hwnd)) {
+    if (!OpenClipboardWithRetry(hwnd)) {
         return text;
     }
 
@@ -10456,25 +10698,17 @@ std::wstring ReadClipboardText(HWND hwnd) {
     return text;
 }
 
-// Decodes whatever bitmap is currently on the clipboard into a small BGRA
-// thumbnail, aspect-preserving and capped at maxDim on the longer side.
-// Requesting CF_BITMAP works regardless of which bitmap format the source
-// app actually placed on the clipboard (CF_DIB/CF_DIBV5) — Windows
-// synthesizes CF_BITMAP from those automatically.
-bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
-    if (!outPixels || !OpenClipboard(hwnd)) {
-        return false;
-    }
+// Decodes clipboard bitmap into a small BGRA thumbnail while the clipboard is ALREADY open.
+bool ReadClipboardImagePixelsInternal(BitmapPixels* outPixels, UINT maxDim) {
+    if (!outPixels) return false;
 
     HBITMAP sourceBitmap = static_cast<HBITMAP>(GetClipboardData(CF_BITMAP));
     if (!sourceBitmap) {
-        CloseClipboard();
         return false;
     }
 
     BITMAP bm = {};
     if (!GetObject(sourceBitmap, sizeof(bm), &bm) || bm.bmWidth <= 0 || bm.bmHeight <= 0) {
-        CloseClipboard();
         return false;
     }
 
@@ -10495,12 +10729,9 @@ bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
     if (!srcDc || !dstDc) {
         if (srcDc) DeleteDC(srcDc);
         if (dstDc) DeleteDC(dstDc);
-        CloseClipboard();
         return false;
     }
 
-    // Selecting the clipboard's own HBITMAP into a scratch DC to read from it
-    // is the MSDN-documented way to do this; we must not DeleteObject it.
     HGDIOBJ oldSrc = SelectObject(srcDc, sourceBitmap);
 
     BITMAPINFO bi = {};
@@ -10517,7 +10748,6 @@ bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
         SelectObject(srcDc, oldSrc);
         DeleteDC(srcDc);
         DeleteDC(dstDc);
-        CloseClipboard();
         return false;
     }
 
@@ -10547,8 +10777,18 @@ bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
     SelectObject(srcDc, oldSrc);
     DeleteDC(srcDc);
     DeleteDC(dstDc);
-    CloseClipboard();
     return true;
+}
+
+// Decodes whatever bitmap is currently on the clipboard into a small BGRA
+// thumbnail, aspect-preserving and capped at maxDim on the longer side.
+bool ReadClipboardImagePixels(HWND hwnd, BitmapPixels* outPixels, UINT maxDim) {
+    if (!outPixels || !OpenClipboardWithRetry(hwnd)) {
+        return false;
+    }
+    const bool ok = ReadClipboardImagePixelsInternal(outPixels, maxDim);
+    CloseClipboard();
+    return ok;
 }
 
 bool IsLikelyToastWindow(HWND hwnd, const wchar_t* className, const wchar_t* title) {
@@ -21807,15 +22047,14 @@ void CopyTextToClipboard(HWND hwnd, const std::wstring& text) {
     CloseClipboard();
 }
 
-void AddImageToFileTrayFromClipboard(HWND hwnd) {
-    std::wstring imgDir;
-    if (!FileTrayStore::ResolveImageDir(&imgDir)) {
-        return;
+bool AddImagePixelsToFileTray(const BitmapPixels& fullPixels) {
+    if (fullPixels.width == 0 || fullPixels.height == 0 || fullPixels.bgra.empty()) {
+        return false;
     }
 
-    BitmapPixels fullPixels;
-    if (!ReadClipboardImagePixels(hwnd, &fullPixels, 2560) || fullPixels.width == 0 || fullPixels.height == 0 || fullPixels.bgra.empty()) {
-        return;
+    std::wstring imgDir;
+    if (!FileTrayStore::ResolveImageDir(&imgDir)) {
+        return false;
     }
 
     wchar_t fileName[128];
@@ -21825,13 +22064,13 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
     std::wstring filePath = imgDir + L"\\" + fileName;
 
     if (!SaveBitmapPixelsToPng(fullPixels, filePath)) {
-        return;
+        return false;
     }
 
     BitmapPixels thumb;
     if (!LoadImagePixelsFromPngFile(filePath, &thumb, 48)) {
         DeleteFileW(filePath.c_str());
-        return;
+        return false;
     }
 
     // Check duplicate: if identical to current top item, avoid duplicate save
@@ -21842,7 +22081,7 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
             if (last.isImage && last.icon && last.icon->bgra.size() == thumb.bgra.size() &&
                 memcmp(last.icon->bgra.data(), thumb.bgra.data(), thumb.bgra.size()) == 0) {
                 DeleteFileW(filePath.c_str());
-                return;
+                return true;
             }
         }
     }
@@ -21863,7 +22102,7 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
         item.sizeBytes = (static_cast<uint64_t>(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
     }
 
-    int maxItems = 10;
+    int maxItems = 20;
     {
         std::lock_guard lock(g_settingsMutex);
         maxItems = std::max(1, g_settings.fileTrayMaxItems);
@@ -21893,49 +22132,67 @@ void AddImageToFileTrayFromClipboard(HWND hwnd) {
 
     PruneExpiredFileTrayItems();
     SaveFileTray();
+    return true;
+}
+
+void AddImageToFileTrayFromClipboard(HWND hwnd) {
+    BitmapPixels fullPixels;
+    if (ReadClipboardImagePixels(hwnd, &fullPixels, 2560)) {
+        AddImagePixelsToFileTray(fullPixels);
+    }
 }
 
 void AutoCaptureClipboardToFileTray(HWND hwnd) {
-    if (!OpenClipboard(hwnd)) {
+    if (!OpenClipboardWithRetry(hwnd)) {
         return;
     }
+
     const bool hasFiles = (GetClipboardData(CF_HDROP) != nullptr);
-    const bool hasText = (GetClipboardData(CF_UNICODETEXT) != nullptr);
     const bool hasBitmap = (GetClipboardData(CF_BITMAP) != nullptr || GetClipboardData(CF_DIB) != nullptr);
-    CloseClipboard();
+    const bool hasText = (GetClipboardData(CF_UNICODETEXT) != nullptr);
+
+    std::vector<std::wstring> paths;
+    BitmapPixels imgPixels;
+    std::wstring textContent;
 
     if (hasFiles) {
-        std::vector<std::wstring> paths;
-        if (OpenClipboard(hwnd)) {
-            HANDLE data = GetClipboardData(CF_HDROP);
-            if (data) {
-                HDROP drop = reinterpret_cast<HDROP>(data);
-                const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
-                for (UINT i = 0; i < count; ++i) {
-                    const UINT len = DragQueryFileW(drop, i, nullptr, 0);
-                    if (len > 0) {
-                        std::wstring path(len, L'\0');
-                        DragQueryFileW(drop, i, path.data(), len + 1);
-                        paths.push_back(std::move(path));
-                    }
+        HANDLE data = GetClipboardData(CF_HDROP);
+        if (data) {
+            HDROP drop = reinterpret_cast<HDROP>(data);
+            const UINT count = DragQueryFileW(drop, 0xFFFFFFFF, nullptr, 0);
+            for (UINT i = 0; i < count; ++i) {
+                const UINT len = DragQueryFileW(drop, i, nullptr, 0);
+                if (len > 0) {
+                    std::wstring path(len, L'\0');
+                    DragQueryFileW(drop, i, path.data(), len + 1);
+                    paths.push_back(std::move(path));
                 }
             }
-            CloseClipboard();
-        }
-        if (!paths.empty()) {
-            AddPathsToFileTray(paths);
-        }
-    } else if (hasBitmap && !hasText) {
-        AddImageToFileTrayFromClipboard(hwnd);
-    } else if (hasText) {
-        std::wstring text = ReadClipboardText(hwnd);
-        if (!text.empty()) {
-            AddTextToFileTray(text);
-            PruneExpiredFileTrayItems();
-            SaveFileTray();
         }
     } else if (hasBitmap) {
-        AddImageToFileTrayFromClipboard(hwnd);
+        // High priority for screenshots (Win+Shift+S) or browser image copy
+        ReadClipboardImagePixelsInternal(&imgPixels, 2560);
+    } else if (hasText) {
+        HANDLE data = GetClipboardData(CF_UNICODETEXT);
+        if (data) {
+            auto* locked = static_cast<const wchar_t*>(GlobalLock(data));
+            if (locked) {
+                textContent = locked;
+                GlobalUnlock(data);
+            }
+        }
+    }
+
+    CloseClipboard();
+
+    if (!paths.empty()) {
+        AddPathsToFileTray(paths);
+    } else if (imgPixels.width > 0 && imgPixels.height > 0 && !imgPixels.bgra.empty()) {
+        AddImagePixelsToFileTray(imgPixels);
+    } else if (!textContent.empty()) {
+        AddTextToFileTray(textContent);
+        PruneExpiredFileTrayItems();
+        SaveFileTray();
     }
 }
 
@@ -23458,6 +23715,7 @@ DWORD WINAPI RenderThreadProc(void*) {
     if (pChangeWindowMessageFilterEx) {
         if (g_shellHookMessage) pChangeWindowMessageFilterEx(hwnd, g_shellHookMessage, 1 /*MSGFLT_ALLOW*/, nullptr);
         if (g_taskbarCreatedMessage) pChangeWindowMessageFilterEx(hwnd, g_taskbarCreatedMessage, 1 /*MSGFLT_ALLOW*/, nullptr);
+        pChangeWindowMessageFilterEx(hwnd, WM_CLIPBOARDUPDATE, 1 /*MSGFLT_ALLOW*/, nullptr);
     } else {
         using ChangeWindowMessageFilter_t = BOOL(WINAPI*)(UINT, DWORD);
         static auto pChangeWindowMessageFilter = reinterpret_cast<ChangeWindowMessageFilter_t>(
@@ -23465,8 +23723,10 @@ DWORD WINAPI RenderThreadProc(void*) {
         if (pChangeWindowMessageFilter) {
             if (g_shellHookMessage) pChangeWindowMessageFilter(g_shellHookMessage, 1 /*MSGFLT_ADD*/);
             if (g_taskbarCreatedMessage) pChangeWindowMessageFilter(g_taskbarCreatedMessage, 1 /*MSGFLT_ADD*/);
+            pChangeWindowMessageFilter(WM_CLIPBOARDUPDATE, 1 /*MSGFLT_ADD*/);
         }
     }
+    AddClipboardFormatListener(hwnd);
     EnableBlurBehind(hwnd);
     ApplyBackdropMaterial(hwnd);
     ShowWindow(hwnd, SW_SHOWNOACTIVATE);
