@@ -4,6 +4,24 @@ Phiên bản Dynamic Island dành riêng cho Windows được cá nhân hóa và
 
 ---
 
+## 📸 Hình Ảnh Minh Họa
+
+<p align="center">
+  <img src="assets/media-collapsed.png" alt="Thanh viên thuốc thu nhỏ với sóng nhạc" width="460" />
+  <br />
+  <sub><i>Thanh thu nhỏ hiển thị ảnh bìa, tên bài tự cuộn marquee và sóng nhạc theo màu chủ đạo</i></sub>
+</p>
+
+| Trình phát Media Mở Rộng | Lời Bài Hát Karaoke Tức Thì |
+| :---: | :---: |
+| <img src="assets/media-expanded.png" alt="Tab Media mở rộng" width="420" /> | <img src="assets/media-lyrics-immersive.png" alt="Lời bài hát trên tab Media" width="420" /> |
+| **Lịch Dương & Âm Lịch Việt Nam** | **Thời Tiết Trực Quan** |
+| <img src="assets/tab-calendar.png" alt="Tab Lịch Âm Dương" width="420" /> | <img src="assets/tab-weather.png" alt="Tab Thời tiết" width="420" /> |
+| **Giám Sát Phần Cứng** | **Khay Tệp & Bộ Nhớ Tạm** |
+| <img src="assets/tab-hardware.png" alt="Tab Giám sát phần cứng" width="420" /> | <img src="assets/tab-filetray.png" alt="Tab Khay tệp" width="420" /> |
+
+---
+
 ## 🚀 Các Tính Năng & Mô-đun Nổi Bật
 
 ### 🎵 Trình phát Media & Lời bài hát siêu mượt
